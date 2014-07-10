@@ -1,7 +1,5 @@
-// $Id$
-
-#ifndef _SSE_IPP_WRAP_H_
-#define _SSE_IPP_WRAP_H_
+#ifndef _SIMD_SSE_IPP_H_
+#define _SIMD_SSE_IPP_H_
 
 #ifdef max
 #undef max
@@ -18,15 +16,15 @@ namespace ipp
 {
 	namespace common
 	{
+		void ipp_free(void* ptr);
+		template<typename T> void free(T * ptr) { ipp_free((void*)ptr); }
+	
 		_EXT_T_ _T* malloc(int len);
-		void free(void* ptr);
 
 		_EXT_T_ void zero(_T* pDst, int len);
 		_EXT_T_ void set(_T val, _T* pDst, int len);
 		_EXT_T_ void copy(const _T* pSrc, _T* pDst, int len);
 		_EXT_T_ void move(const _T* pSrc, _T* pDst, int len);
-
-		_EXT_T_ void vectorSlope(_T* pDst, int len, float offset, float slope);
 
 		_EXT_T_U_ void convert(const _T* pSrc, _U* pDst, int len);
 	}
@@ -340,3 +338,4 @@ namespace ipp_f11_d26
 }
 
 #endif
+

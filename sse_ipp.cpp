@@ -1,5 +1,3 @@
-// $Id$
-
 #include <stdint.h>
 #include <ipp.h>
 
@@ -10,13 +8,20 @@ namespace ipp
 {
 namespace common
 {
+	void ipp_free(void * ptr) { ippsFree(ptr); }
+
 	// malloc
 	template <> uint8_t* malloc<uint8_t>(int len) { return ippsMalloc_8u(len); }
+	template <> uint16_t* malloc<uint16_t>(int len) { return ippsMalloc_16u(len); }
+	template <> uint32_t* malloc<uint32_t>(int len) { return ippsMalloc_32u(len); }
+	template <> int8_t* malloc<int8_t>(int len) { return ippsMalloc_8s(len); }
 	template <> int16_t* malloc<int16_t>(int len) { return ippsMalloc_16s(len); }
 	template <> int32_t* malloc<int32_t>(int len) { return ippsMalloc_32s(len); }
+	template <> int64_t* malloc<int64_t>(int len) { return (int64_t*)ippsMalloc_64s(len); }
 	template <> float* malloc<float>(int len) { return ippsMalloc_32f(len); }
-
-	void free(void* ptr) { ippsFree(ptr); }
+	template <> double* malloc<double>(int len) { return ippsMalloc_64f(len); }
+	//
+	template <> uint64_t* malloc<uint64_t>(int len) { return (uint64_t*)malloc<int64_t>(len); }
 
 	// zero
 	template <> void zero(uint8_t* pDst, int len) { STATUS_CHECK(ippsZero_8u(pDst, len)); }
@@ -25,43 +30,50 @@ namespace common
 	template <> void zero(int64_t* pDst, int len) { STATUS_CHECK(ippsZero_64s((Ipp64s*)pDst, len)); }
 	template <> void zero(float* pDst, int len) { STATUS_CHECK(ippsZero_32f(pDst, len)); }
 	template <> void zero(double* pDst, int len) { STATUS_CHECK(ippsZero_64f(pDst, len)); }
+	//
+	template <> void zero(int8_t* pDst, int len) { zero<uint8_t>((uint8_t*)pDst, len); }
+	template <> void zero(uint16_t* pDst, int len) { zero<int16_t>((int16_t*)pDst, len); }
+	template <> void zero(uint32_t* pDst, int len) { zero<int32_t>((int32_t*)pDst, len); }
+	template <> void zero(uint64_t* pDst, int len) { zero<int64_t>((int64_t*)pDst, len); }
 
 	// set
-	template <> void set(uint8_t val, uint8_t* pDst, int len) { STATUS_CHECK(
-		ippsSet_8u(val, pDst, len)); }
-	template <> void set(int16_t val, int16_t* pDst, int len) { STATUS_CHECK(
-		ippsSet_16s(val, pDst, len)); }
-	template <> void set(int32_t val, int32_t* pDst, int len) { STATUS_CHECK(
-		ippsSet_32s(val, pDst, len)); }
-	template <> void set(int64_t val, int64_t* pDst, int len) { STATUS_CHECK(
-		ippsSet_64s(val, (Ipp64s*)pDst, len)); }
-	template <> void set(float val, float* pDst, int len) { STATUS_CHECK(
-		ippsSet_32f(val, pDst, len)); }
-	template <> void set(double val, double* pDst, int len) { STATUS_CHECK(
-		ippsSet_64f(val, pDst, len)); }
+	template <> void set(uint8_t val, uint8_t* pDst, int len) { STATUS_CHECK(ippsSet_8u(val, pDst, len)); }
+	template <> void set(int16_t val, int16_t* pDst, int len) { STATUS_CHECK(ippsSet_16s(val, pDst, len)); }
+	template <> void set(int32_t val, int32_t* pDst, int len) { STATUS_CHECK(ippsSet_32s(val, pDst, len)); }
+	template <> void set(int64_t val, int64_t* pDst, int len) { STATUS_CHECK(ippsSet_64s(val, (Ipp64s*)pDst, len)); }
+	template <> void set(float val, float* pDst, int len) { STATUS_CHECK(ippsSet_32f(val, pDst, len)); }
+	template <> void set(double val, double* pDst, int len) { STATUS_CHECK(ippsSet_64f(val, pDst, len)); }
+	//
+	template <> void set(int8_t val, int8_t* pDst, int len) { set<uint8_t>((uint8_t)val, (uint8_t*)pDst, len); }
+	template <> void set(uint16_t val, uint16_t* pDst, int len) { set<int16_t>((int16_t)val, (int16_t*)pDst, len); }
+	template <> void set(uint32_t val, uint32_t* pDst, int len) { set<int32_t>((int32_t)val, (int32_t*)pDst, len); }
+	template <> void set(uint64_t val, uint64_t* pDst, int len) { set<int64_t>((int64_t)val, (int64_t*)pDst, len); }
 
 	// copy
-	template <> void copy(const uint8_t* pSrc, uint8_t* pDst, int len) { STATUS_CHECK(
-		ippsCopy_8u(pSrc, pDst, len)); }
-	template <> void copy(const int16_t* pSrc, int16_t* pDst, int len) { STATUS_CHECK(
-		ippsCopy_16s(pSrc, pDst, len)); }
-	template <> void copy(const int32_t* pSrc, int32_t* pDst, int len) { STATUS_CHECK(
-		ippsCopy_32s(pSrc, pDst, len)); }
-	template <> void copy(const int64_t* pSrc, int64_t* pDst, int len) { STATUS_CHECK(
-		ippsCopy_64s((Ipp64s*)pSrc, (Ipp64s*)pDst, len)); }
-	template <> void copy(const float* pSrc, float* pDst, int len) { STATUS_CHECK(
-		ippsCopy_32f(pSrc, pDst, len)); }
-	template <> void copy(const double* pSrc, double* pDst, int len) { STATUS_CHECK(
-		ippsCopy_64f(pSrc, pDst, len)); }
+	template <> void copy(const uint8_t* pSrc, uint8_t* pDst, int len) { STATUS_CHECK(ippsCopy_8u(pSrc, pDst, len)); }
+	template <> void copy(const int16_t* pSrc, int16_t* pDst, int len) { STATUS_CHECK(ippsCopy_16s(pSrc, pDst, len)); }
+	template <> void copy(const int32_t* pSrc, int32_t* pDst, int len) { STATUS_CHECK(ippsCopy_32s(pSrc, pDst, len)); }
+	template <> void copy(const int64_t* pSrc, int64_t* pDst, int len) { STATUS_CHECK(ippsCopy_64s((const Ipp64s*)pSrc, (Ipp64s*)pDst, len)); }
+	template <> void copy(const float* pSrc, float* pDst, int len) { STATUS_CHECK(ippsCopy_32f(pSrc, pDst, len)); }
+	template <> void copy(const double* pSrc, double* pDst, int len) { STATUS_CHECK(ippsCopy_64f(pSrc, pDst, len)); }
+	//
+	template <> void copy(const int8_t* pSrc, int8_t* pDst, int len) { copy<uint8_t>((const uint8_t*)pSrc, (uint8_t*)pDst, len); }
+	template <> void copy(const uint16_t* pSrc, uint16_t* pDst, int len) { copy<int16_t>((const int16_t*)pSrc, (int16_t*)pDst, len); }
+	template <> void copy(const uint32_t* pSrc, uint32_t* pDst, int len) { copy<int32_t>((const int32_t*)pSrc, (int32_t*)pDst, len); }
+	template <> void copy(const uint64_t* pSrc, uint64_t* pDst, int len) { copy<int64_t>((const int64_t*)pSrc, (int64_t*)pDst, len); }
 
 	// move
-	template <> void move(const float* pSrc, float* pDst, int len) { STATUS_CHECK(
-		ippsMove_32f(pSrc, pDst, len)); }
-	// ...
-
-	// vectorSlope
-	template <> void vectorSlope(float* pDst, int len, float offset, float slope) { STATUS_CHECK(
-		ippsVectorSlope_32f(pDst, len, offset, slope)); }
+	template <> void move(const uint8_t* pSrc, uint8_t* pDst, int len) { STATUS_CHECK(ippsMove_8u(pSrc, pDst, len)); }
+	template <> void move(const int16_t* pSrc, int16_t* pDst, int len) { STATUS_CHECK(ippsMove_16s(pSrc, pDst, len)); }
+	template <> void move(const int32_t* pSrc, int32_t* pDst, int len) { STATUS_CHECK(ippsMove_32s(pSrc, pDst, len)); }
+	template <> void move(const int64_t* pSrc, int64_t* pDst, int len) { STATUS_CHECK(ippsMove_64s((const Ipp64s*)pSrc, (Ipp64s*)pDst, len)); }
+	template <> void move(const float* pSrc, float* pDst, int len) { STATUS_CHECK(ippsMove_32f(pSrc, pDst, len)); }
+	template <> void move(const double* pSrc, double* pDst, int len) { STATUS_CHECK(ippsMove_64f(pSrc, pDst, len)); }
+	//
+	template <> void move(const int8_t* pSrc, int8_t* pDst, int len) { move<uint8_t>((const uint8_t*)pSrc, (uint8_t*)pDst, len); }
+	template <> void move(const uint16_t* pSrc, uint16_t* pDst, int len) { move<int16_t>((const int16_t*)pSrc, (int16_t*)pDst, len); }
+	template <> void move(const uint32_t* pSrc, uint32_t* pDst, int len) { move<int32_t>((const int32_t*)pSrc, (int32_t*)pDst, len); }
+	template <> void move(const uint64_t* pSrc, uint64_t* pDst, int len) { move<int64_t>((const int64_t*)pSrc, (int64_t*)pDst, len); }
 
 	// convert
 	template <>	void convert(const int8_t* pSrc, int16_t* pDst, int len) { STATUS_CHECK(
@@ -263,3 +275,4 @@ namespace trigonometric
 
 // TODO: ipp_f21_d50
 // TODO: ipp_f11_d26
+

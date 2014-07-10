@@ -3,29 +3,37 @@ cmake_minimum_required(VERSION 2.6)
 project(libsimd)
 enable_testing()
 
-set(SFX em64t)
-set(MSFX merged${SFX})
-set(ESFX emerged${SFX})
+set(IPP_PLATFORM em64t)
+set(MSFX merged${IPP_PLATFORM})
+set(ESFX emerged${IPP_PLATFORM})
 
 set(LIB_IPP
-	ippsr${ESFX} ippsr${MSFX}
 	ipps${ESFX} ipps${MSFX}
+#	ippsr${ESFX} ippsr${MSFX}
 	ippvm${ESFX} ippvm${MSFX}
-	ippcore${SFX}
+	ippcore${IPP_PLATFORM}
 )
 
 if(WIN32)
 	set(CXX_OPT /EHsc)
-	set(CMAKE_CXX_FLAGS "${CXX_OPT}")
-	set(CMAKE_EXE_LINKER_FLAGS "${CXX_OPT}")
+else()
+	if(OLDGCC)
+		set(CXX_OPT "-std=c++0x -m64 -msse3 -mssse3")
+	else()
+		set(CXX_OPT "-std=c++11 -m64 -msse3 -mssse3")
+	endif()
 endif()
+
+set(CMAKE_CXX_FLAGS "${CXX_OPT}")
+set(CMAKE_EXE_LINKER_FLAGS "${CXX_OPT}")
 
 #add_definitions(-DSEGFAULT_ON_IPP_ERROR)
 
-include_directories(${IPP_INC_DIR})
-link_directories(${IPP_LIB_DIR})
+include_directories(${IPP_DIR}/${IPP_PLATFORM}/include)
+link_directories(${IPP_DIR}/${IPP_PLATFORM}/lib)
 
 add_library(simd STATIC sse_ipp.cpp)
 target_link_libraries(simd ${LIB_IPP})
 
 add_subdirectory(test)
+
