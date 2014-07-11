@@ -59,6 +59,7 @@ namespace unroll
 	}
 
 	using namespace unroll::common;
+	using namespace nosimd::arithmetic;
 }
 
 #endif

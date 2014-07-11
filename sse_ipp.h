@@ -77,7 +77,6 @@ namespace ipp
 	namespace statistical
 	{
 		_EXT_T_ void sum(const _T* pSrc, int len, _T* pSum);
-		_EXT_T_ void sumLn(const _T* pSrc, int len, _T* pSum);
 		_EXT_T_ void mean(const _T* pSrc, int len, _T* pMean);
 
 		_EXT_T_ void max(const _T* pSrc, int len, _T* pMax);

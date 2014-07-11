@@ -33,7 +33,331 @@ namespace nosimd
 		}
 	}
 
+	namespace arithmetic
+	{
+		template<typename T> void addC(const T * pSrc, T val, T * pDst, int len)
+		{
+			if (pSrc == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] += val;
+			}
+			else
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] = pSrc[i] + val;
+			}
+		}
+		
+		template<typename T> void add(const T * pSrc1, const T * pSrc2, T * pDst, int len)
+		{
+			if (pSrc1 == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] += pSrc2[i];
+			}
+			else if(pSrc2 == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] += pSrc1[i];
+			}
+			else
+			{ 
+				for (int i=0; i < len; ++i)
+					pDst[i] = pSrc1[i] + pSrc2[i];
+			}
+		}
+		
+		template<typename T> void subC(const T * pSrc, T val, T * pDst, int len)
+		{
+			if (pSrc == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] -= val;
+			}
+			else
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] = pSrc[i] - val;
+			}
+		}
+		
+		template<typename T> void subCRev(const T * pSrc, T val, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = val - pSrc[i];
+		}
+		
+		template<typename T> void sub(const T * pSrc1, const T * pSrc2, T * pDst, int len)
+		{
+			if (pSrc1 == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] -= pSrc2[i];
+			}
+			else
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] = pSrc1[i] - pSrc2[i];
+			}
+		}
+
+		template<typename T> void mulC(const T * pSrc, T val, T * pDst, int len)
+		{
+			if (pSrc == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] *= val;
+			}
+			else
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] = pSrc[i] * val;
+			}
+		}
+
+		template<typename T> void mul(const T * pSrc1, const T * pSrc2, T * pDst, int len)
+		{
+			if (pSrc1 == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] *= pSrc2[i];
+			}
+			else if(pSrc2 == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] *= pSrc1[i];
+			}
+			else
+			{ 
+				for (int i=0; i < len; ++i)
+					pDst[i] = pSrc1[i] * pSrc2[i];
+			}
+		}
+
+		template<typename T> void divC(const T * pSrc, T val, T * pDst, int len)
+		{
+			if (pSrc == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] /= val;
+			}
+			else
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] = pSrc[i] / val;
+			}
+		}
+
+		template<typename T> void divCRev(const T * pSrc, T val, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = val / pSrc[i];
+		}
+
+		template<typename T> void div(const T * pSrc1, const T * pSrc2, T * pDst, int len)
+		{
+			if (pSrc1 == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] /= pSrc2[i];
+			}
+			else
+			{
+				for (int i=0; i < len; ++i)
+					pDst[i] = pSrc1[i] / pSrc2[i];
+			}
+		}
+
+		template<typename T> void abs(const T * pSrc, T * pDst, int len)
+		{
+			if (pSrc == pDst)
+			{
+				for (int i=0; i < len; ++i)
+					if (pDst[i] < 0)
+						pDst[i] = -pDst[i];
+			}
+			else
+			{
+				for (int i=0; i < len; ++i)
+				{
+					if (pSrc[i] >= 0)
+						pDst[i] = pSrc[i];
+					else
+						pDst[i] = -pSrc[i];
+				}
+			}
+		}
+	}
+	
+	namespace statistical
+	{
+		template<typename T> void sum(const T * pSrc, int len, T * pSum)
+		{
+			T s = 0;
+			for (int i=0; i < len; ++i)
+				s += pSrc[i];
+			*pSum = s;
+		}
+
+		template<typename T> void mean(const T * pSrc, int len, T * pMean)
+		{
+			T s = 0;
+			for (int i=0; i < len; ++i)
+				s += pSrc[i];
+			*pMean = s/len;
+		}
+
+		template<typename T> void max(const T * pSrc, int len, T * pMax)
+		{
+			T mx = pSrc[0];
+			for (int i=1; i < len; ++i)
+				if (pSrc[i] > mx)
+					mx = pSrc[i];
+			*pMax = mx;
+		}
+
+		template<typename T> void maxIndx(const T * pSrc, int len, T * pMax, int * pIndx)
+		{
+			T mx = pSrc[0];
+			int idx = 0;
+			for (int i=1; i < len; ++i)
+				if (pSrc[i] > mx) {
+					mx = pSrc[i];
+					idx = i;
+				}
+			*pMax = mx;
+			*pIndx = idx;
+		}
+
+		template<typename T> void maxAbs(const T * pSrc, int len, T * pMaxAbs)
+		{
+			T mx = pSrc[0];
+			for (int i=1; i < len; ++i)
+			{
+				if (mx >= 0 && pSrc[i] > mx)
+					mx = pSrc[i];
+				else if (mx < 0 && pSrc[i] < mx)
+					mx = pSrc[i];
+			}
+			*pMaxAbs = mx;
+		}
+
+		template<typename T> void maxAbsIndx(const T * pSrc, int len, T * pMaxAbs, int * pIndx)
+		{
+			T mx = pSrc[0];
+			int idx = 0;
+			for (int i=1; i < len; ++i)
+			{
+				if (mx >= 0 && pSrc[i] > mx) {
+					mx = pSrc[i];
+					idx = i;
+				}
+				else if (mx < 0 && pSrc[i] < mx) {
+					mx = pSrc[i];
+					idx = i;
+				}
+			}
+			*pMaxAbs = mx;
+			*pIndx = idx;
+		}
+
+		template<typename T> void min(const T * pSrc, int len, T * pMin)
+		{
+			T mn = pSrc[0];
+			for (int i=1; i < len; ++i)
+				if (pSrc[i] < mn)
+					mn = pSrc[i];
+			*pMin = mn;
+		}
+
+		template<typename T> void minIndx(const T * pSrc, int len, T * pMin, int * pIndx)
+		{
+			T mn = pSrc[0];
+			int idx = 0;
+			for (int i=1; i < len; ++i)
+				if (pSrc[i] < mn) {
+					mn = pSrc[i];
+					idx = i;
+				}
+			*pMin = mn;
+			*pIndx = idx;
+		}
+
+		template<typename T> void minAbs(const T * pSrc, int len, T * pMinAbs)
+		{
+			T mn = pSrc[0];
+			for (int i=1; i < len; ++i)
+			{
+				if (mn >= 0 && pSrc[i] < mn)
+					mn = pSrc[i];
+				else if (mn < 0 && pSrc[i] > mn)
+					mn = pSrc[i];
+			}
+			*pMinAbs = mn;
+		}
+
+		template<typename T> void minAbsIndx(const T * pSrc, int len, T * pMinAbs, int * pIndx)
+		{
+			T mn = pSrc[0];
+			int idx = 0;
+			for (int i=1; i < len; ++i)
+			{
+				if (mn >= 0 && pSrc[i] < mn) {
+					mn = pSrc[i];
+					idx = i;
+				}
+				else if (mn < 0 && pSrc[i] > mn) {
+					mn = pSrc[i];
+					idx = i;
+				}
+			}
+			*pMinAbs = mn;
+			*pIndx = idx;
+		}
+
+		template<typename T> void minMax(const T * pSrc, int len, T * pMin, T * pMax)
+		{
+			T mn = pSrc[0];
+			T mx = pSrc[0];
+			for (int i=1; i < len; ++i)
+			{
+				if (pSrc[i] < mn)
+					mn = pSrc[i];
+				if (pSrc[i] > mx)
+					mx = pSrc[i];
+			}
+			*pMin = mn;
+			*pMax = mx;
+		}
+
+		template<typename T> void minMaxIndx(const T * pSrc, int len, T * pMin, int * pMinIndx, T * pMax, int * pMaxIndx)
+		{
+			T mn = pSrc[0];
+			T mx = pSrc[0];
+			int idxMin = 0;
+			int idxMax = 0;
+			for (int i=1; i < len; ++i)
+			{
+				if (pSrc[i] < mn) {
+					mn = pSrc[i];
+					idxMin = i;
+				}
+				if (pSrc[i] > mx) {
+					mx = pSrc[i];
+					idxMax = i;
+				}
+			}
+			*pMin = mn;
+			*pMinIndx = idxMin;
+			*pMax = mx;
+			*pMaxIndx = idxMax;
+		}
+	}
+
 	using namespace nosimd::common;
+	using namespace nosimd::arithmetic;
+	using namespace nosimd::statistical;
 }
 
 #endif
