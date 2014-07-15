@@ -31,6 +31,12 @@ namespace nosimd
 			for (int i=0; i < len; ++i)
 				pDst[i] = pSrc[i];
 		}
+		
+		template<typename T, typename U> void convert(const T * pSrc, U * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = pSrc[i];
+		}
 	}
 
 	namespace arithmetic
@@ -149,12 +155,6 @@ namespace nosimd
 			}
 		}
 
-		template<typename T> void divCRev(const T * pSrc, T val, T * pDst, int len)
-		{
-			for (int i=0; i < len; ++i)
-				pDst[i] = val / pSrc[i];
-		}
-
 		template<typename T> void div(const T * pSrc1, const T * pSrc2, T * pDst, int len)
 		{
 			if (pSrc1 == pDst)
@@ -190,24 +190,33 @@ namespace nosimd
 		}
 	}
 	
+	namespace power
+	{
+		template<typename T> void inv(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = T(1) / pSrc[i];
+		}
+		
+		template<typename T> void sqr(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = pSrc[i] * pSrc[i];
+		}
+		
+		// sqrt
+		// powx
+		// pow
+	}
+	
+	namespace exp_log
+	{
+		// exp
+		// log
+	}
+	
 	namespace statistical
 	{
-		template<typename T> void sum(const T * pSrc, int len, T * pSum)
-		{
-			T s = 0;
-			for (int i=0; i < len; ++i)
-				s += pSrc[i];
-			*pSum = s;
-		}
-
-		template<typename T> void mean(const T * pSrc, int len, T * pMean)
-		{
-			T s = 0;
-			for (int i=0; i < len; ++i)
-				s += pSrc[i];
-			*pMean = s/len;
-		}
-
 		template<typename T> void max(const T * pSrc, int len, T * pMax)
 		{
 			T mx = pSrc[0];
@@ -230,38 +239,6 @@ namespace nosimd
 			*pIndx = idx;
 		}
 
-		template<typename T> void maxAbs(const T * pSrc, int len, T * pMaxAbs)
-		{
-			T mx = pSrc[0];
-			for (int i=1; i < len; ++i)
-			{
-				if (mx >= 0 && pSrc[i] > mx)
-					mx = pSrc[i];
-				else if (mx < 0 && pSrc[i] < mx)
-					mx = pSrc[i];
-			}
-			*pMaxAbs = mx;
-		}
-
-		template<typename T> void maxAbsIndx(const T * pSrc, int len, T * pMaxAbs, int * pIndx)
-		{
-			T mx = pSrc[0];
-			int idx = 0;
-			for (int i=1; i < len; ++i)
-			{
-				if (mx >= 0 && pSrc[i] > mx) {
-					mx = pSrc[i];
-					idx = i;
-				}
-				else if (mx < 0 && pSrc[i] < mx) {
-					mx = pSrc[i];
-					idx = i;
-				}
-			}
-			*pMaxAbs = mx;
-			*pIndx = idx;
-		}
-
 		template<typename T> void min(const T * pSrc, int len, T * pMin)
 		{
 			T mn = pSrc[0];
@@ -281,38 +258,6 @@ namespace nosimd
 					idx = i;
 				}
 			*pMin = mn;
-			*pIndx = idx;
-		}
-
-		template<typename T> void minAbs(const T * pSrc, int len, T * pMinAbs)
-		{
-			T mn = pSrc[0];
-			for (int i=1; i < len; ++i)
-			{
-				if (mn >= 0 && pSrc[i] < mn)
-					mn = pSrc[i];
-				else if (mn < 0 && pSrc[i] > mn)
-					mn = pSrc[i];
-			}
-			*pMinAbs = mn;
-		}
-
-		template<typename T> void minAbsIndx(const T * pSrc, int len, T * pMinAbs, int * pIndx)
-		{
-			T mn = pSrc[0];
-			int idx = 0;
-			for (int i=1; i < len; ++i)
-			{
-				if (mn >= 0 && pSrc[i] < mn) {
-					mn = pSrc[i];
-					idx = i;
-				}
-				else if (mn < 0 && pSrc[i] > mn) {
-					mn = pSrc[i];
-					idx = i;
-				}
-			}
-			*pMinAbs = mn;
 			*pIndx = idx;
 		}
 
@@ -353,10 +298,76 @@ namespace nosimd
 			*pMax = mx;
 			*pMaxIndx = idxMax;
 		}
+		
+		template<typename T, typename U> void sum(const T * pSrc, int len, U * pSum)
+		{
+			U s = 0;
+			for (int i=0; i < len; ++i)
+				s += pSrc[i];
+			*pSum = s;
+		}
+
+		template<typename T, typename U> void mean(const T * pSrc, int len, U * pMean)
+		{
+			U s = 0;
+			for (int i=0; i < len; ++i)
+				s += pSrc[i];
+			*pMean = s/len;
+		}
+		
+		// stdDev
+		// meanStdDev
+		
+		template<typename T, typename U> void normInf(const T * pSrc, int len, U * pNorm)
+		{
+			U mx = pSrc[0];
+			if (pSrc[0] < 0)
+				mx = -pSrc[0];
+
+			for (int i=1; i < len; ++i)
+			{
+				if (pSrc[i] < 0)
+				{
+					if (mx < -pSrc[i])
+						mx = -pSrc[i];
+				}
+				else
+				{
+					if (mx < pSrc[i])
+						mx = pSrc[i];
+				}
+			}
+			*pNorm = mx;
+		}
+
+		template<typename T, typename U> void normL1(const T * pSrc, int len, U * pNorm)
+		{
+			U norm = 0;
+			for (int i=0; i < len; ++i)
+			{
+				if (pSrc[i] < 0)
+					norm -= pSrc[i];
+				else
+					norm += pSrc[i];
+			}
+			*pNorm = norm;
+		}
+
+		// normL2
+
+		template<typename T, typename U> void dotProd(const T * pSrc1, const T * pSrc2, int len, U * pDp)
+		{
+			U s = 0;
+			for (int i=0; i < len; ++i)
+				s += pSrc1[i] * pSrc2[i];
+			*pDp = s;
+		}
 	}
 
 	using namespace nosimd::common;
 	using namespace nosimd::arithmetic;
+	using namespace nosimd::power;
+	using namespace nosimd::exp_log;
 	using namespace nosimd::statistical;
 }
 

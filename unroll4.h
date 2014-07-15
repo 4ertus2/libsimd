@@ -56,10 +56,14 @@ namespace unroll
 		}
 
 		using nosimd::common::move;
+		using nosimd::common::convert;
 	}
 
 	using namespace unroll::common;
 	using namespace nosimd::arithmetic;
+	using namespace nosimd::power;
+	using namespace nosimd::exp_log;
+	using namespace nosimd::statistical;
 }
 
 #endif
