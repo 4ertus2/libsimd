@@ -1,12 +1,13 @@
+#include <iostream>
 #include <memory>
 #include <stdint.h>
 
 #include "simd.h"
 
-static const unsigned LENGTH = 128;
+static const unsigned LENGTH = 32;
 
 template<typename T>
-int test_common()
+void test_common()
 {
 	using std::shared_ptr;
 
@@ -20,45 +21,41 @@ int test_common()
 	simd::set(VALUE, d, LENGTH);
 	for (unsigned i=0; i<LENGTH; ++i)
 		if (d[i] != VALUE)
-			return 1;
+			throw __PRETTY_FUNCTION__;
 
 	simd::copy(d, c, LENGTH);
 	for (unsigned i=0; i<LENGTH; ++i)
 		if (c[i] != VALUE)
-			return 1;	
+			throw __PRETTY_FUNCTION__;
 
 	simd::zero(d, LENGTH);
 	for (unsigned i=0; i<LENGTH; ++i)
 		if (d[i] != 0)
-			return 1;
-
-	return 0;
+			throw __PRETTY_FUNCTION__;
 }
 
 int main()
 {
-	if (test_common<uint8_t>())
-		return 1;
-	if (test_common<uint16_t>())
-		return 1;
-	if (test_common<uint32_t>())
-		return 1;
-	if (test_common<uint64_t>())
-		return 1;
+	try
+	{
+		test_common<uint8_t>();
+		test_common<uint16_t>();
+		test_common<uint32_t>();
+		test_common<uint64_t>();
 
-	if (test_common<int8_t>())
-		return 1;
-	if (test_common<int16_t>())
-		return 1;
-	if (test_common<int32_t>())
-		return 1;
-	if (test_common<int64_t>())
-		return 1;
+		test_common<int8_t>();
+		test_common<int16_t>();
+		test_common<int32_t>();
+		test_common<int64_t>();
 
-	if (test_common<float>())
+		test_common<float>();
+		test_common<double>();
+	}
+	catch (const char * msg)
+	{
+		std::cerr << msg << std::endl;
 		return 1;
-	if (test_common<double>())
-		return 1;
+	}
 
 	return 0;
 }
