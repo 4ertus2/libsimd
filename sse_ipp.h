@@ -9,8 +9,13 @@
 #undef min
 #endif
 
-#define _EXT_T_ template<typename _T> extern
-#define _EXT_T_U_ template<typename _T, typename _U> extern
+#ifndef _SIMD_EXT_T
+#define _SIMD_EXT_T template<typename _T> extern
+#endif
+
+#ifndef _SIMD_EXT_TU
+#define _SIMD_EXT_TU template<typename _T, typename _U> extern
+#endif
 
 namespace ipp
 {
@@ -19,32 +24,33 @@ namespace ipp
 		void ipp_free(void* ptr);
 		template<typename T> void free(T * ptr) { ipp_free((void*)ptr); }
 	
-		_EXT_T_ _T* malloc(int len);
+		_SIMD_EXT_T _T* malloc(int len);
 
-		_EXT_T_ void zero(_T* pDst, int len);
-		_EXT_T_ void set(_T val, _T* pDst, int len);
-		_EXT_T_ void copy(const _T* pSrc, _T* pDst, int len);
-		_EXT_T_ void move(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void zero(_T* pDst, int len);
+		_SIMD_EXT_T void set(_T val, _T* pDst, int len);
+		_SIMD_EXT_T void copy(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void move(const _T* pSrc, _T* pDst, int len);
 
-		_EXT_T_U_ void convert(const _T* pSrc, _U* pDst, int len);
+		_SIMD_EXT_TU void convert(const _T* pSrc, _U* pDst, int len);
 	}
 
 	namespace arithmetic
 	{
-		_EXT_T_ void addC(const _T* pSrc, _T val, _T* pDst, int len);
-		_EXT_T_ void add(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
+		_SIMD_EXT_T void addC(const _T* pSrc, _T val, _T* pDst, int len);
+		_SIMD_EXT_T void add(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
 
-		_EXT_T_ void subC(const _T* pSrc, _T val, _T* pDst, int len);
-		_EXT_T_ void subCRev(const _T* pSrc, _T val, _T* pDst, int len);
-		_EXT_T_ void sub(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
+		_SIMD_EXT_T void subC(const _T* pSrc, _T val, _T* pDst, int len);
+		_SIMD_EXT_T void subCRev(const _T* pSrc, _T val, _T* pDst, int len);
+		_SIMD_EXT_T void sub(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
 
-		_EXT_T_ void mulC(const _T* pSrc, _T val, _T* pDst, int len);
-		_EXT_T_ void mul(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
+		_SIMD_EXT_T void mulC(const _T* pSrc, _T val, _T* pDst, int len);
+		_SIMD_EXT_T void mul(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
 
-		_EXT_T_ void divC(const _T* pSrc, _T val, _T* pDst, int len);		
-		_EXT_T_ void div(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
+		_SIMD_EXT_T void divC(const _T* pSrc, _T val, _T* pDst, int len);
+		_SIMD_EXT_T void divCRev(const _T* pSrc, _T val, _T* pDst, int len);
+		_SIMD_EXT_T void div(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
 
-		_EXT_T_ void abs(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void abs(const _T* pSrc, _T* pDst, int len);
 		
 		namespace f21
 		{
@@ -74,16 +80,16 @@ namespace ipp
 
 	namespace power
 	{
-		_EXT_T_ void inv(const _T* pSrc, _T* pDst, int len);
-		_EXT_T_ void sqr(const _T* pSrc, _T* pDst, int len);
-		_EXT_T_ void sqrt(const _T* pSrc, _T* pDst, int len);
-		_EXT_T_ void powx(const _T* pSrc, const _T constValue, _T* pDst, int len);
-		_EXT_T_ void pow(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
+		_SIMD_EXT_T void inv(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void sqr(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void sqrt(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void powx(const _T* pSrc, const _T constValue, _T* pDst, int len);
+		_SIMD_EXT_T void pow(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
 #if 0
-		_EXT_T_ void cbrt(const _T* pSrc, _T* pDst, int len);
-		_EXT_T_ void pow2o3(const _T* pSrc, _T* pDst, int len);
-		_EXT_T_ void pow3o2(const _T* pSrc, _T* pDst, int len);
-		_EXT_T_ void hypot(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len); // sqtr(a^2+b^2)
+		_SIMD_EXT_T void cbrt(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void pow2o3(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void pow3o2(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void hypot(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len); // sqtr(a^2+b^2)
 #endif
 		
 		namespace f21
@@ -112,8 +118,8 @@ namespace ipp
 
 	namespace exp_log
 	{
-		_EXT_T_ void exp(const _T* pSrc, _T* pDst, int len);
-		_EXT_T_ void ln(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void exp(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void ln(const _T* pSrc, _T* pDst, int len);
 
 		namespace f21
 		{
@@ -139,25 +145,25 @@ namespace ipp
 
 	namespace statistical
 	{
-		_EXT_T_ void max(const _T* pSrc, int len, _T* pMax);
-		_EXT_T_ void maxIndx(const _T* pSrc, int len, _T* pMax, int* pIndx);
+		_SIMD_EXT_T void max(const _T* pSrc, int len, _T* pMax);
+		_SIMD_EXT_T void maxIndx(const _T* pSrc, int len, _T* pMax, int* pIndx);
 
-		_EXT_T_ void min(const _T* pSrc, int len, _T* pMin);
-		_EXT_T_ void minIndx(const _T* pSrc, int len, _T* pMin, int* pIndx);
+		_SIMD_EXT_T void min(const _T* pSrc, int len, _T* pMin);
+		_SIMD_EXT_T void minIndx(const _T* pSrc, int len, _T* pMin, int* pIndx);
 
-		_EXT_T_ void minMax(const _T* pSrc, int len, _T* pMin, _T* pMax);
-		_EXT_T_ void minMaxIndx(const _T* pSrc, int len, _T* pMin, int* pMinIndx, _T* pMax, int* pMaxIndx);
+		_SIMD_EXT_T void minMax(const _T* pSrc, int len, _T* pMin, _T* pMax);
+		_SIMD_EXT_T void minMaxIndx(const _T* pSrc, int len, _T* pMin, int* pMinIndx, _T* pMax, int* pMaxIndx);
 		
-		_EXT_T_U_ void sum(const _T* pSrc, int len, _U* pSum);
-		_EXT_T_ void mean(const _T* pSrc, int len, _T* pMean);
-		_EXT_T_ void stdDev(const _T* pSrc, int len, _T* pStdDev);
-		_EXT_T_ void meanStdDev(const _T* pSrc, int len, _T* pMean, _T* pStdDev);
+		_SIMD_EXT_TU void sum(const _T* pSrc, int len, _U* pSum);
+		_SIMD_EXT_T void mean(const _T* pSrc, int len, _T* pMean);
+		_SIMD_EXT_T void stdDev(const _T* pSrc, int len, _T* pStdDev);
+		_SIMD_EXT_T void meanStdDev(const _T* pSrc, int len, _T* pMean, _T* pStdDev);
 
-		_EXT_T_U_ void normInf(const _T* pSrc, int len, _U* pNorm);
-		_EXT_T_U_ void normL1(const _T* pSrc, int len, _U* pNorm);
-		_EXT_T_U_ void normL2(const _T* pSrc, int len, _U* pNorm);
+		_SIMD_EXT_TU void normInf(const _T* pSrc, int len, _U* pNorm);
+		_SIMD_EXT_TU void normL1(const _T* pSrc, int len, _U* pNorm);
+		_SIMD_EXT_TU void normL2(const _T* pSrc, int len, _U* pNorm);
 		
-		_EXT_T_U_ void dotProd(const _T* pSrc1, const _T* pSrc2, int len, _U* pDp);
+		_SIMD_EXT_TU void dotProd(const _T* pSrc1, const _T* pSrc2, int len, _U* pDp);
 	}
 
 	namespace trigonometric

@@ -248,6 +248,10 @@ namespace arithmetic
 	template <> void divC(const int16_t * pSrc, int16_t val, int16_t * pDst, int len) { STATUS_CHECK(
 		ippsDivC_16s_Sfs(pSrc, val, pDst, len, 0)); }
 
+	// divCRev
+	template <> void divCRev(const float * pSrc, float val, float * pDst, int len) { STATUS_CHECK(
+		ippsDivCRev_32f(pSrc, val, pDst, len)); }
+
 	// div (fixed parameters order)
 	template <> void div(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
 		ippsDiv_32f(pSrc2, pSrc1, pDst, len)); }

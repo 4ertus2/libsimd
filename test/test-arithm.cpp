@@ -62,9 +62,9 @@ namespace
 	}
 }
 
-static const unsigned LENGTH = 32;
+static const unsigned LENGTH = 39;
 
-template<typename T, bool hasDivC = true>
+template<typename T, bool hasDivC = true, bool hasDivCRev = false>
 int test_arithm(T value1, T value2)
 {
 	using std::shared_ptr;
@@ -136,6 +136,15 @@ int test_arithm(T value1, T value2)
 			if (! equal(result[i], r))
 				throw __PRETTY_FUNCTION__;
 	}
+	
+	if (hasDivCRev)
+	{
+		r = value2 / value1;
+		simd::divCRev(v1, value2, result, LENGTH);
+		for (int i=0; i<LENGTH; ++i)
+			if (! equal(result[i], r))
+				throw __PRETTY_FUNCTION__;
+	}
 #endif // TEST_FIXED
 
 	return 0;
@@ -146,9 +155,15 @@ int main()
 	try
 	{
 #ifdef TEST_FLOAT
-		test_arithm<float>(2, 1);
-		test_arithm<double>(2, 1);
+
+		test_arithm<float, true, true>(2, 1);
+#ifdef SIMD_IPP
+		test_arithm<double>(1, 2);
 #else
+		test_arithm<double, true, true>(1, 2);
+#endif
+
+#else // TEST_FLOAT
 
 		test_arithm<uint8_t>(2, 1);
 		test_arithm<int16_t>(2, 1);

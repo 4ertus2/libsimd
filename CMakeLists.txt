@@ -32,8 +32,9 @@ set(CMAKE_EXE_LINKER_FLAGS "${CXX_OPT}")
 include_directories(${IPP_DIR}/${IPP_PLATFORM}/include)
 link_directories(${IPP_DIR}/${IPP_PLATFORM}/lib)
 
-add_library(simd STATIC sse_ipp.cpp)
-target_link_libraries(simd ${LIB_IPP})
+add_library(simdsse STATIC sse.cpp)
+add_library(simdipp STATIC sse_ipp.cpp)
+target_link_libraries(simdipp ${LIB_IPP})
 
 add_subdirectory(test)
 

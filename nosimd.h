@@ -155,6 +155,12 @@ namespace nosimd
 			}
 		}
 
+		template<typename T> void divCRev(const T * pSrc, T val, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = val / pSrc[i];
+		}
+
 		template<typename T> void div(const T * pSrc1, const T * pSrc2, T * pDst, int len)
 		{
 			if (pSrc1 == pDst)
