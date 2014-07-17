@@ -174,19 +174,19 @@ namespace arithmetic
 	template <> void subCRev(const int32_t * pSrc, int32_t val, int32_t * pDst, int len) { STATUS_CHECK(
 		ippsSubCRev_32s_Sfs(pSrc, val, pDst, len, 0)); }
 	
-	// sub
+	// sub (fixed parameters order)
 	template <> void sub(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
-		ippsSub_32f(pSrc1, pSrc2, pDst, len)); }
+		ippsSub_32f(pSrc2, pSrc1, pDst, len)); }
 	template <> void sub(const double * pSrc1, const double * pSrc2, double * pDst, int len) { STATUS_CHECK(
-		ippsSub_64f(pSrc1, pSrc2, pDst, len)); }
+		ippsSub_64f(pSrc2, pSrc1, pDst, len)); }
 	template <> void sub(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len) { STATUS_CHECK(
-		ippsSub_16s(pSrc1, pSrc2, pDst, len)); }
+		ippsSub_16s(pSrc2, pSrc1, pDst, len)); }
 	template <> void sub(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len) { STATUS_CHECK(
-		ippsSub_8u_Sfs(pSrc1, pSrc2, pDst, len, 0)); }
+		ippsSub_8u_Sfs(pSrc2, pSrc1, pDst, len, 0)); }
 	template <> void sub(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len) { STATUS_CHECK(
-		ippsSub_16u_Sfs(pSrc1, pSrc2, pDst, len, 0)); }
+		ippsSub_16u_Sfs(pSrc2, pSrc1, pDst, len, 0)); }
 	template <> void sub(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len) { STATUS_CHECK(
-		ippsSub_32s_Sfs(pSrc1, pSrc2, pDst, len, 0)); }
+		ippsSub_32s_Sfs(pSrc2, pSrc1, pDst, len, 0)); }
 	namespace f24
 	{
 		void sub(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
@@ -248,19 +248,19 @@ namespace arithmetic
 	template <> void divC(const int16_t * pSrc, int16_t val, int16_t * pDst, int len) { STATUS_CHECK(
 		ippsDivC_16s_Sfs(pSrc, val, pDst, len, 0)); }
 
-	// div
+	// div (fixed parameters order)
 	template <> void div(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
-		ippsDiv_32f(pSrc1, pSrc2, pDst, len)); }
+		ippsDiv_32f(pSrc2, pSrc1, pDst, len)); }
 	template <> void div(const double * pSrc1, const double * pSrc2, double * pDst, int len) { STATUS_CHECK(
-		ippsDiv_64f(pSrc1, pSrc2, pDst, len)); }
+		ippsDiv_64f(pSrc2, pSrc1, pDst, len)); }
 	template <> void div(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len) { STATUS_CHECK(
-		ippsDiv_8u_Sfs(pSrc1, pSrc2, pDst, len, 0)); }
+		ippsDiv_8u_Sfs(pSrc2, pSrc1, pDst, len, 0)); }
 	template <> void div(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len) { STATUS_CHECK(
-		ippsDiv_16u_Sfs(pSrc1, pSrc2, pDst, len, 0)); }
+		ippsDiv_16u_Sfs(pSrc2, pSrc1, pDst, len, 0)); }
 	template <> void div(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len) { STATUS_CHECK(
-		ippsDiv_16s_Sfs(pSrc1, pSrc2, pDst, len, 0)); }
+		ippsDiv_16s_Sfs(pSrc2, pSrc1, pDst, len, 0)); }
 	template <> void div(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len) { STATUS_CHECK(
-		ippsDiv_32s_Sfs(pSrc1, pSrc2, pDst, len, 0)); }
+		ippsDiv_32s_Sfs(pSrc2, pSrc1, pDst, len, 0)); }
 	namespace f21
 	{
 		void div(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
