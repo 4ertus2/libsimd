@@ -13,13 +13,13 @@ namespace nosimd
 			for (int i=0; i<len; ++i)
 				pDst[i] = 0;
 		}
-	
+
 		template<typename T> void set(T val, T * pDst, int len)
 		{
 			for (int i=0; i<len; ++i)
 				pDst[i] = val;
 		}
-	
+
 		template<typename T> void copy(const T * pSrc, T * pDst, int len)
 		{
 			for (int i=0; i<len; ++i)
@@ -31,7 +31,7 @@ namespace nosimd
 			for (int i=0; i < len; ++i)
 				pDst[i] = pSrc[i];
 		}
-		
+
 		template<typename T, typename U> void convert(const T * pSrc, U * pDst, int len)
 		{
 			for (int i=0; i < len; ++i)
@@ -54,7 +54,7 @@ namespace nosimd
 					pDst[i] = pSrc[i] + val;
 			}
 		}
-		
+
 		template<typename T> void add(const T * pSrc1, const T * pSrc2, T * pDst, int len)
 		{
 			if (pSrc1 == pDst)
@@ -68,12 +68,12 @@ namespace nosimd
 					pDst[i] += pSrc1[i];
 			}
 			else
-			{ 
+			{
 				for (int i=0; i < len; ++i)
 					pDst[i] = pSrc1[i] + pSrc2[i];
 			}
 		}
-		
+
 		template<typename T> void subC(const T * pSrc, T val, T * pDst, int len)
 		{
 			if (pSrc == pDst)
@@ -87,13 +87,13 @@ namespace nosimd
 					pDst[i] = pSrc[i] - val;
 			}
 		}
-		
+
 		template<typename T> void subCRev(const T * pSrc, T val, T * pDst, int len)
 		{
 			for (int i=0; i < len; ++i)
 				pDst[i] = val - pSrc[i];
 		}
-		
+
 		template<typename T> void sub(const T * pSrc1, const T * pSrc2, T * pDst, int len)
 		{
 			if (pSrc1 == pDst)
@@ -135,7 +135,7 @@ namespace nosimd
 					pDst[i] *= pSrc1[i];
 			}
 			else
-			{ 
+			{
 				for (int i=0; i < len; ++i)
 					pDst[i] = pSrc1[i] * pSrc2[i];
 			}
@@ -195,7 +195,7 @@ namespace nosimd
 			}
 		}
 	}
-	
+
 	namespace power
 	{
 		template<typename T> void inv(const T * pSrc, T * pDst, int len)
@@ -203,24 +203,24 @@ namespace nosimd
 			for (int i=0; i < len; ++i)
 				pDst[i] = T(1) / pSrc[i];
 		}
-		
+
 		template<typename T> void sqr(const T * pSrc, T * pDst, int len)
 		{
 			for (int i=0; i < len; ++i)
 				pDst[i] = pSrc[i] * pSrc[i];
 		}
-		
+
 		// sqrt
 		// powx
 		// pow
 	}
-	
+
 	namespace exp_log
 	{
 		// exp
 		// log
 	}
-	
+
 	namespace statistical
 	{
 		template<typename T> void max(const T * pSrc, int len, T * pMax)
@@ -304,7 +304,7 @@ namespace nosimd
 			*pMax = mx;
 			*pMaxIndx = idxMax;
 		}
-		
+
 		template<typename T, typename U> void sum(const T * pSrc, int len, U * pSum)
 		{
 			U s = 0;
@@ -320,10 +320,10 @@ namespace nosimd
 				s += pSrc[i];
 			*pMean = s/len;
 		}
-		
+
 		// stdDev
 		// meanStdDev
-		
+
 		template<typename T, typename U> void normInf(const T * pSrc, int len, U * pNorm)
 		{
 			U mx = pSrc[0];

@@ -11,25 +11,25 @@ namespace arithmetic
 	template <> void addC(const float * pSrc, float val, float * pDst, int len)
 	{
 		__m128 b = _mm_load1_ps(&val);
-	
+
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			
+
 			__m128 r0 = _mm_add_ps(a0, b);
 			__m128 r1 = _mm_add_ps(a1, b);
-			
+
 			_mm_store_ps(pDst, r0);
 			_mm_store_ps(pDst+4, r1);
 		}
-	
+
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 r0 = _mm_add_ps(a0, b);
 			_mm_store_ps(pDst, r0);
-			
+
 			len -= 4;
 			pSrc += 4;
 			pDst += 4;
@@ -47,14 +47,14 @@ namespace arithmetic
 			__m128 a1 = _mm_loadu_ps(pSrc1+4);
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-			
+
 			__m128 r0 = _mm_add_ps(a0, b0);
 			__m128 r1 = _mm_add_ps(a1, b1);
-			
+
 			_mm_store_ps(pDst, r0);
 			_mm_store_ps(pDst+4, r1);
 		}
-	
+
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc1);
@@ -62,7 +62,7 @@ namespace arithmetic
 
 			__m128 r0 = _mm_add_ps(a0, b0);
 			_mm_store_ps(pDst, r0);
-			
+
 			len -= 4;
 			pSrc1 += 4;
 			pSrc2 += 4;
@@ -76,25 +76,25 @@ namespace arithmetic
 	template <> void subC(const float * pSrc, float val, float * pDst, int len)
 	{
 		__m128 b = _mm_load1_ps(&val);
-	
+
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			
+
 			__m128 r0 = _mm_sub_ps(a0, b);
 			__m128 r1 = _mm_sub_ps(a1, b);
-			
+
 			_mm_store_ps(pDst, r0);
 			_mm_store_ps(pDst+4, r1);
 		}
-	
+
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 r0 = _mm_sub_ps(a0, b);
 			_mm_store_ps(pDst, r0);
-			
+
 			len -= 4;
 			pSrc += 4;
 			pDst += 4;
@@ -107,25 +107,25 @@ namespace arithmetic
 	template <> void subCRev(const float * pSrc, float val, float * pDst, int len)
 	{
 		__m128 a = _mm_load1_ps(&val);
-	
+
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128 b0 = _mm_loadu_ps(pSrc);
 			__m128 b1 = _mm_loadu_ps(pSrc+4);
-			
+
 			__m128 r0 = _mm_sub_ps(a, b0);
 			__m128 r1 = _mm_sub_ps(a, b1);
-			
+
 			_mm_store_ps(pDst, r0);
 			_mm_store_ps(pDst+4, r1);
 		}
-	
+
 		if (len >= 4)
 		{
 			__m128 b0 = _mm_loadu_ps(pSrc);
 			__m128 r0 = _mm_sub_ps(a, b0);
 			_mm_store_ps(pDst, r0);
-			
+
 			len -= 4;
 			pSrc += 4;
 			pDst += 4;
@@ -143,14 +143,14 @@ namespace arithmetic
 			__m128 a1 = _mm_loadu_ps(pSrc1+4);
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-			
+
 			__m128 r0 = _mm_sub_ps(a0, b0);
 			__m128 r1 = _mm_sub_ps(a1, b1);
-			
+
 			_mm_store_ps(pDst, r0);
 			_mm_store_ps(pDst+4, r1);
 		}
-	
+
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc1);
@@ -158,7 +158,7 @@ namespace arithmetic
 
 			__m128 r0 = _mm_sub_ps(a0, b0);
 			_mm_store_ps(pDst, r0);
-			
+
 			len -= 4;
 			pSrc1 += 4;
 			pSrc2 += 4;
@@ -172,25 +172,25 @@ namespace arithmetic
 	template <> void mulC(const float * pSrc, float val, float * pDst, int len)
 	{
 		__m128 b = _mm_load1_ps(&val);
-	
+
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			
+
 			__m128 r0 = _mm_mul_ps(a0, b);
 			__m128 r1 = _mm_mul_ps(a1, b);
-			
+
 			_mm_store_ps(pDst, r0);
 			_mm_store_ps(pDst+4, r1);
 		}
-	
+
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 r0 = _mm_mul_ps(a0, b);
 			_mm_store_ps(pDst, r0);
-			
+
 			len -= 4;
 			pSrc += 4;
 			pDst += 4;
@@ -208,14 +208,14 @@ namespace arithmetic
 			__m128 a1 = _mm_loadu_ps(pSrc1+4);
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-			
+
 			__m128 r0 = _mm_mul_ps(a0, b0);
 			__m128 r1 = _mm_mul_ps(a1, b1);
-			
+
 			_mm_store_ps(pDst, r0);
 			_mm_store_ps(pDst+4, r1);
 		}
-	
+
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc1);
@@ -223,7 +223,7 @@ namespace arithmetic
 
 			__m128 r0 = _mm_mul_ps(a0, b0);
 			_mm_store_ps(pDst, r0);
-			
+
 			len -= 4;
 			pSrc1 += 4;
 			pSrc2 += 4;
@@ -237,25 +237,25 @@ namespace arithmetic
 	template <> void divC(const float * pSrc, float val, float * pDst, int len)
 	{
 		__m128 b = _mm_load1_ps(&val);
-	
+
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			
+
 			__m128 r0 = _mm_div_ps(a0, b);
 			__m128 r1 = _mm_div_ps(a1, b);
-			
+
 			_mm_store_ps(pDst, r0);
 			_mm_store_ps(pDst+4, r1);
 		}
-	
+
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 r0 = _mm_div_ps(a0, b);
 			_mm_store_ps(pDst, r0);
-			
+
 			len -= 4;
 			pSrc += 4;
 			pDst += 4;
@@ -268,25 +268,25 @@ namespace arithmetic
 	template <> void divCRev(const float * pSrc, float val, float * pDst, int len)
 	{
 		__m128 a = _mm_load1_ps(&val);
-	
+
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128 b0 = _mm_loadu_ps(pSrc);
 			__m128 b1 = _mm_loadu_ps(pSrc+4);
-			
+
 			__m128 r0 = _mm_div_ps(a, b0);
 			__m128 r1 = _mm_div_ps(a, b1);
-			
+
 			_mm_store_ps(pDst, r0);
 			_mm_store_ps(pDst+4, r1);
 		}
-	
+
 		if (len >= 4)
 		{
 			__m128 b0 = _mm_loadu_ps(pSrc);
 			__m128 r0 = _mm_div_ps(a, b0);
 			_mm_store_ps(pDst, r0);
-			
+
 			len -= 4;
 			pSrc += 4;
 			pDst += 4;
@@ -304,14 +304,14 @@ namespace arithmetic
 			__m128 a1 = _mm_loadu_ps(pSrc1+4);
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-			
+
 			__m128 r0 = _mm_div_ps(a0, b0);
 			__m128 r1 = _mm_div_ps(a1, b1);
-			
+
 			_mm_store_ps(pDst, r0);
 			_mm_store_ps(pDst+4, r1);
 		}
-	
+
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc1);
@@ -319,7 +319,7 @@ namespace arithmetic
 
 			__m128 r0 = _mm_div_ps(a0, b0);
 			_mm_store_ps(pDst, r0);
-			
+
 			len -= 4;
 			pSrc1 += 4;
 			pSrc2 += 4;
@@ -347,7 +347,7 @@ namespace arithmetic
 			_mm_store_pd(pDst, r0);
 			_mm_store_pd(pDst+2, r1);
  		}
- 
+
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = *pSrc + val;
 	}
@@ -367,7 +367,7 @@ namespace arithmetic
 			_mm_store_pd(pDst, r0);
 			_mm_store_pd(pDst+2, r1);
  		}
- 
+
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
 			*pDst = *pSrc1 + *pSrc2;
 	}
@@ -387,7 +387,7 @@ namespace arithmetic
 			_mm_store_pd(pDst, r0);
 			_mm_store_pd(pDst+2, r1);
  		}
- 
+
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = *pSrc - val;
 	}
@@ -407,7 +407,7 @@ namespace arithmetic
 			_mm_store_pd(pDst, r0);
 			_mm_store_pd(pDst+2, r1);
  		}
- 
+
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = val - *pSrc;
 	}
@@ -427,7 +427,7 @@ namespace arithmetic
 			_mm_store_pd(pDst, r0);
 			_mm_store_pd(pDst+2, r1);
  		}
- 
+
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
 			*pDst = *pSrc1 - *pSrc2;
 	}
@@ -447,7 +447,7 @@ namespace arithmetic
 			_mm_store_pd(pDst, r0);
 			_mm_store_pd(pDst+2, r1);
  		}
- 
+
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = *pSrc * val;
 	}
@@ -467,7 +467,7 @@ namespace arithmetic
 			_mm_store_pd(pDst, r0);
 			_mm_store_pd(pDst+2, r1);
  		}
- 
+
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
 			*pDst = *pSrc1 * *pSrc2;
 	}
@@ -487,7 +487,7 @@ namespace arithmetic
 			_mm_store_pd(pDst, r0);
 			_mm_store_pd(pDst+2, r1);
  		}
- 
+
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = *pSrc / val;
 	}
@@ -507,7 +507,7 @@ namespace arithmetic
 			_mm_store_pd(pDst, r0);
 			_mm_store_pd(pDst+2, r1);
  		}
- 
+
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = val / *pSrc;
 	}
@@ -527,7 +527,7 @@ namespace arithmetic
 			_mm_store_pd(pDst, r0);
 			_mm_store_pd(pDst+2, r1);
  		}
- 
+
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
 			*pDst = *pSrc1 / *pSrc2;
 	}

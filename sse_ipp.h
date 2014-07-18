@@ -23,7 +23,7 @@ namespace ipp
 	{
 		void ipp_free(void* ptr);
 		template<typename T> void free(T * ptr) { ipp_free((void*)ptr); }
-	
+
 		_SIMD_EXT_T _T* malloc(int len);
 
 		_SIMD_EXT_T void zero(_T* pDst, int len);
@@ -51,7 +51,7 @@ namespace ipp
 		_SIMD_EXT_T void div(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
 
 		_SIMD_EXT_T void abs(const _T* pSrc, _T* pDst, int len);
-		
+
 		namespace f21
 		{
 			void div(const float * pSrc1, const float * pSrc2, float * pDst, int len);
@@ -91,7 +91,7 @@ namespace ipp
 		_SIMD_EXT_T void pow3o2(const _T* pSrc, _T* pDst, int len);
 		_SIMD_EXT_T void hypot(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len); // sqtr(a^2+b^2)
 #endif
-		
+
 		namespace f21
 		{
 			void inv(const float * pSrc, float * pDst, int len);
@@ -153,7 +153,7 @@ namespace ipp
 
 		_SIMD_EXT_T void minMax(const _T* pSrc, int len, _T* pMin, _T* pMax);
 		_SIMD_EXT_T void minMaxIndx(const _T* pSrc, int len, _T* pMin, int* pMinIndx, _T* pMax, int* pMaxIndx);
-		
+
 		_SIMD_EXT_TU void sum(const _T* pSrc, int len, _U* pSum);
 		_SIMD_EXT_T void mean(const _T* pSrc, int len, _T* pMean);
 		_SIMD_EXT_T void stdDev(const _T* pSrc, int len, _T* pStdDev);
@@ -162,7 +162,7 @@ namespace ipp
 		_SIMD_EXT_TU void normInf(const _T* pSrc, int len, _U* pNorm);
 		_SIMD_EXT_TU void normL1(const _T* pSrc, int len, _U* pNorm);
 		_SIMD_EXT_TU void normL2(const _T* pSrc, int len, _U* pNorm);
-		
+
 		_SIMD_EXT_TU void dotProd(const _T* pSrc1, const _T* pSrc2, int len, _U* pDp);
 	}
 
@@ -211,7 +211,7 @@ namespace ipp
 	using namespace ipp::power;
 	using namespace ipp::exp_log;
 	using namespace ipp::statistical;
-	
+
 	namespace f21
 	{
 		using namespace ipp::arithmetic::f21;
@@ -227,7 +227,7 @@ namespace ipp
 		using namespace ipp::exp_log::f24;
 		using namespace ipp::trigonometric::f24;
 	}
-	
+
 	namespace d50
 	{
 		using namespace ipp::arithmetic::d50;

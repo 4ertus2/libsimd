@@ -16,9 +16,9 @@ void test_convert(T valueT, U valueU)
 	shared_ptr<U> pu = shared_ptr<U>(simd::malloc<U>(LENGTH), simd::free<U>);
 	T * t = pt.get();
 	U * u = pu.get();
-	
+
 	simd::set(valueT, t, LENGTH);
-	
+
 	simd::convert(t, u, LENGTH);
 	for (int i=0; i<LENGTH; ++i)
 		if (u[i] != valueU)
@@ -54,7 +54,7 @@ void test_i32(int value)
 	test_convert<int32_t, double>(value, value);
 }
 
-void test_i64(int value)
+void test_i64(int64_t value)
 {
 	test_convert<int64_t, double>(value, value);
 }

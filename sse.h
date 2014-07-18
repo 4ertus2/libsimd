@@ -36,7 +36,7 @@ namespace sse
 
 		_SIMD_EXT_T void abs(const _T* pSrc, _T* pDst, int len);
 	}
-	
+
 	using namespace sse::common;
 	using namespace sse::arithmetic;
 }

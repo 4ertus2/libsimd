@@ -117,7 +117,7 @@ namespace arithmetic
 		ippsAddC_16s_Sfs(pSrc, val, pDst, len, 0)); }
 	template <> void addC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len) { STATUS_CHECK(
 		ippsAddC_32s_Sfs(pSrc, val, pDst, len, 0)); }
-	
+
 	// add
 	template <> void add(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
 		ippsAdd_32f(pSrc1, pSrc2, pDst, len)); }
@@ -173,7 +173,7 @@ namespace arithmetic
 		ippsSubCRev_16s_Sfs(pSrc, val, pDst, len, 0)); }
 	template <> void subCRev(const int32_t * pSrc, int32_t val, int32_t * pDst, int len) { STATUS_CHECK(
 		ippsSubCRev_32s_Sfs(pSrc, val, pDst, len, 0)); }
-	
+
 	// sub (fixed parameters order)
 	template <> void sub(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
 		ippsSub_32f(pSrc2, pSrc1, pDst, len)); }
@@ -211,7 +211,7 @@ namespace arithmetic
 		ippsMulC_16s_Sfs(pSrc, val, pDst, len, 0)); }
 	template <> void mulC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len) { STATUS_CHECK(
 		ippsMulC_32s_Sfs(pSrc, val, pDst, len, 0)); }
-		
+
 	// mul
 	template <> void mul(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
 		ippsMul_32f(pSrc1, pSrc2, pDst, len)); }
@@ -374,7 +374,7 @@ namespace power
 	{
 		void sqrt(const double * pSrc, double * pDst, int len) { STATUS_CHECK(ippsSqrt_64f_A53(pSrc, pDst, len)); }
 	}
-	
+
 	// powx
 	namespace f21
 	{
@@ -396,7 +396,7 @@ namespace power
 		void powx(const double * pSrc, const double constValue, double * pDst, int len) { STATUS_CHECK(
 			ippsPowx_64f_A53(pSrc, constValue, pDst, len)); }
 	}
-	
+
 	// pow
 	namespace f21
 	{
@@ -456,7 +456,7 @@ namespace statistical
 		ippsMax_16s(pSrc, len, pMax)); }
 	template <> void max(const int32_t * pSrc, int len, int32_t * pMax) { STATUS_CHECK(
 		ippsMax_32s(pSrc, len, pMax)); }
-	
+
 	// maxIndx
 	template <> void maxIndx(const float * pSrc, int len, float * pMax, int * pIndx) { STATUS_CHECK(
 		ippsMaxIndx_32f(pSrc, len, pMax, pIndx)); }
@@ -502,7 +502,7 @@ namespace statistical
 		ippsMinMax_16s(pSrc, len, pMin, pMax)); }
 	template <> void minMax(const int32_t * pSrc, int len, int32_t * pMin, int32_t * pMax) { STATUS_CHECK(
 		ippsMinMax_32s(pSrc, len, pMin, pMax)); }
-		
+
 	// minMaxIndx
 	template <> void minMaxIndx(const float * pSrc, int len, float * pMin, int * pMinIndx, float * pMax, int * pMaxIndx) {
 		STATUS_CHECK(ippsMinMaxIndx_32f(pSrc, len, pMin, pMinIndx, pMax, pMaxIndx)); }
@@ -518,7 +518,7 @@ namespace statistical
 		STATUS_CHECK(ippsMinMaxIndx_16s(pSrc, len, pMin, pMinIndx, pMax, pMaxIndx)); }
 	template <> void minMaxIndx(const int32_t * pSrc, int len, int32_t * pMin, int * pMinIndx, int32_t * pMax, int * pMaxIndx) {
 		STATUS_CHECK(ippsMinMaxIndx_32s(pSrc, len, pMin, pMinIndx, pMax, pMaxIndx)); }
-	
+
 	// sum
 	template <> void sum(const float * pSrc, int len, float * pSum) { STATUS_CHECK(
 		ippsSum_32f(pSrc, len, pSum, ippAlgHintNone)); }
@@ -540,7 +540,7 @@ namespace statistical
 		ippsMean_16s_Sfs(pSrc, len, pMean, 0)); }
 	template <> void mean(const int32_t * pSrc, int len, int32_t * pMean) { STATUS_CHECK(
 		ippsMean_32s_Sfs(pSrc, len, pMean, 0)); }
-		
+
 	// stdDev
 	template <> void stdDev(const float * pSrc, int len, float * pStdDev) { STATUS_CHECK(
 		ippsStdDev_32f(pSrc, len, pStdDev, ippAlgHintNone)); }

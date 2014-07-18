@@ -13,6 +13,7 @@ add_executable(test-arithm-float-sse test-arithm.cpp)
 set_target_properties(test-arithm-float-sse PROPERTIES COMPILE_FLAGS "-DSIMD_SSE -DTEST_FLOAT")
 target_link_libraries(test-arithm-float-sse simdsse)
 
+if(IPP_DIR)
 # ipp
 add_executable(test-common-ipp test-common.cpp)
 add_executable(test-convert-ipp test-convert.cpp)
@@ -31,17 +32,20 @@ target_link_libraries(test-convert-ipp simdipp)
 target_link_libraries(test-arithm-ipp simdipp)
 target_link_libraries(test-arithm-float-ipp simdipp)
 target_link_libraries(test-arithm-fixed-ipp simdipp)
+endif(IPP_DIR)
 
 #
 
 add_test(common			test-common)
-add_test(common_ipp		test-common-ipp)
 add_test(convert		test-convert)
-add_test(convert_ipp	test-convert-ipp)
 add_test(arithm			test-arithm)
-add_test(arithm_ipp		test-arithm-ipp)
 add_test(arithm_f		test-arithm-float)
-add_test(arithm_f_ipp	test-arithm-float-ipp)
 add_test(arithm_f_sse	test-arithm-float-sse)
-add_test(arithm_fixed	test-arithm-fixed-ipp)
 
+if(IPP_DIR)
+add_test(common_ipp		test-common-ipp)
+add_test(convert_ipp	test-convert-ipp)
+add_test(arithm_ipp		test-arithm-ipp)
+add_test(arithm_f_ipp	test-arithm-float-ipp)
+add_test(arithm_fixed	test-arithm-fixed-ipp)
+endif()

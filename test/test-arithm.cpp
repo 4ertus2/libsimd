@@ -136,7 +136,7 @@ int test_arithm(T value1, T value2)
 			if (! equal(result[i], r))
 				throw __PRETTY_FUNCTION__;
 	}
-	
+
 	if (hasDivCRev)
 	{
 		r = value2 / value1;
