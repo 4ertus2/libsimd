@@ -83,6 +83,7 @@ namespace ipp
 		_SIMD_EXT_T void inv(const _T* pSrc, _T* pDst, int len);
 		_SIMD_EXT_T void sqr(const _T* pSrc, _T* pDst, int len);
 		_SIMD_EXT_T void sqrt(const _T* pSrc, _T* pDst, int len);
+		_SIMD_EXT_T void invSqrt(const _T* pSrc, _T* pDst, int len);
 		_SIMD_EXT_T void powx(const _T* pSrc, const _T constValue, _T* pDst, int len);
 		_SIMD_EXT_T void pow(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
 #if 0

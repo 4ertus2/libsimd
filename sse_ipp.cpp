@@ -375,6 +375,8 @@ namespace power
 		void sqrt(const double * pSrc, double * pDst, int len) { STATUS_CHECK(ippsSqrt_64f_A53(pSrc, pDst, len)); }
 	}
 
+	// invSqrt
+
 	// powx
 	namespace f21
 	{
