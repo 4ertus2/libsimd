@@ -8,31 +8,23 @@ namespace sse
 {
 namespace common
 {
-	template <> void zero(float * pDst, int len)
-	{
-		__m128 a = _mm_setzero_ps();
-
-		for (; len >= 16; len-=16, pDst+=16)
-		{
-			_mm_store_ps(pDst, a);
-			_mm_store_ps(pDst+4, a);
-			_mm_store_ps(pDst+8, a);
-			_mm_store_ps(pDst+12, a);
-		}
-
-		for (; len >= 4; len-=4, pDst+=4)
-		{
-			_mm_store_ps(pDst, a);
-		}
-
-		for (; len > 0; --len, ++pDst)
-			*pDst = 0;
-	}
-
 	template <> void set(float val, float * pDst, int len)
 	{
 		__m128 a = _mm_set1_ps(val);
+#ifdef UNROLL_MORE
+		for (; len >= 32; len-=32, pDst+=32)
+		{
+			_mm_store_ps(pDst, a);
+			_mm_store_ps(pDst+4, a);
+			_mm_store_ps(pDst+8, a);
+			_mm_store_ps(pDst+12, a);
 
+			_mm_store_ps(pDst+16, a);
+			_mm_store_ps(pDst+20, a);
+			_mm_store_ps(pDst+24, a);
+			_mm_store_ps(pDst+28, a);
+		}
+#endif
 		for (; len >= 16; len-=16, pDst+=16)
 		{
 			_mm_store_ps(pDst, a);
@@ -41,9 +33,19 @@ namespace common
 			_mm_store_ps(pDst+12, a);
 		}
 
-		for (; len >= 4; len-=4, pDst+=4)
+		if (len >= 8)
 		{
 			_mm_store_ps(pDst, a);
+			_mm_store_ps(pDst+4, a);
+
+			len -= 8; pDst += 8;
+		}
+
+		if (len >= 4)
+		{
+			_mm_store_ps(pDst, a);
+
+			len -= 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pDst)
@@ -52,6 +54,30 @@ namespace common
 
 	template <> void copy(const float * pSrc, float * pDst, int len)
 	{
+#ifdef UNROLL_MORE
+		for (; len >= 32; len-=32, pSrc+=32, pDst+=32)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc);
+			__m128 a1 = _mm_loadu_ps(pSrc+4);
+			__m128 a2 = _mm_loadu_ps(pSrc+8);
+			__m128 a3 = _mm_loadu_ps(pSrc+12);
+
+			__m128 a4 = _mm_loadu_ps(pSrc+16);
+			__m128 a5 = _mm_loadu_ps(pSrc+20);
+			__m128 a6 = _mm_loadu_ps(pSrc+24);
+			__m128 a7 = _mm_loadu_ps(pSrc+28);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+
+			_mm_store_ps(pDst+16, a4);
+			_mm_store_ps(pDst+20, a5);
+			_mm_store_ps(pDst+24, a6);
+			_mm_store_ps(pDst+28, a7);
+		}
+#endif
 		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
@@ -65,10 +91,23 @@ namespace common
 			_mm_store_ps(pDst+12, a3);
 		}
 
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
+		if (len >= 8)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc);
+			__m128 a1 = _mm_loadu_ps(pSrc+4);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+
+			len -= 4; pSrc += 4; pDst += 4;
+		}
+
+		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			_mm_store_ps(pDst, a0);
+
+			len -= 4; pSrc += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -77,31 +116,23 @@ namespace common
 
 	// double
 
-	template <> void zero(double * pDst, int len)
-	{
-		__m128d a = _mm_setzero_pd();
-
-		for (; len >= 8; len-=8, pDst+=8)
-		{
-			_mm_store_pd(pDst, a);
-			_mm_store_pd(pDst+2, a);
-			_mm_store_pd(pDst+4, a);
-			_mm_store_pd(pDst+6, a);
-		}
-
-		for (; len >= 2; len-=2, pDst+=2)
-		{
-			_mm_store_pd(pDst, a);
-		}
-
-		if (len)
-			*pDst = 0;
-	}
-
 	template <> void set(double val, double * pDst, int len)
 	{
 		__m128d a = _mm_set1_pd(val);
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pDst+=16)
+		{
+			_mm_store_pd(pDst, a);
+			_mm_store_pd(pDst+2, a);
+			_mm_store_pd(pDst+4, a);
+			_mm_store_pd(pDst+6, a);
 
+			_mm_store_pd(pDst+8, a);
+			_mm_store_pd(pDst+10, a);
+			_mm_store_pd(pDst+12, a);
+			_mm_store_pd(pDst+14, a);
+		}
+#endif
 		for (; len >= 8; len-=8, pDst+=8)
 		{
 			_mm_store_pd(pDst, a);
@@ -110,9 +141,19 @@ namespace common
 			_mm_store_pd(pDst+6, a);
 		}
 
-		for (; len >= 2; len-=2, pDst+=2)
+		if (len >= 4)
 		{
 			_mm_store_pd(pDst, a);
+			_mm_store_pd(pDst+2, a);
+
+			len -= 4; pDst += 4;
+		}
+
+		if (len >= 2)
+		{
+			_mm_store_pd(pDst, a);
+
+			len -= 2; pDst += 2;
 		}
 
 		if (len)
@@ -121,6 +162,30 @@ namespace common
 
 	template <> void copy(const double * pSrc, double * pDst, int len)
 	{
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			__m128d a1 = _mm_loadu_pd(pSrc+2);
+			__m128d a2 = _mm_loadu_pd(pSrc+4);
+			__m128d a3 = _mm_loadu_pd(pSrc+6);
+
+			__m128d a4 = _mm_loadu_pd(pSrc+8);
+			__m128d a5 = _mm_loadu_pd(pSrc+10);
+			__m128d a6 = _mm_loadu_pd(pSrc+12);
+			__m128d a7 = _mm_loadu_pd(pSrc+14);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+
+			_mm_store_pd(pDst+8, a4);
+			_mm_store_pd(pDst+10, a5);
+			_mm_store_pd(pDst+12, a6);
+			_mm_store_pd(pDst+14, a7);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc);
@@ -134,10 +199,23 @@ namespace common
 			_mm_store_pd(pDst+6, a3);
 		}
 
-		for (; len >= 2; len-=2, pSrc+=2, pDst+=2)
+		if (len >= 4)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			__m128d a1 = _mm_loadu_pd(pSrc+2);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+
+			len -= 4; pSrc += 4; pDst += 4;
+		}
+
+		if (len >= 2)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc);
 			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc += 2; pDst += 2;
 		}
 
 		if (len)
@@ -150,28 +228,45 @@ namespace arithmetic
 	template <> void addC(const float * pSrc, float val, float * pDst, int len)
 	{
 		__m128 b = _mm_set1_ps(val);
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc);
+			__m128 a1 = _mm_loadu_ps(pSrc+4);
+			__m128 a2 = _mm_loadu_ps(pSrc+8);
+			__m128 a3 = _mm_loadu_ps(pSrc+12);
 
+			a0 = _mm_add_ps(a0, b);
+			a1 = _mm_add_ps(a1, b);
+			a2 = _mm_add_ps(a2, b);
+			a3 = _mm_add_ps(a3, b);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 a1 = _mm_loadu_ps(pSrc+4);
 
-			__m128 r0 = _mm_add_ps(a0, b);
-			__m128 r1 = _mm_add_ps(a1, b);
+			a0 = _mm_add_ps(a0, b);
+			a1 = _mm_add_ps(a1, b);
 
-			_mm_store_ps(pDst, r0);
-			_mm_store_ps(pDst+4, r1);
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
 		}
 
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 r0 = _mm_add_ps(a0, b);
-			_mm_store_ps(pDst, r0);
 
-			len -= 4;
-			pSrc += 4;
-			pDst += 4;
+			a0 = _mm_add_ps(a0, b);
+			_mm_store_ps(pDst, a0);
+
+			len -= 4; pSrc += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -180,18 +275,43 @@ namespace arithmetic
 
 	template <> void add(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc1+=16, pSrc2+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc1);
+			__m128 a1 = _mm_loadu_ps(pSrc1+4);
+			__m128 a2 = _mm_loadu_ps(pSrc1+8);
+			__m128 a3 = _mm_loadu_ps(pSrc1+12);
+
+			__m128 b0 = _mm_loadu_ps(pSrc2);
+			__m128 b1 = _mm_loadu_ps(pSrc2+4);
+			__m128 b2 = _mm_loadu_ps(pSrc2+8);
+			__m128 b3 = _mm_loadu_ps(pSrc2+12);
+
+			a0 = _mm_add_ps(a0, b0);
+			a1 = _mm_add_ps(a1, b1);
+			a2 = _mm_add_ps(a2, b2);
+			a3 = _mm_add_ps(a3, b3);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc1);
 			__m128 a1 = _mm_loadu_ps(pSrc1+4);
+
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 			__m128 b1 = _mm_loadu_ps(pSrc2+4);
 
-			__m128 r0 = _mm_add_ps(a0, b0);
-			__m128 r1 = _mm_add_ps(a1, b1);
+			a0 = _mm_add_ps(a0, b0);
+			a1 = _mm_add_ps(a1, b1);
 
-			_mm_store_ps(pDst, r0);
-			_mm_store_ps(pDst+4, r1);
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
 		}
 
 		if (len >= 4)
@@ -199,13 +319,10 @@ namespace arithmetic
 			__m128 a0 = _mm_loadu_ps(pSrc1);
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 
-			__m128 r0 = _mm_add_ps(a0, b0);
-			_mm_store_ps(pDst, r0);
+			a0 = _mm_add_ps(a0, b0);
+			_mm_store_ps(pDst, a0);
 
-			len -= 4;
-			pSrc1 += 4;
-			pSrc2 += 4;
-			pDst += 4;
+			len -= 4; pSrc1 += 4; pSrc2 += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
@@ -215,17 +332,35 @@ namespace arithmetic
 	template <> void subC(const float * pSrc, float val, float * pDst, int len)
 	{
 		__m128 b = _mm_set1_ps(val);
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc);
+			__m128 a1 = _mm_loadu_ps(pSrc+4);
+			__m128 a2 = _mm_loadu_ps(pSrc+8);
+			__m128 a3 = _mm_loadu_ps(pSrc+12);
 
+			a0 = _mm_sub_ps(a0, b);
+			a1 = _mm_sub_ps(a1, b);
+			a2 = _mm_sub_ps(a2, b);
+			a3 = _mm_sub_ps(a3, b);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 a1 = _mm_loadu_ps(pSrc+4);
 
-			__m128 r0 = _mm_sub_ps(a0, b);
-			__m128 r1 = _mm_sub_ps(a1, b);
+			a0 = _mm_sub_ps(a0, b);
+			a1 = _mm_sub_ps(a1, b);
 
-			_mm_store_ps(pDst, r0);
-			_mm_store_ps(pDst+4, r1);
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
 		}
 
 		if (len >= 4)
@@ -234,9 +369,7 @@ namespace arithmetic
 			__m128 r0 = _mm_sub_ps(a0, b);
 			_mm_store_ps(pDst, r0);
 
-			len -= 4;
-			pSrc += 4;
-			pDst += 4;
+			len -= 4; pSrc += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -245,29 +378,54 @@ namespace arithmetic
 
 	template <> void subCRev(const float * pSrc, float val, float * pDst, int len)
 	{
-		__m128 a = _mm_set1_ps(val);
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_set1_ps(val);
+			__m128 a1 = _mm_set1_ps(val);
+			__m128 a2 = _mm_set1_ps(val);
+			__m128 a3 = _mm_set1_ps(val);
 
+			__m128 b0 = _mm_loadu_ps(pSrc);
+			__m128 b1 = _mm_loadu_ps(pSrc+4);
+			__m128 b2 = _mm_loadu_ps(pSrc+8);
+			__m128 b3 = _mm_loadu_ps(pSrc+16);
+
+			a0 = _mm_sub_ps(a0, b0);
+			a1 = _mm_sub_ps(a1, b1);
+			a2 = _mm_sub_ps(a2, b2);
+			a3 = _mm_sub_ps(a3, b3);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
+			__m128 a0 = _mm_set1_ps(val);
+			__m128 a1 = _mm_set1_ps(val);
+
 			__m128 b0 = _mm_loadu_ps(pSrc);
 			__m128 b1 = _mm_loadu_ps(pSrc+4);
 
-			__m128 r0 = _mm_sub_ps(a, b0);
-			__m128 r1 = _mm_sub_ps(a, b1);
+			a0 = _mm_sub_ps(a0, b0);
+			a1 = _mm_sub_ps(a1, b1);
 
-			_mm_store_ps(pDst, r0);
-			_mm_store_ps(pDst+4, r1);
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
 		}
 
 		if (len >= 4)
 		{
+			__m128 a0 = _mm_set1_ps(val);
 			__m128 b0 = _mm_loadu_ps(pSrc);
-			__m128 r0 = _mm_sub_ps(a, b0);
-			_mm_store_ps(pDst, r0);
 
-			len -= 4;
-			pSrc += 4;
-			pDst += 4;
+			a0 = _mm_sub_ps(a0, b0);
+			_mm_store_ps(pDst, a0);
+
+			len -= 4; pSrc += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -276,18 +434,43 @@ namespace arithmetic
 
 	template <> void sub(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc1+=16, pSrc2+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc1);
+			__m128 a1 = _mm_loadu_ps(pSrc1+4);
+			__m128 a2 = _mm_loadu_ps(pSrc1+8);
+			__m128 a3 = _mm_loadu_ps(pSrc1+12);
+
+			__m128 b0 = _mm_loadu_ps(pSrc2);
+			__m128 b1 = _mm_loadu_ps(pSrc2+4);
+			__m128 b2 = _mm_loadu_ps(pSrc2+8);
+			__m128 b3 = _mm_loadu_ps(pSrc2+12);
+
+			a0 = _mm_sub_ps(a0, b0);
+			a1 = _mm_sub_ps(a1, b1);
+			a2 = _mm_sub_ps(a2, b2);
+			a3 = _mm_sub_ps(a3, b3);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc1);
 			__m128 a1 = _mm_loadu_ps(pSrc1+4);
+
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 			__m128 b1 = _mm_loadu_ps(pSrc2+4);
 
-			__m128 r0 = _mm_sub_ps(a0, b0);
-			__m128 r1 = _mm_sub_ps(a1, b1);
+			a0 = _mm_sub_ps(a0, b0);
+			a1 = _mm_sub_ps(a1, b1);
 
-			_mm_store_ps(pDst, r0);
-			_mm_store_ps(pDst+4, r1);
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
 		}
 
 		if (len >= 4)
@@ -295,13 +478,10 @@ namespace arithmetic
 			__m128 a0 = _mm_loadu_ps(pSrc1);
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 
-			__m128 r0 = _mm_sub_ps(a0, b0);
-			_mm_store_ps(pDst, r0);
+			a0 = _mm_sub_ps(a0, b0);
+			_mm_store_ps(pDst, a0);
 
-			len -= 4;
-			pSrc1 += 4;
-			pSrc2 += 4;
-			pDst += 4;
+			len -= 4; pSrc1 += 4; pSrc2 += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
@@ -311,28 +491,45 @@ namespace arithmetic
 	template <> void mulC(const float * pSrc, float val, float * pDst, int len)
 	{
 		__m128 b = _mm_set1_ps(val);
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc);
+			__m128 a1 = _mm_loadu_ps(pSrc+4);
+			__m128 a2 = _mm_loadu_ps(pSrc+8);
+			__m128 a3 = _mm_loadu_ps(pSrc+12);
 
+			a0 = _mm_mul_ps(a0, b);
+			a1 = _mm_mul_ps(a1, b);
+			a2 = _mm_mul_ps(a2, b);
+			a3 = _mm_mul_ps(a3, b);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 a1 = _mm_loadu_ps(pSrc+4);
 
-			__m128 r0 = _mm_mul_ps(a0, b);
-			__m128 r1 = _mm_mul_ps(a1, b);
+			a0 = _mm_mul_ps(a0, b);
+			a1 = _mm_mul_ps(a1, b);
 
-			_mm_store_ps(pDst, r0);
-			_mm_store_ps(pDst+4, r1);
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
 		}
 
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 r0 = _mm_mul_ps(a0, b);
-			_mm_store_ps(pDst, r0);
 
-			len -= 4;
-			pSrc += 4;
-			pDst += 4;
+			a0 = _mm_mul_ps(a0, b);
+			_mm_store_ps(pDst, a0);
+
+			len -= 4; pSrc += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -341,18 +538,43 @@ namespace arithmetic
 
 	template <> void mul(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc1+=16, pSrc2+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc1);
+			__m128 a1 = _mm_loadu_ps(pSrc1+4);
+			__m128 a2 = _mm_loadu_ps(pSrc1+8);
+			__m128 a3 = _mm_loadu_ps(pSrc1+12);
+
+			__m128 b0 = _mm_loadu_ps(pSrc2);
+			__m128 b1 = _mm_loadu_ps(pSrc2+4);
+			__m128 b2 = _mm_loadu_ps(pSrc2+8);
+			__m128 b3 = _mm_loadu_ps(pSrc2+12);
+
+			a0 = _mm_mul_ps(a0, b0);
+			a1 = _mm_mul_ps(a1, b1);
+			a2 = _mm_mul_ps(a2, b2);
+			a3 = _mm_mul_ps(a3, b3);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc1);
 			__m128 a1 = _mm_loadu_ps(pSrc1+4);
+
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 			__m128 b1 = _mm_loadu_ps(pSrc2+4);
 
-			__m128 r0 = _mm_mul_ps(a0, b0);
-			__m128 r1 = _mm_mul_ps(a1, b1);
+			a0 = _mm_mul_ps(a0, b0);
+			a1 = _mm_mul_ps(a1, b1);
 
-			_mm_store_ps(pDst, r0);
-			_mm_store_ps(pDst+4, r1);
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
 		}
 
 		if (len >= 4)
@@ -360,13 +582,10 @@ namespace arithmetic
 			__m128 a0 = _mm_loadu_ps(pSrc1);
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 
-			__m128 r0 = _mm_mul_ps(a0, b0);
-			_mm_store_ps(pDst, r0);
+			a0 = _mm_mul_ps(a0, b0);
+			_mm_store_ps(pDst, a0);
 
-			len -= 4;
-			pSrc1 += 4;
-			pSrc2 += 4;
-			pDst += 4;
+			len -= 4; pSrc1 += 4; pSrc2 += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
@@ -376,28 +595,45 @@ namespace arithmetic
 	template <> void divC(const float * pSrc, float val, float * pDst, int len)
 	{
 		__m128 b = _mm_set1_ps(val);
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc);
+			__m128 a1 = _mm_loadu_ps(pSrc+4);
+			__m128 a2 = _mm_loadu_ps(pSrc+8);
+			__m128 a3 = _mm_loadu_ps(pSrc+12);
 
+			a0 = _mm_div_ps(a0, b);
+			a1 = _mm_div_ps(a1, b);
+			a2 = _mm_div_ps(a2, b);
+			a3 = _mm_div_ps(a3, b);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			__m128 a1 = _mm_loadu_ps(pSrc+4);
 
-			__m128 r0 = _mm_div_ps(a0, b);
-			__m128 r1 = _mm_div_ps(a1, b);
+			a0 = _mm_div_ps(a0, b);
+			a1 = _mm_div_ps(a1, b);
 
-			_mm_store_ps(pDst, r0);
-			_mm_store_ps(pDst+4, r1);
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
 		}
 
 		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 r0 = _mm_div_ps(a0, b);
-			_mm_store_ps(pDst, r0);
 
-			len -= 4;
-			pSrc += 4;
-			pDst += 4;
+			a0 = _mm_div_ps(a0, b);
+			_mm_store_ps(pDst, a0);
+
+			len -= 4; pSrc += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -406,29 +642,54 @@ namespace arithmetic
 
 	template <> void divCRev(const float * pSrc, float val, float * pDst, int len)
 	{
-		__m128 a = _mm_set1_ps(val);
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_set1_ps(val);
+			__m128 a1 = _mm_set1_ps(val);
+			__m128 a2 = _mm_set1_ps(val);
+			__m128 a3 = _mm_set1_ps(val);
 
+			__m128 b0 = _mm_loadu_ps(pSrc);
+			__m128 b1 = _mm_loadu_ps(pSrc+4);
+			__m128 b2 = _mm_loadu_ps(pSrc+8);
+			__m128 b3 = _mm_loadu_ps(pSrc+12);
+
+			a0 = _mm_div_ps(a0, b0);
+			a1 = _mm_div_ps(a1, b1);
+			a2 = _mm_div_ps(a2, b2);
+			a3 = _mm_div_ps(a3, b3);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
+			__m128 a0 = _mm_set1_ps(val);
+			__m128 a1 = _mm_set1_ps(val);
+
 			__m128 b0 = _mm_loadu_ps(pSrc);
 			__m128 b1 = _mm_loadu_ps(pSrc+4);
 
-			__m128 r0 = _mm_div_ps(a, b0);
-			__m128 r1 = _mm_div_ps(a, b1);
+			a0 = _mm_div_ps(a0, b0);
+			a1 = _mm_div_ps(a1, b1);
 
-			_mm_store_ps(pDst, r0);
-			_mm_store_ps(pDst+4, r1);
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
 		}
 
 		if (len >= 4)
 		{
+			__m128 a0 = _mm_set1_ps(val);
 			__m128 b0 = _mm_loadu_ps(pSrc);
-			__m128 r0 = _mm_div_ps(a, b0);
-			_mm_store_ps(pDst, r0);
 
-			len -= 4;
-			pSrc += 4;
-			pDst += 4;
+			a0 = _mm_div_ps(a0, b0);
+			_mm_store_ps(pDst, a0);
+
+			len -= 4; pSrc += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -437,18 +698,43 @@ namespace arithmetic
 
 	template <> void div(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc1+=16, pSrc2+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc1);
+			__m128 a1 = _mm_loadu_ps(pSrc1+4);
+			__m128 a2 = _mm_loadu_ps(pSrc1+8);
+			__m128 a3 = _mm_loadu_ps(pSrc1+12);
+
+			__m128 b0 = _mm_loadu_ps(pSrc2);
+			__m128 b1 = _mm_loadu_ps(pSrc2+4);
+			__m128 b2 = _mm_loadu_ps(pSrc2+8);
+			__m128 b3 = _mm_loadu_ps(pSrc2+12);
+
+			a0 = _mm_div_ps(a0, b0);
+			a1 = _mm_div_ps(a1, b1);
+			a2 = _mm_div_ps(a2, b2);
+			a3 = _mm_div_ps(a3, b3);
+
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
+			_mm_store_ps(pDst+8, a2);
+			_mm_store_ps(pDst+12, a3);
+		}
+#endif
 		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc1);
 			__m128 a1 = _mm_loadu_ps(pSrc1+4);
+
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 			__m128 b1 = _mm_loadu_ps(pSrc2+4);
 
-			__m128 r0 = _mm_div_ps(a0, b0);
-			__m128 r1 = _mm_div_ps(a1, b1);
+			a0 = _mm_div_ps(a0, b0);
+			a1 = _mm_div_ps(a1, b1);
 
-			_mm_store_ps(pDst, r0);
-			_mm_store_ps(pDst+4, r1);
+			_mm_store_ps(pDst, a0);
+			_mm_store_ps(pDst+4, a1);
 		}
 
 		if (len >= 4)
@@ -456,13 +742,10 @@ namespace arithmetic
 			__m128 a0 = _mm_loadu_ps(pSrc1);
 			__m128 b0 = _mm_loadu_ps(pSrc2);
 
-			__m128 r0 = _mm_div_ps(a0, b0);
-			_mm_store_ps(pDst, r0);
+			a0 = _mm_div_ps(a0, b0);
+			_mm_store_ps(pDst, a0);
 
-			len -= 4;
-			pSrc1 += 4;
-			pSrc2 += 4;
-			pDst += 4;
+			len -= 4; pSrc1 += 4; pSrc2 += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
@@ -474,17 +757,44 @@ namespace arithmetic
 	template <> void addC(const double * pSrc, double val, double * pDst, int len)
 	{
 		__m128d b = _mm_set1_pd(val);
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			__m128d a1 = _mm_loadu_pd(pSrc+2);
+			__m128d a2 = _mm_loadu_pd(pSrc+4);
+			__m128d a3 = _mm_loadu_pd(pSrc+6);
 
+			a0 = _mm_add_pd(a0, b);
+			a1 = _mm_add_pd(a1, b);
+			a2 = _mm_add_pd(a2, b);
+			a3 = _mm_add_pd(a3, b);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc);
 			__m128d a1 = _mm_loadu_pd(pSrc+2);
 
-			__m128d r0 = _mm_add_pd(a0, b);
-			__m128d r1 = _mm_add_pd(a1, b);
+			a0 = _mm_add_pd(a0, b);
+			a1 = _mm_add_pd(a1, b);
 
-			_mm_store_pd(pDst, r0);
-			_mm_store_pd(pDst+2, r1);
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			a0 = _mm_add_pd(a0, b);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc += 2; pDst += 2;
  		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -493,18 +803,54 @@ namespace arithmetic
 
 	template <> void add(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc1);
+			__m128d a1 = _mm_loadu_pd(pSrc1+2);
+			__m128d a2 = _mm_loadu_pd(pSrc1+4);
+			__m128d a3 = _mm_loadu_pd(pSrc1+6);
+
+			__m128d b0 = _mm_loadu_pd(pSrc2);
+			__m128d b1 = _mm_loadu_pd(pSrc2+2);
+			__m128d b2 = _mm_loadu_pd(pSrc2+4);
+			__m128d b3 = _mm_loadu_pd(pSrc2+6);
+
+			a0 = _mm_add_pd(a0, b0);
+			a1 = _mm_add_pd(a1, b1);
+			a2 = _mm_add_pd(a2, b2);
+			a3 = _mm_add_pd(a3, b3);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
 		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc1);
 			__m128d a1 = _mm_loadu_pd(pSrc1+2);
+
 			__m128d b0 = _mm_loadu_pd(pSrc2);
 			__m128d b1 = _mm_loadu_pd(pSrc2+2);
 
-			__m128d r0 = _mm_add_pd(a0, b0);
-			__m128d r1 = _mm_add_pd(a1, b1);
+			a0 = _mm_add_pd(a0, b0);
+			a1 = _mm_add_pd(a1, b1);
 
-			_mm_store_pd(pDst, r0);
-			_mm_store_pd(pDst+2, r1);
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc1);
+			__m128d b0 = _mm_loadu_pd(pSrc2);
+
+			a0 = _mm_add_pd(a0, b0);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc1 += 2; pSrc2 += 2; pDst += 2;
  		}
 
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
@@ -514,18 +860,45 @@ namespace arithmetic
 	template <> void subC(const double * pSrc, double val, double * pDst, int len)
 	{
 		__m128d b = _mm_set1_pd(val);
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			__m128d a1 = _mm_loadu_pd(pSrc+2);
+			__m128d a2 = _mm_loadu_pd(pSrc+4);
+			__m128d a3 = _mm_loadu_pd(pSrc+6);
 
+			a0 = _mm_sub_pd(a0, b);
+			a1 = _mm_sub_pd(a1, b);
+			a2 = _mm_sub_pd(a2, b);
+			a3 = _mm_sub_pd(a3, b);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc);
 			__m128d a1 = _mm_loadu_pd(pSrc+2);
 
-			__m128d r0 = _mm_sub_pd(a0, b);
-			__m128d r1 = _mm_sub_pd(a1, b);
+			a0 = _mm_sub_pd(a0, b);
+			a1 = _mm_sub_pd(a1, b);
 
-			_mm_store_pd(pDst, r0);
-			_mm_store_pd(pDst+2, r1);
- 		}
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			a0 = _mm_sub_pd(a0, b);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc += 2; pDst += 2;
+		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = *pSrc - val;
@@ -533,19 +906,55 @@ namespace arithmetic
 
 	template <> void subCRev(const double * pSrc, double val, double * pDst, int len)
 	{
-		__m128d a = _mm_set1_pd(val);
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_set1_pd(val);
+			__m128d a1 = _mm_set1_pd(val);
+			__m128d a2 = _mm_set1_pd(val);
+			__m128d a3 = _mm_set1_pd(val);
 
+			__m128d b0 = _mm_loadu_pd(pSrc);
+			__m128d b1 = _mm_loadu_pd(pSrc+2);
+			__m128d b2 = _mm_loadu_pd(pSrc+4);
+			__m128d b3 = _mm_loadu_pd(pSrc+6);
+
+			a0 = _mm_sub_pd(a0, b0);
+			a1 = _mm_sub_pd(a1, b1);
+			a2 = _mm_sub_pd(a2, b2);
+			a3 = _mm_sub_pd(a3, b3);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
 		{
+			__m128d a0 = _mm_set1_pd(val);
+			__m128d a1 = _mm_set1_pd(val);
+
 			__m128d b0 = _mm_loadu_pd(pSrc);
 			__m128d b1 = _mm_loadu_pd(pSrc+2);
 
-			__m128d r0 = _mm_sub_pd(a, b0);
-			__m128d r1 = _mm_sub_pd(a, b1);
+			a0 = _mm_sub_pd(a0, b0);
+			a1 = _mm_sub_pd(a1, b1);
 
-			_mm_store_pd(pDst, r0);
-			_mm_store_pd(pDst+2, r1);
- 		}
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_set1_pd(val);
+			__m128d b0 = _mm_loadu_pd(pSrc);
+
+			a0 = _mm_sub_pd(a0, b0);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc += 2; pDst += 2;
+		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = val - *pSrc;
@@ -553,19 +962,55 @@ namespace arithmetic
 
 	template <> void sub(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc1);
+			__m128d a1 = _mm_loadu_pd(pSrc1+2);
+			__m128d a2 = _mm_loadu_pd(pSrc1+4);
+			__m128d a3 = _mm_loadu_pd(pSrc1+6);
+
+			__m128d b0 = _mm_loadu_pd(pSrc2);
+			__m128d b1 = _mm_loadu_pd(pSrc2+2);
+			__m128d b2 = _mm_loadu_pd(pSrc2+4);
+			__m128d b3 = _mm_loadu_pd(pSrc2+6);
+
+			a0 = _mm_sub_pd(a0, b0);
+			a1 = _mm_sub_pd(a1, b1);
+			a2 = _mm_sub_pd(a2, b2);
+			a3 = _mm_sub_pd(a3, b3);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
 		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc1);
 			__m128d a1 = _mm_loadu_pd(pSrc1+2);
+
 			__m128d b0 = _mm_loadu_pd(pSrc2);
 			__m128d b1 = _mm_loadu_pd(pSrc2+2);
 
-			__m128d r0 = _mm_sub_pd(a0, b0);
-			__m128d r1 = _mm_sub_pd(a1, b1);
+			a0 = _mm_sub_pd(a0, b0);
+			a1 = _mm_sub_pd(a1, b1);
 
-			_mm_store_pd(pDst, r0);
-			_mm_store_pd(pDst+2, r1);
- 		}
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc1);
+			__m128d b0 = _mm_loadu_pd(pSrc2);
+
+			a0 = _mm_sub_pd(a0, b0);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc1 += 2; pSrc2 += 2; pDst += 2;
+		}
 
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
 			*pDst = *pSrc1 - *pSrc2;
@@ -574,18 +1019,46 @@ namespace arithmetic
 	template <> void mulC(const double * pSrc, double val, double * pDst, int len)
 	{
 		__m128d b = _mm_set1_pd(val);
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			__m128d a1 = _mm_loadu_pd(pSrc+2);
+			__m128d a2 = _mm_loadu_pd(pSrc+4);
+			__m128d a3 = _mm_loadu_pd(pSrc+6);
 
+			a0 = _mm_mul_pd(a0, b);
+			a1 = _mm_mul_pd(a1, b);
+			a2 = _mm_mul_pd(a2, b);
+			a3 = _mm_mul_pd(a3, b);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc);
 			__m128d a1 = _mm_loadu_pd(pSrc+2);
 
-			__m128d r0 = _mm_mul_pd(a0, b);
-			__m128d r1 = _mm_mul_pd(a1, b);
+			a0 = _mm_mul_pd(a0, b);
+			a1 = _mm_mul_pd(a1, b);
 
-			_mm_store_pd(pDst, r0);
-			_mm_store_pd(pDst+2, r1);
- 		}
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+
+			a0 = _mm_mul_pd(a0, b);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc += 2; pDst += 2;
+		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = *pSrc * val;
@@ -593,19 +1066,55 @@ namespace arithmetic
 
 	template <> void mul(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc1);
+			__m128d a1 = _mm_loadu_pd(pSrc1+2);
+			__m128d a2 = _mm_loadu_pd(pSrc1+4);
+			__m128d a3 = _mm_loadu_pd(pSrc1+6);
+
+			__m128d b0 = _mm_loadu_pd(pSrc2);
+			__m128d b1 = _mm_loadu_pd(pSrc2+2);
+			__m128d b2 = _mm_loadu_pd(pSrc2+4);
+			__m128d b3 = _mm_loadu_pd(pSrc2+6);
+
+			a0 = _mm_mul_pd(a0, b0);
+			a1 = _mm_mul_pd(a1, b1);
+			a2 = _mm_mul_pd(a2, b2);
+			a3 = _mm_mul_pd(a3, b3);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
 		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc1);
 			__m128d a1 = _mm_loadu_pd(pSrc1+2);
+
 			__m128d b0 = _mm_loadu_pd(pSrc2);
 			__m128d b1 = _mm_loadu_pd(pSrc2+2);
 
-			__m128d r0 = _mm_mul_pd(a0, b0);
-			__m128d r1 = _mm_mul_pd(a1, b1);
+			a0 = _mm_mul_pd(a0, b0);
+			a1 = _mm_mul_pd(a1, b1);
 
-			_mm_store_pd(pDst, r0);
-			_mm_store_pd(pDst+2, r1);
- 		}
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc1);
+			__m128d b0 = _mm_loadu_pd(pSrc2);
+
+			a0 = _mm_mul_pd(a0, b0);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc1 += 2; pSrc2 += 2; pDst += 2;
+		}
 
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
 			*pDst = *pSrc1 * *pSrc2;
@@ -614,18 +1123,46 @@ namespace arithmetic
 	template <> void divC(const double * pSrc, double val, double * pDst, int len)
 	{
 		__m128d b = _mm_set1_pd(val);
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			__m128d a1 = _mm_loadu_pd(pSrc+2);
+			__m128d a2 = _mm_loadu_pd(pSrc+4);
+			__m128d a3 = _mm_loadu_pd(pSrc+6);
 
+			a0 = _mm_div_pd(a0, b);
+			a1 = _mm_div_pd(a1, b);
+			a2 = _mm_div_pd(a2, b);
+			a3 = _mm_div_pd(a3, b);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc);
 			__m128d a1 = _mm_loadu_pd(pSrc+2);
 
-			__m128d r0 = _mm_div_pd(a0, b);
-			__m128d r1 = _mm_div_pd(a1, b);
+			a0 = _mm_div_pd(a0, b);
+			a1 = _mm_div_pd(a1, b);
 
-			_mm_store_pd(pDst, r0);
-			_mm_store_pd(pDst+2, r1);
- 		}
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+
+			a0 = _mm_div_pd(a0, b);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc += 2; pDst += 2;
+		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = *pSrc / val;
@@ -633,19 +1170,55 @@ namespace arithmetic
 
 	template <> void divCRev(const double * pSrc, double val, double * pDst, int len)
 	{
-		__m128d a = _mm_set1_pd(val);
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_set1_pd(val);
+			__m128d a1 = _mm_set1_pd(val);
+			__m128d a2 = _mm_set1_pd(val);
+			__m128d a3 = _mm_set1_pd(val);
 
+			__m128d b0 = _mm_loadu_pd(pSrc);
+			__m128d b1 = _mm_loadu_pd(pSrc+2);
+			__m128d b2 = _mm_loadu_pd(pSrc+4);
+			__m128d b3 = _mm_loadu_pd(pSrc+6);
+
+			a0 = _mm_div_pd(a0, b0);
+			a1 = _mm_div_pd(a1, b1);
+			a2 = _mm_div_pd(a2, b2);
+			a3 = _mm_div_pd(a3, b3);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
 		{
+			__m128d a0 = _mm_set1_pd(val);
+			__m128d a1 = _mm_set1_pd(val);
+
 			__m128d b0 = _mm_loadu_pd(pSrc);
 			__m128d b1 = _mm_loadu_pd(pSrc+2);
 
-			__m128d r0 = _mm_div_pd(a, b0);
-			__m128d r1 = _mm_div_pd(a, b1);
+			a0 = _mm_div_pd(a0, b0);
+			a1 = _mm_div_pd(a1, b1);
 
-			_mm_store_pd(pDst, r0);
-			_mm_store_pd(pDst+2, r1);
- 		}
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_set1_pd(val);
+			__m128d b0 = _mm_loadu_pd(pSrc);
+
+			a0 = _mm_div_pd(a0, b0);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc += 2; pDst += 2;
+		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
 			*pDst = val / *pSrc;
@@ -653,19 +1226,55 @@ namespace arithmetic
 
 	template <> void div(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc1);
+			__m128d a1 = _mm_loadu_pd(pSrc1+2);
+			__m128d a2 = _mm_loadu_pd(pSrc1+4);
+			__m128d a3 = _mm_loadu_pd(pSrc1+6);
+
+			__m128d b0 = _mm_loadu_pd(pSrc2);
+			__m128d b1 = _mm_loadu_pd(pSrc2+2);
+			__m128d b2 = _mm_loadu_pd(pSrc2+4);
+			__m128d b3 = _mm_loadu_pd(pSrc2+6);
+
+			a0 = _mm_div_pd(a0, b0);
+			a1 = _mm_div_pd(a1, b1);
+			a2 = _mm_div_pd(a2, b2);
+			a3 = _mm_div_pd(a3, b3);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
 		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc1);
 			__m128d a1 = _mm_loadu_pd(pSrc1+2);
+
 			__m128d b0 = _mm_loadu_pd(pSrc2);
 			__m128d b1 = _mm_loadu_pd(pSrc2+2);
 
-			__m128d r0 = _mm_div_pd(a0, b0);
-			__m128d r1 = _mm_div_pd(a1, b1);
+			a0 = _mm_div_pd(a0, b0);
+			a1 = _mm_div_pd(a1, b1);
 
-			_mm_store_pd(pDst, r0);
-			_mm_store_pd(pDst+2, r1);
- 		}
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc1);
+			__m128d b0 = _mm_loadu_pd(pSrc2);
+
+			a0 = _mm_div_pd(a0, b0);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc1 += 2; pSrc2 += 2; pDst += 2;
+		}
 
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
 			*pDst = *pSrc1 / *pSrc2;
@@ -689,10 +1298,23 @@ namespace power
 			_mm_store_ps(pDst+12,	_mm_rcp_ps(a3));
 		}
 
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
+		if (len >= 8)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc);
+			__m128 a1 = _mm_loadu_ps(pSrc+4);
+
+			_mm_store_ps(pDst, 		_mm_rcp_ps(a0));
+			_mm_store_ps(pDst+4,	_mm_rcp_ps(a1));
+
+			len -= 8; pSrc += 8; pDst += 8;
+		}
+
+		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			_mm_store_ps(pDst,		_mm_rcp_ps(a0));
+
+			len -= 4; pSrc += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -717,10 +1339,23 @@ namespace power
 			_mm_store_ps(pDst+12,	_mm_sqrt_ps(a3));
 		}
 
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
+		if (len >= 8)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc);
+			__m128 a1 = _mm_loadu_ps(pSrc+4);
+
+			_mm_store_ps(pDst,		_mm_sqrt_ps(a0));
+			_mm_store_ps(pDst+4,	_mm_sqrt_ps(a1));
+
+			len -= 8; pSrc += 8; pDst += 8;
+		}
+
+		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			_mm_store_ps(pDst,		_mm_sqrt_ps(a0));
+
+			len -= 4, pSrc += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -745,10 +1380,23 @@ namespace power
 			_mm_store_ps(pDst+12,	_mm_rsqrt_ps(a3));
 		}
 
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
+		if (len >= 8)
+		{
+			__m128 a0 = _mm_loadu_ps(pSrc);
+			__m128 a1 = _mm_loadu_ps(pSrc+4);
+
+			_mm_store_ps(pDst,		_mm_rsqrt_ps(a0));
+			_mm_store_ps(pDst+4,	_mm_rsqrt_ps(a1));
+
+			len -= 8; pSrc += 8; pDst += 8;
+		}
+
+		if (len >= 4)
 		{
 			__m128 a0 = _mm_loadu_ps(pSrc);
 			_mm_store_ps(pDst, 		_mm_rsqrt_ps(a0));
+
+			len -= 4; pSrc += 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
@@ -780,10 +1428,23 @@ namespace power
 			_mm_store_pd(pDst+6,	_mm_sqrt_pd(a3));
 		}
 
-		for (; len >= 2; len-=2, pSrc+=2, pDst+=2)
+		if (len >= 4)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			__m128d a1 = _mm_loadu_pd(pSrc+2);
+
+			_mm_store_pd(pDst,		_mm_sqrt_pd(a0));
+			_mm_store_pd(pDst+2,	_mm_sqrt_pd(a1));
+
+			len -= 4; pSrc += 4; pDst += 4;
+		}
+
+		if (len >= 2)
 		{
 			__m128d a0 = _mm_loadu_pd(pSrc);
 			_mm_store_pd(pDst,		_mm_sqrt_pd(a0));
+
+			len -= 2; pSrc += 2; pDst += 2;
 		}
 
 		if (len)

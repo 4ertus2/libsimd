@@ -65,9 +65,11 @@ namespace
 static const unsigned LENGTH = 39;
 
 template<typename T, bool hasDivC = true, bool hasDivCRev = false>
-int test_arithm(T value1, T value2)
+void test_arithm(T value1, T value2)
 {
 	using std::shared_ptr;
+	using std::cerr;
+	using std::endl;
 
 	shared_ptr<T> pv1 = shared_ptr<T>(simd::malloc<T>(LENGTH), simd::free<T>);
 	shared_ptr<T> pv2 = shared_ptr<T>(simd::malloc<T>(LENGTH), simd::free<T>);
@@ -76,57 +78,90 @@ int test_arithm(T value1, T value2)
 	T * v2 = pv2.get();
 	T * result = presult.get();
 
+	bool failed = false;
+
 	simd::set(value1, v1, LENGTH);
 	simd::set(value2, v2, LENGTH);
+
+	for (int i=0; i<LENGTH; ++i)
+		if (! equal(v1[i], value1) || ! equal(v2[i], value2))
+		{
+			cerr << "set" << endl;
+			failed = true;
+		}
 
 	T r = value1 + value2;
 	arithm::add(v1, v2, result, LENGTH);
 	for (int i=0; i<LENGTH; ++i)
 		if (! equal(result[i], r))
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "add" << endl;
+			failed = true;
+		}
 
 	r = value1 - value2;
 	arithm::sub(v1, v2, result, LENGTH);
 	for (int i=0; i<LENGTH; ++i)
 		if (! equal(result[i], r))
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "sub" << endl;
+			failed = true;
+		}
 
 	r = value1 * value2;
 	arithm::mul(v1, v2, result, LENGTH);
 	for (int i=0; i<LENGTH; ++i)
 		if (! equal(result[i], r))
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "mul" << endl;
+			failed = true;
+		}
 
 	r = value1 / value2;
 	arithm::div(v1, v2, result, LENGTH);
 	for (int i=0; i<LENGTH; ++i)
 		if (! equal(result[i], r))
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "div" << endl;
+			failed = true;
+		}
 
 #ifndef TEST_FIXED
 	r = value1 + value2;
 	simd::addC(v1, value2, result, LENGTH);
 	for (int i=0; i<LENGTH; ++i)
 		if (! equal(result[i], r))
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "addC" << endl;
+			failed = true;
+		}
 
 	r = value1 - value2;
 	simd::subC(v1, value2, result, LENGTH);
 	for (int i=0; i<LENGTH; ++i)
 		if (result[i] != r)
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "subC" << endl;
+			failed = true;
+		}
 
 	r = value2 - value1;
 	simd::subCRev(v1, value2, result, LENGTH);
 	for (int i=0; i<LENGTH; ++i)
 		if (! equal(result[i], r))
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "subCRev" << endl;
+			failed = true;
+		}
 
 	r = value1 * value2;
 	simd::mulC(v1, value2, result, LENGTH);
 	for (int i=0; i<LENGTH; ++i)
 		if (result[i] != r)
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "mulC" << endl;
+			failed = true;
+		}
 
 	if (hasDivC)
 	{
@@ -134,7 +169,10 @@ int test_arithm(T value1, T value2)
 		simd::divC(v1, value2, result, LENGTH);
 		for (int i=0; i<LENGTH; ++i)
 			if (! equal(result[i], r))
-				throw __PRETTY_FUNCTION__;
+			{
+				cerr << "divC" << endl;
+				failed = true;
+			}
 	}
 
 	if (hasDivCRev)
@@ -143,11 +181,15 @@ int test_arithm(T value1, T value2)
 		simd::divCRev(v1, value2, result, LENGTH);
 		for (int i=0; i<LENGTH; ++i)
 			if (! equal(result[i], r))
-				throw __PRETTY_FUNCTION__;
+			{
+				cerr << "divCRev" << endl;
+				failed = true;
+			}
 	}
 #endif // TEST_FIXED
 
-	return 0;
+	if (failed)
+		throw __PRETTY_FUNCTION__;
 }
 
 int main()

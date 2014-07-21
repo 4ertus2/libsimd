@@ -24,7 +24,7 @@ namespace sse
 	namespace common
 	{
 		_SIMD_EXT_T void set(_T val, _T* pDst, int len);
-		_SIMD_EXT_T void zero(_T* pDst, int len);
+		_SIMD_EXT_T void zero(_T* pDst, int len) { set<_T>((_T)0, pDst, len); }
 		_SIMD_EXT_T void copy(const _T* pSrc, _T* pDst, int len);
 
 		using nosimd::common::malloc;

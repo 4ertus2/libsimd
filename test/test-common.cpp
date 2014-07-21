@@ -10,6 +10,8 @@ template<typename T>
 void test_common()
 {
 	using std::shared_ptr;
+	using std::cerr;
+	using std::endl;
 
 	static const T VALUE = 42;
 
@@ -18,27 +20,44 @@ void test_common()
 	T * a = pa.get();
 	T * b = pb.get();
 
+	bool failed = false;
+
 	simd::set(VALUE, a, LENGTH);
 	for (unsigned i=0; i<LENGTH; ++i)
 		if (a[i] != VALUE)
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "set" << endl;
+			failed = true;
+		}
 
 	simd::copy(a, b, LENGTH);
 	for (unsigned i=0; i<LENGTH; ++i)
 		if (b[i] != VALUE)
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "copy" << endl;
+			failed = true;
+		}
 
 	simd::zero(b, LENGTH);
 	for (unsigned i=0; i<LENGTH; ++i)
 		if (b[i] != 0)
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "zero" << endl;
+			failed = true;
+		}
 
 	for (unsigned i=0; i<LENGTH; ++i)
 		a[i] = i;
 	simd::copy(a, b, LENGTH);
 	for (unsigned i=0; i<LENGTH; ++i)
 		if (b[i] != i)
-			throw __PRETTY_FUNCTION__;
+		{
+			cerr << "copy(2)" << endl;
+			failed = true;
+		}
+
+	if (failed)
+		throw __PRETTY_FUNCTION__;
 }
 
 int main()

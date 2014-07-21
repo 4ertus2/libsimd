@@ -38,6 +38,8 @@ if(IPP_DIR)
 endif()
 
 add_library(simdsse STATIC sse.cpp)
+add_library(simdsse_ur STATIC sse.cpp)
+set_target_properties(simdsse_ur PROPERTIES COMPILE_FLAGS "-DUNROLL_MORE")
 
 add_subdirectory(test)
 
