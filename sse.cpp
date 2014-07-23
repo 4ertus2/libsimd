@@ -1467,53 +1467,146 @@ namespace statistical
 {
 	template <> void min(const float * pSrc, int len, float * pMin)
 	{
-		if (len < 16) {
-			nosimd::min(pSrc, len, pMin);
-			return;
+		__m128 r0;
+
+		if (len >= 4)
+		{
+			r0 = _mm_loadu_ps(pSrc);
+			len -= 4; pSrc += 4;
+
+			if (len >= 8)
+			{
+				__m128 r1 = _mm_loadu_ps(pSrc);
+				len -= 4; pSrc += 4;
+
+				if (len >= 16)
+				{
+					__m128 r2 = _mm_loadu_ps(pSrc);
+					__m128 r3 = _mm_loadu_ps(pSrc+4);
+					len -= 8; pSrc += 8;
+
+					for (; len >= 16; len-=16, pSrc+=16)
+					{
+						__m128 a0 = _mm_loadu_ps(pSrc);
+						__m128 a1 = _mm_loadu_ps(pSrc+4);
+						__m128 a2 = _mm_loadu_ps(pSrc+8);
+						__m128 a3 = _mm_loadu_ps(pSrc+12);
+
+						r0 = _mm_min_ps(r0, a0);
+						r1 = _mm_min_ps(r1, a1);
+						r2 = _mm_min_ps(r2, a2);
+						r3 = _mm_min_ps(r3, a3);
+					}
+
+					r0 = _mm_min_ps(r0, r2);
+					r1 = _mm_min_ps(r1, r3);
+				}
+
+				if (len >= 8)
+				{
+					__m128 a0 = _mm_loadu_ps(pSrc);
+					__m128 a1 = _mm_loadu_ps(pSrc+4);
+
+					r0 = _mm_min_ps(r0, a0);
+					r1 = _mm_min_ps(r1, a1);
+
+					len -=8; pSrc += 8;
+				}
+
+				r0 = _mm_min_ps(r0, r1);
+			}
+
+			if (len >= 4)
+			{
+				__m128 a0 = _mm_loadu_ps(pSrc);
+				r0 = _mm_min_ps(r0, a0);
+				len -= 4; pSrc += 4;
+			}
+		}
+		else
+		{
+			r0 = _mm_load1_ps(pSrc);
+			--len; ++pSrc;
 		}
 
-		__m128 m0 = _mm_loadu_ps(pSrc);
-		__m128 m1 = _mm_loadu_ps(pSrc+4);
-		__m128 m2 = _mm_loadu_ps(pSrc+8);
-		__m128 m3 = _mm_loadu_ps(pSrc+12);
-
-		len -= 16;
-		pSrc += 16;
-
-		for (; len >= 16; len-=16, pSrc+=16)
+		for (; len; --len, ++pSrc)
 		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-			m0 = _mm_min_ps(m0, a0);
-			m1 = _mm_min_ps(m1, a1);
-			m2 = _mm_min_ps(m2, a2);
-			m3 = _mm_min_ps(m3, a3);
-		}
-
-		m0 = _mm_min_ps(m0, m1);
-		m2 = _mm_min_ps(m2, m3);
-		m0 = _mm_min_ps(m0, m2);
-
-		for (; len >= 4; len-=4, pSrc+=4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			m0 = _mm_min_ps(m0, a0);
+			__m128 a0 = _mm_load_ss(pSrc);
+			r0 = _mm_min_ss(r0, a0);
 		}
 
 		float res[4];
-		_mm_store_ps(res, m0);
+		_mm_store_ps(res, r0);
 
-		*pMin = res[0];
-		for (unsigned i=1; i<4; ++i)
-			if (*pMin < res[i])
-				*pMin = res[i];
+		res[0] = (res[0] < res[1]) ? res[0] : res[1];
+		res[2] = (res[2] < res[3]) ? res[2] : res[3];
+		*pMin = (res[0] < res[2]) ? res[0] : res[2];
+	}
 
-		for (; len > 0; --len, ++pSrc)
-			if (*pMin < *pSrc)
-				*pMin = *pSrc;
+	template <> void sum(const float * pSrc, int len, float * pSum)
+	{
+		__m128 r0 = _mm_setzero_ps();
+
+		if (len >= 4)
+		{
+			if (len >= 8)
+			{
+				__m128 r1 = _mm_setzero_ps();
+
+				if (len >= 16)
+				{
+					__m128 r2 = _mm_setzero_ps();
+					__m128 r3 = _mm_setzero_ps();
+
+					for (; len >= 16; len-=16, pSrc+=16)
+					{
+						__m128 a0 = _mm_loadu_ps(pSrc);
+						__m128 a1 = _mm_loadu_ps(pSrc+4);
+						__m128 a2 = _mm_loadu_ps(pSrc+8);
+						__m128 a3 = _mm_loadu_ps(pSrc+12);
+
+						r0 = _mm_add_ps(r0, a0);
+						r1 = _mm_add_ps(r1, a1);
+						r2 = _mm_add_ps(r2, a2);
+						r3 = _mm_add_ps(r3, a3);
+					}
+
+					r0 = _mm_add_ps(r0, r2);
+					r1 = _mm_add_ps(r1, r3);
+				}
+
+				if (len >= 8)
+				{
+					__m128 a0 = _mm_loadu_ps(pSrc);
+					__m128 a1 = _mm_loadu_ps(pSrc+4);
+
+					r0 = _mm_add_ps(r0, a0);
+					r1 = _mm_add_ps(r1, a1);
+
+					len -= 8; pSrc += 8;
+				}
+
+				r0 = _mm_add_ps(r0, r1);
+			}
+
+			if (len >= 4)
+			{
+				__m128 a0 = _mm_loadu_ps(pSrc);
+				r0 = _mm_add_ps(r0, a0);
+
+				len -= 4; pSrc += 4;
+			}
+		}
+
+		for (; len; --len, ++pSrc)
+		{
+			__m128 a0 = _mm_load_ss(pSrc);
+			r0 = _mm_add_ss(r0, a0);
+		}
+
+		float res[4];
+		_mm_store_ps(res, r0);
+		*pSum = res[0] + res[1] + res[2] + res[3];
 	}
 }
 }
