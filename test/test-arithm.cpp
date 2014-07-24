@@ -73,10 +73,11 @@ void test_arithm(T value1, T value2)
 
 	shared_ptr<T> pv1 = shared_ptr<T>(simd::malloc<T>(LENGTH), simd::free<T>);
 	shared_ptr<T> pv2 = shared_ptr<T>(simd::malloc<T>(LENGTH), simd::free<T>);
-	shared_ptr<T> presult = shared_ptr<T>(simd::malloc<T>(LENGTH), simd::free<T>);
+	shared_ptr<T> presult = shared_ptr<T>(simd::malloc<T>(LENGTH+1), simd::free<T>);
 	T * v1 = pv1.get();
 	T * v2 = pv2.get();
 	T * result = presult.get();
+	result[LENGTH] = 0x7f;
 
 	bool failed = false;
 
@@ -188,6 +189,41 @@ void test_arithm(T value1, T value2)
 	}
 #endif // TEST_FIXED
 
+	if (result[LENGTH] != 0x7f)
+	{
+		cerr << "length" << endl;
+		failed = true;
+	}
+
+	if (failed)
+		throw __PRETTY_FUNCTION__;
+}
+
+template<typename T>
+void test_abs()
+{
+	using std::shared_ptr;
+	using std::cerr;
+	using std::endl;
+
+	shared_ptr<T> pv = shared_ptr<T>(simd::malloc<T>(LENGTH), simd::free<T>);
+	T * v = pv.get();
+
+	bool failed = false;
+
+	T val = 1;
+	for (int i=0; i < LENGTH; ++i, val*=-1)
+		v[i] = val;
+
+	simd::abs(v, v, LENGTH);
+
+	for (int i=0; i < LENGTH; ++i, val+=1)
+		if (v[i] < 0)
+		{
+			cerr << "abs" << endl;
+			failed = true;
+		}
+
 	if (failed)
 		throw __PRETTY_FUNCTION__;
 }
@@ -204,6 +240,8 @@ int main()
 #else
 		test_arithm<double, true, true>(1, 2);
 #endif
+		test_abs<float>();
+		test_abs<double>();
 
 #else // TEST_FLOAT
 
@@ -212,9 +250,12 @@ int main()
 		test_arithm<uint16_t>(2, 1);
 #ifdef SIMD_IPP
 		test_arithm<int32_t, false>(2, 1);
+		test_abs<int64_t>();
 #else
 		test_arithm<int32_t>(2, 1);
 #endif
+		test_abs<int16_t>();
+		test_abs<int32_t>();
 
 #endif // TEST_FLOAT
 	}

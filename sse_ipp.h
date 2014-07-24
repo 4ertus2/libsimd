@@ -164,8 +164,32 @@ namespace ipp
 		_SIMD_EXT_TU void normL1(const _T* pSrc, int len, _U* pNorm);
 		_SIMD_EXT_TU void normL2(const _T* pSrc, int len, _U* pNorm);
 
+		_SIMD_EXT_T void normDiffInf(const _T* pSrc1, const _T* pSrc2, int len, _T* pNorm);
+		_SIMD_EXT_T void normDiffL1(const _T* pSrc1, const _T* pSrc2, int len, _T* pNorm);
+		_SIMD_EXT_T void normDiffL2(const _T* pSrc1, const _T* pSrc2, int len, _T* pNorm);
+#if 0
+		// MahDistSingle (IPPs p.8 Speech Recording > Model Evalution)
+#endif
+
 		_SIMD_EXT_TU void dotProd(const _T* pSrc1, const _T* pSrc2, int len, _U* pDp);
 	}
+
+#if 0
+	namespace matrix
+	{
+		// IPPs p.8 Speech Recording > Basic Arithmetics
+
+		// SumColumn
+		// SumRow
+		// SubRow
+		// VecMatMul
+		// MatVecMul
+
+		// IPPs p.8 Speech Recording > ModelAdaptation
+
+		// DotProdColumn
+	}
+#endif
 
 	namespace trigonometric
 	{

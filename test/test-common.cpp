@@ -15,10 +15,12 @@ void test_common()
 
 	static const T VALUE = 42;
 
-	shared_ptr<T> pa = shared_ptr<T>(simd::malloc<T>(LENGTH), simd::free<T>);
-	shared_ptr<T> pb = shared_ptr<T>(simd::malloc<T>(LENGTH), simd::free<T>);
+	shared_ptr<T> pa = shared_ptr<T>(simd::malloc<T>(LENGTH+1), simd::free<T>);
+	shared_ptr<T> pb = shared_ptr<T>(simd::malloc<T>(LENGTH+1), simd::free<T>);
 	T * a = pa.get();
 	T * b = pb.get();
+	a[LENGTH] = 0x7f;
+	b[LENGTH] = 0x7f;
 
 	bool failed = false;
 
@@ -55,6 +57,12 @@ void test_common()
 			cerr << "copy(2)" << endl;
 			failed = true;
 		}
+
+	if (a[LENGTH] != 0x7f || b[LENGTH] != 0x7f)
+	{
+		cerr << "length" << endl;
+		failed = true;
+	}
 
 	if (failed)
 		throw __PRETTY_FUNCTION__;

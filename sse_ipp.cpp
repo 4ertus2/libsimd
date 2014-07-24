@@ -583,6 +583,30 @@ namespace statistical
 	template <> void normL2(const int16_t * pSrc, int len, float * pNorm) { STATUS_CHECK(
 		ippsNorm_L2_16s32f(pSrc, len, pNorm)); }
 
+	// normDiffInf
+	template <> void normDiffInf(const float * pSrc1, const float * pSrc2, int len, float * pNorm) { STATUS_CHECK(
+		ippsNormDiff_Inf_32f(pSrc1, pSrc2, len, pNorm)); }
+	template <> void normDiffInf(const double * pSrc1, const double * pSrc2, int len, double * pNorm) { STATUS_CHECK(
+		ippsNormDiff_Inf_64f(pSrc1, pSrc2, len, pNorm)); }
+	template <> void normDiffInf(const int16_t * pSrc1, const int16_t * pSrc2, int len, float * pNorm) { STATUS_CHECK(
+		ippsNormDiff_Inf_16s32f(pSrc1, pSrc2, len, pNorm)); }
+
+	// normDiffL1
+	template <> void normDiffL1(const float * pSrc1, const float * pSrc2, int len, float * pNorm) { STATUS_CHECK(
+		ippsNormDiff_L1_32f(pSrc1, pSrc2, len, pNorm)); }
+	template <> void normDiffL1(const double * pSrc1, const double * pSrc2, int len, double * pNorm) { STATUS_CHECK(
+		ippsNormDiff_L1_64f(pSrc1, pSrc2, len, pNorm)); }
+	template <> void normDiffL1(const int16_t * pSrc1, const int16_t * pSrc2, int len, float * pNorm) { STATUS_CHECK(
+		ippsNormDiff_L1_16s32f(pSrc1, pSrc2, len, pNorm)); }
+
+	// normDiffL2
+	template <> void normDiffL2(const float * pSrc1, const float * pSrc2, int len, float * pNorm) { STATUS_CHECK(
+		ippsNormDiff_L2_32f(pSrc1, pSrc2, len, pNorm)); }
+	template <> void normDiffL2(const double * pSrc1, const double * pSrc2, int len, double * pNorm) { STATUS_CHECK(
+		ippsNormDiff_L2_64f(pSrc1, pSrc2, len, pNorm)); }
+	template <> void normDiffL2(const int16_t * pSrc1, const int16_t * pSrc2, int len, float * pNorm) { STATUS_CHECK(
+		ippsNormDiff_L2_16s32f(pSrc1, pSrc2, len, pNorm)); }
+
 	// dotProd
 	template <> void dotProd(const float * pSrc1, const float * pSrc2, int len, float * pDp) { STATUS_CHECK(
 		ippsDotProd_32f(pSrc1, pSrc2, len, pDp)); }
