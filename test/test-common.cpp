@@ -4,7 +4,7 @@
 
 #include "simd.h"
 
-static const unsigned LENGTH = 39;
+static const unsigned LENGTH = 47;
 
 template<typename T>
 void test_common()

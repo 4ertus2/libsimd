@@ -5,7 +5,7 @@
 
 #include "simd.h"
 
-static const unsigned LENGTH = 32;
+static const unsigned LENGTH = 47;
 
 template<typename T, typename U>
 void test_convert(T valueT, U valueU)

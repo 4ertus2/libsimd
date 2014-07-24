@@ -62,7 +62,7 @@ namespace
 	}
 }
 
-static const unsigned LENGTH = 39;
+static const unsigned LENGTH = 47;
 
 template<typename T, bool hasDivC = true, bool hasDivCRev = false>
 void test_arithm(T value1, T value2)
