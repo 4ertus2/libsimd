@@ -6,6 +6,21 @@
 
 namespace
 {
+	typedef __m128 (*IntrS)(__m128);
+	typedef __m128 (*IntrSS)(__m128, __m128);
+	typedef __m128 (*IntrPs)(float const *);
+	typedef void (*IntrPS)(float *, __m128);
+
+	typedef __m128d (*IntrD)(__m128d);
+	typedef __m128d (*IntrDD)(__m128d, __m128d);
+	typedef __m128d (*IntrPd)(double const *);
+	typedef void (*IntrPD)(double *, __m128d);
+
+	//
+
+	inline __m128 nop_ps(__m128 x) { return x; }
+	inline __m128d nop_pd(__m128d x) { return x; }
+
 	inline __m128 abs_ps(__m128 x)
 	{
 		static const __m128 sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
@@ -23,6 +38,508 @@ namespace
 		// some magic here
 		const __m128 t = _mm_add_ps(x, _mm_movehl_ps(x, x));
 		return _mm_add_ss(t, _mm_shuffle_ps(t, t, 1));
+	}
+
+	//
+
+	template <	IntrS op_ps,
+				IntrS op_ss,
+				IntrPs load_ps = _mm_loadu_ps,
+				IntrPs load_ss = _mm_load_ss,
+				IntrPS store_ps = _mm_store_ps,
+				IntrPS store_ss = _mm_store_ss>
+	void sPtrDst(const float * pSrc, float * pDst, int len)
+	{
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
+		{
+			__m128 a0 = load_ps(pSrc);
+			__m128 a1 = load_ps(pSrc+4);
+			__m128 a2 = load_ps(pSrc+8);
+			__m128 a3 = load_ps(pSrc+12);
+
+			a0 = op_ps(a0);
+			a1 = op_ps(a1);
+			a2 = op_ps(a2);
+			a3 = op_ps(a3);
+
+			store_ps(pDst, a0);
+			store_ps(pDst+4, a1);
+			store_ps(pDst+8, a2);
+			store_ps(pDst+12, a3);
+		}
+#endif
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128 a0 = load_ps(pSrc);
+			__m128 a1 = load_ps(pSrc+4);
+
+			a0 = op_ps(a0);
+			a1 = op_ps(a1);
+
+			store_ps(pDst, a0);
+			store_ps(pDst+4, a1);
+		}
+
+		if (len >= 4)
+		{
+			__m128 a0 = load_ps(pSrc);
+			a0 = op_ps(a0);
+			store_ps(pDst, a0);
+
+			len -= 4; pSrc += 4; pDst += 4;
+		}
+
+		for (; len > 0; --len, ++pSrc, ++pDst)
+		{
+			__m128 a0 = load_ss(pSrc);
+			a0 = op_ps(a0);
+			store_ss(pDst, a0);
+		}
+	}
+
+	template <	IntrSS op_ps,
+				IntrSS op_ss,
+				IntrPs load_ps = _mm_loadu_ps,
+				IntrPs load_ss = _mm_load_ss,
+				IntrPS store_ps = _mm_store_ps,
+				IntrPS store_ss = _mm_store_ss>
+	void sPtrValDst(const float * pSrc, float val, float * pDst, int len)
+	{
+		const __m128 b = _mm_set1_ps(val);
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
+		{
+			__m128 a0 = load_ps(pSrc);
+			__m128 a1 = load_ps(pSrc+4);
+			__m128 a2 = load_ps(pSrc+8);
+			__m128 a3 = load_ps(pSrc+12);
+
+			a0 = op_ps(a0, b);
+			a1 = op_ps(a1, b);
+			a2 = op_ps(a2, b);
+			a3 = op_ps(a3, b);
+
+			store_ps(pDst, a0);
+			store_ps(pDst+4, a1);
+			store_ps(pDst+8, a2);
+			store_ps(pDst+12, a3);
+		}
+#endif
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128 a0 = load_ps(pSrc);
+			__m128 a1 = load_ps(pSrc+4);
+
+			a0 = op_ps(a0, b);
+			a1 = op_ps(a1, b);
+
+			store_ps(pDst, a0);
+			store_ps(pDst+4, a1);
+		}
+
+		if (len >= 4)
+		{
+			__m128 a0 = load_ps(pSrc);
+			a0 = op_ps(a0, b);
+			store_ps(pDst, a0);
+
+			len -= 4; pSrc += 4; pDst += 4;
+		}
+
+		for (; len > 0; --len, ++pSrc, ++pDst)
+		{
+			__m128 a0 = load_ss(pSrc);
+			a0 = op_ss(a0, b);
+			store_ss(pDst, a0);
+		}
+	}
+
+	template <	IntrSS op_ps,
+				IntrSS op_ss,
+				IntrPs load_ps = _mm_loadu_ps,
+				IntrPs load_ss = _mm_load_ss,
+				IntrPS store_ps = _mm_store_ps,
+				IntrPS store_ss = _mm_store_ss>
+	void sPtrValDstRev(const float * pSrc, float val, float * pDst, int len)
+	{
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
+		{
+			__m128 a0 = _mm_set1_ps(val);
+			__m128 a1 = _mm_set1_ps(val);
+			__m128 a2 = _mm_set1_ps(val);
+			__m128 a3 = _mm_set1_ps(val);
+
+			__m128 b0 = load_ps(pSrc);
+			__m128 b1 = load_ps(pSrc+4);
+			__m128 b2 = load_ps(pSrc+8);
+			__m128 b3 = load_ps(pSrc+16);
+
+			a0 = op_ps(a0, b0);
+			a1 = op_ps(a1, b1);
+			a2 = op_ps(a2, b2);
+			a3 = op_ps(a3, b3);
+
+			store_ps(pDst, a0);
+			store_ps(pDst+4, a1);
+			store_ps(pDst+8, a2);
+			store_ps(pDst+12, a3);
+		}
+#endif
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128 a0 = _mm_set1_ps(val);
+			__m128 a1 = _mm_set1_ps(val);
+
+			__m128 b0 = load_ps(pSrc);
+			__m128 b1 = load_ps(pSrc+4);
+
+			a0 = op_ps(a0, b0);
+			a1 = op_ps(a1, b1);
+
+			store_ps(pDst, a0);
+			store_ps(pDst+4, a1);
+		}
+
+		if (len >= 4)
+		{
+			__m128 a0 = _mm_set1_ps(val);
+			__m128 b0 = load_ps(pSrc);
+
+			a0 = op_ps(a0, b0);
+			store_ps(pDst, a0);
+
+			len -= 4; pSrc += 4; pDst += 4;
+		}
+
+		for (; len > 0; --len, ++pSrc, ++pDst)
+		{
+			__m128 a0 = _mm_set1_ps(val);
+			__m128 b0 = load_ss(pSrc);
+
+			a0 = op_ss(a0, b0);
+			store_ss(pDst, a0);
+		}
+	}
+
+	template <	IntrSS op_ps,
+				IntrSS op_ss,
+				IntrPs load_ps = _mm_loadu_ps,
+				IntrPs load_ss = _mm_load_ss,
+				IntrPS store_ps = _mm_store_ps,
+				IntrPS store_ss = _mm_store_ss>
+	void sPtrPtrDst(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+	{
+#ifdef UNROLL_MORE
+		for (; len >= 16; len-=16, pSrc1+=16, pSrc2+=16, pDst+=16)
+		{
+			__m128 a0 = load_ps(pSrc1);
+			__m128 a1 = load_ps(pSrc1+4);
+			__m128 a2 = load_ps(pSrc1+8);
+			__m128 a3 = load_ps(pSrc1+12);
+
+			__m128 b0 = load_ps(pSrc2);
+			__m128 b1 = load_ps(pSrc2+4);
+			__m128 b2 = load_ps(pSrc2+8);
+			__m128 b3 = load_ps(pSrc2+12);
+
+			a0 = op_ps(a0, b0);
+			a1 = op_ps(a1, b1);
+			a2 = op_ps(a2, b2);
+			a3 = op_ps(a3, b3);
+
+			store_ps(pDst, a0);
+			store_ps(pDst+4, a1);
+			store_ps(pDst+8, a2);
+			store_ps(pDst+12, a3);
+		}
+#endif
+		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
+		{
+			__m128 a0 = load_ps(pSrc1);
+			__m128 a1 = load_ps(pSrc1+4);
+
+			__m128 b0 = load_ps(pSrc2);
+			__m128 b1 = load_ps(pSrc2+4);
+
+			a0 = op_ps(a0, b0);
+			a1 = op_ps(a1, b1);
+
+			store_ps(pDst, a0);
+			store_ps(pDst+4, a1);
+		}
+
+		if (len >= 4)
+		{
+			__m128 a0 = load_ps(pSrc1);
+			__m128 b0 = load_ps(pSrc2);
+
+			a0 = op_ps(a0, b0);
+			store_ps(pDst, a0);
+
+			len -= 4; pSrc1 += 4; pSrc2 += 4; pDst += 4;
+		}
+
+		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
+		{
+			__m128 a0 = load_ss(pSrc1);
+			__m128 b0 = load_ss(pSrc2);
+
+			a0 = op_ss(a0, b0);
+			store_ss(pDst, a0);
+		}
+	}
+
+	// double
+
+	template <	IntrD op_pd,
+				IntrD op_sd,
+				IntrPd load_pd = _mm_loadu_pd,
+				IntrPd load_sd = _mm_load_sd,
+				IntrPD store_pd = _mm_store_pd,
+				IntrPD store_sd = _mm_store_sd>
+	void dPtrDst(const double * pSrc, double * pDst, int len)
+	{
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			__m128d a1 = _mm_loadu_pd(pSrc+2);
+			__m128d a2 = _mm_loadu_pd(pSrc+4);
+			__m128d a3 = _mm_loadu_pd(pSrc+6);
+
+			a0 = abs_pd(a0);
+			a1 = abs_pd(a1);
+			a2 = abs_pd(a2);
+			a3 = abs_pd(a3);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+			_mm_store_pd(pDst+4, a2);
+			_mm_store_pd(pDst+6, a3);
+		}
+#endif
+		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			__m128d a1 = _mm_loadu_pd(pSrc+2);
+
+			a0 = abs_pd(a0);
+			a1 = abs_pd(a1);
+
+			_mm_store_pd(pDst, a0);
+			_mm_store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_loadu_pd(pSrc);
+			a0 = abs_pd(a0);
+			_mm_store_pd(pDst, a0);
+
+			len -= 2; pSrc += 2; pDst += 2;
+		}
+
+		if (len)
+		{
+			__m128d a0 = _mm_load_sd(pSrc);
+			a0 = abs_pd(a0);
+			_mm_store_sd(pDst, a0);
+		}
+	}
+
+	template <	IntrDD op_pd,
+				IntrDD op_sd,
+				IntrPd load_pd = _mm_loadu_pd,
+				IntrPd load_sd = _mm_load_sd,
+				IntrPD store_pd = _mm_store_pd,
+				IntrPD store_sd = _mm_store_sd>
+	void dPtrValDst(const double * pSrc, double val, double * pDst, int len)
+	{
+		const __m128d b = _mm_set1_pd(val);
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128d a0 = load_pd(pSrc);
+			__m128d a1 = load_pd(pSrc+2);
+			__m128d a2 = load_pd(pSrc+4);
+			__m128d a3 = load_pd(pSrc+6);
+
+			a0 = op_pd(a0, b);
+			a1 = op_pd(a1, b);
+			a2 = op_pd(a2, b);
+			a3 = op_pd(a3, b);
+
+			store_pd(pDst, a0);
+			store_pd(pDst+2, a1);
+			store_pd(pDst+4, a2);
+			store_pd(pDst+6, a3);
+		}
+#endif
+		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
+		{
+			__m128d a0 = load_pd(pSrc);
+			__m128d a1 = load_pd(pSrc+2);
+
+			a0 = op_pd(a0, b);
+			a1 = op_pd(a1, b);
+
+			store_pd(pDst, a0);
+			store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = load_pd(pSrc);
+			a0 = op_pd(a0, b);
+			store_pd(pDst, a0);
+
+			len -= 2; pSrc += 2; pDst += 2;
+		}
+
+		if (len)
+		{
+			__m128d a0 = load_sd(pSrc);
+			a0 = op_sd(a0, b);
+			store_sd(pDst, a0);
+		}
+	}
+
+	template <	IntrDD op_pd,
+				IntrDD op_sd,
+				IntrPd load_pd = _mm_loadu_pd,
+				IntrPd load_sd = _mm_load_sd,
+				IntrPD store_pd = _mm_store_pd,
+				IntrPD store_sd = _mm_store_sd>
+	void dPtrValDstRev(const double * pSrc, double val, double * pDst, int len)
+	{
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
+		{
+			__m128d a0 = _mm_set1_pd(val);
+			__m128d a1 = _mm_set1_pd(val);
+			__m128d a2 = _mm_set1_pd(val);
+			__m128d a3 = _mm_set1_pd(val);
+
+			__m128d b0 = load_pd(pSrc);
+			__m128d b1 = load_pd(pSrc+2);
+			__m128d b2 = load_pd(pSrc+4);
+			__m128d b3 = load_pd(pSrc+6);
+
+			a0 = op_pd(a0, b0);
+			a1 = op_pd(a1, b1);
+			a2 = op_pd(a2, b2);
+			a3 = op_pd(a3, b3);
+
+			store_pd(pDst, a0);
+			store_pd(pDst+2, a1);
+			store_pd(pDst+4, a2);
+			store_pd(pDst+6, a3);
+		}
+#endif
+		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
+		{
+			__m128d a0 = _mm_set1_pd(val);
+			__m128d a1 = _mm_set1_pd(val);
+
+			__m128d b0 = load_pd(pSrc);
+			__m128d b1 = load_pd(pSrc+2);
+
+			a0 = op_pd(a0, b0);
+			a1 = op_pd(a1, b1);
+
+			store_pd(pDst, a0);
+			store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = _mm_set1_pd(val);
+			__m128d b0 = load_pd(pSrc);
+
+			a0 = op_pd(a0, b0);
+			store_pd(pDst, a0);
+
+			len -= 2; pSrc += 2; pDst += 2;
+		}
+
+		if (len)
+		{
+			__m128d a0 = _mm_set1_pd(val);
+			__m128d b0 = load_sd(pSrc);
+
+			a0 = op_sd(a0, b0);
+			store_sd(pDst, a0);
+		}
+	}
+
+	template <	IntrDD op_pd,
+				IntrDD op_sd,
+				IntrPd load_pd = _mm_loadu_pd,
+				IntrPd load_sd = _mm_load_sd,
+				IntrPD store_pd = _mm_store_pd,
+				IntrPD store_sd = _mm_store_sd>
+	void dPtrPtrDst(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+	{
+#ifdef UNROLL_MORE
+		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
+		{
+			__m128d a0 = load_pd(pSrc1);
+			__m128d a1 = load_pd(pSrc1+2);
+			__m128d a2 = load_pd(pSrc1+4);
+			__m128d a3 = load_pd(pSrc1+6);
+
+			__m128d b0 = load_pd(pSrc2);
+			__m128d b1 = load_pd(pSrc2+2);
+			__m128d b2 = load_pd(pSrc2+4);
+			__m128d b3 = load_pd(pSrc2+6);
+
+			a0 = op_pd(a0, b0);
+			a1 = op_pd(a1, b1);
+			a2 = op_pd(a2, b2);
+			a3 = op_pd(a3, b3);
+
+			store_pd(pDst, a0);
+			store_pd(pDst+2, a1);
+			store_pd(pDst+4, a2);
+			store_pd(pDst+6, a3);
+		}
+#endif
+		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
+		{
+			__m128d a0 = load_pd(pSrc1);
+			__m128d a1 = load_pd(pSrc1+2);
+
+			__m128d b0 = load_pd(pSrc2);
+			__m128d b1 = load_pd(pSrc2+2);
+
+			a0 = op_pd(a0, b0);
+			a1 = op_pd(a1, b1);
+
+			store_pd(pDst, a0);
+			store_pd(pDst+2, a1);
+		}
+
+		if (len >= 2)
+		{
+			__m128d a0 = load_pd(pSrc1);
+			__m128d b0 = load_pd(pSrc2);
+
+			a0 = op_pd(a0, b0);
+			store_pd(pDst, a0);
+
+			len -= 2; pSrc1 += 2; pSrc2 += 2; pDst += 2;
+ 		}
+
+		if (len)
+		{
+			__m128d a0 = load_sd(pSrc1);
+			__m128d b0 = load_sd(pSrc2);
+
+			a0 = op_sd(a0, b0);
+			store_sd(pDst, a0);
+		}
 	}
 }
 
@@ -76,64 +593,7 @@ namespace common
 
 	template <> void copy(const float * pSrc, float * pDst, int len)
 	{
-#ifdef UNROLL_MORE
-		for (; len >= 32; len-=32, pSrc+=32, pDst+=32)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-			__m128 a4 = _mm_loadu_ps(pSrc+16);
-			__m128 a5 = _mm_loadu_ps(pSrc+20);
-			__m128 a6 = _mm_loadu_ps(pSrc+24);
-			__m128 a7 = _mm_loadu_ps(pSrc+28);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-
-			_mm_store_ps(pDst+16, a4);
-			_mm_store_ps(pDst+20, a5);
-			_mm_store_ps(pDst+24, a6);
-			_mm_store_ps(pDst+28, a7);
-		}
-#endif
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-
-		if (len >= 8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-			*pDst = *pSrc;
+		sPtrDst<nop_ps, nop_ps>(pSrc, pDst, len);
 	}
 
 	// double
@@ -184,64 +644,7 @@ namespace common
 
 	template <> void copy(const double * pSrc, double * pDst, int len)
 	{
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-			__m128d a2 = _mm_loadu_pd(pSrc+4);
-			__m128d a3 = _mm_loadu_pd(pSrc+6);
-
-			__m128d a4 = _mm_loadu_pd(pSrc+8);
-			__m128d a5 = _mm_loadu_pd(pSrc+10);
-			__m128d a6 = _mm_loadu_pd(pSrc+12);
-			__m128d a7 = _mm_loadu_pd(pSrc+14);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-
-			_mm_store_pd(pDst+8, a4);
-			_mm_store_pd(pDst+10, a5);
-			_mm_store_pd(pDst+12, a6);
-			_mm_store_pd(pDst+14, a7);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-			__m128d a2 = _mm_loadu_pd(pSrc+4);
-			__m128d a3 = _mm_loadu_pd(pSrc+6);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-
-		if (len >= 4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc += 2; pDst += 2;
-		}
-
-		if (len)
-			*pDst = *pSrc;
+		dPtrDst<nop_pd, nop_pd>(pSrc, pDst, len);
 	}
 }
 
@@ -249,1256 +652,118 @@ namespace arithmetic
 {
 	template <> void addC(const float * pSrc, float val, float * pDst, int len)
 	{
-		const __m128 b = _mm_set1_ps(val);
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-			a0 = _mm_add_ps(a0, b);
-			a1 = _mm_add_ps(a1, b);
-			a2 = _mm_add_ps(a2, b);
-			a3 = _mm_add_ps(a3, b);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-			a0 = _mm_add_ps(a0, b);
-			a1 = _mm_add_ps(a1, b);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			a0 = _mm_add_ps(a0, b);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc);
-			a0 = _mm_add_ss(a0, b);
-			_mm_store_ss(pDst, a0);
-		}
-	}
-
-	template <> void add(const float * pSrc1, const float * pSrc2, float * pDst, int len)
-	{
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc1+=16, pSrc2+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 a1 = _mm_loadu_ps(pSrc1+4);
-			__m128 a2 = _mm_loadu_ps(pSrc1+8);
-			__m128 a3 = _mm_loadu_ps(pSrc1+12);
-
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-			__m128 b2 = _mm_loadu_ps(pSrc2+8);
-			__m128 b3 = _mm_loadu_ps(pSrc2+12);
-
-			a0 = _mm_add_ps(a0, b0);
-			a1 = _mm_add_ps(a1, b1);
-			a2 = _mm_add_ps(a2, b2);
-			a3 = _mm_add_ps(a3, b3);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 a1 = _mm_loadu_ps(pSrc1+4);
-
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-
-			a0 = _mm_add_ps(a0, b0);
-			a1 = _mm_add_ps(a1, b1);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-
-			a0 = _mm_add_ps(a0, b0);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc1 += 4; pSrc2 += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc1);
-			__m128 b0 = _mm_load_ss(pSrc2);
-
-			a0 = _mm_add_ss(a0, b0);
-			_mm_store_ss(pDst, a0);
-		}
+		sPtrValDst<_mm_add_ps, _mm_add_ss>(pSrc, val, pDst, len);
 	}
 
 	template <> void subC(const float * pSrc, float val, float * pDst, int len)
 	{
-		const __m128 b = _mm_set1_ps(val);
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-			a0 = _mm_sub_ps(a0, b);
-			a1 = _mm_sub_ps(a1, b);
-			a2 = _mm_sub_ps(a2, b);
-			a3 = _mm_sub_ps(a3, b);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-			a0 = _mm_sub_ps(a0, b);
-			a1 = _mm_sub_ps(a1, b);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 r0 = _mm_sub_ps(a0, b);
-			_mm_store_ps(pDst, r0);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc);
-			__m128 r0 = _mm_sub_ss(a0, b);
-			_mm_store_ss(pDst, r0);
-		}
-	}
-
-	template <> void subCRev(const float * pSrc, float val, float * pDst, int len)
-	{
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 a1 = _mm_set1_ps(val);
-			__m128 a2 = _mm_set1_ps(val);
-			__m128 a3 = _mm_set1_ps(val);
-
-			__m128 b0 = _mm_loadu_ps(pSrc);
-			__m128 b1 = _mm_loadu_ps(pSrc+4);
-			__m128 b2 = _mm_loadu_ps(pSrc+8);
-			__m128 b3 = _mm_loadu_ps(pSrc+16);
-
-			a0 = _mm_sub_ps(a0, b0);
-			a1 = _mm_sub_ps(a1, b1);
-			a2 = _mm_sub_ps(a2, b2);
-			a3 = _mm_sub_ps(a3, b3);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 a1 = _mm_set1_ps(val);
-
-			__m128 b0 = _mm_loadu_ps(pSrc);
-			__m128 b1 = _mm_loadu_ps(pSrc+4);
-
-			a0 = _mm_sub_ps(a0, b0);
-			a1 = _mm_sub_ps(a1, b1);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 b0 = _mm_loadu_ps(pSrc);
-
-			a0 = _mm_sub_ps(a0, b0);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 b0 = _mm_load_ss(pSrc);
-
-			a0 = _mm_sub_ss(a0, b0);
-			_mm_store_ss(pDst, a0);
-		}
-	}
-
-	template <> void sub(const float * pSrc1, const float * pSrc2, float * pDst, int len)
-	{
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc1+=16, pSrc2+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 a1 = _mm_loadu_ps(pSrc1+4);
-			__m128 a2 = _mm_loadu_ps(pSrc1+8);
-			__m128 a3 = _mm_loadu_ps(pSrc1+12);
-
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-			__m128 b2 = _mm_loadu_ps(pSrc2+8);
-			__m128 b3 = _mm_loadu_ps(pSrc2+12);
-
-			a0 = _mm_sub_ps(a0, b0);
-			a1 = _mm_sub_ps(a1, b1);
-			a2 = _mm_sub_ps(a2, b2);
-			a3 = _mm_sub_ps(a3, b3);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 a1 = _mm_loadu_ps(pSrc1+4);
-
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-
-			a0 = _mm_sub_ps(a0, b0);
-			a1 = _mm_sub_ps(a1, b1);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-
-			a0 = _mm_sub_ps(a0, b0);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc1 += 4; pSrc2 += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc1);
-			__m128 b0 = _mm_load_ss(pSrc2);
-
-			a0 = _mm_sub_ss(a0, b0);
-			_mm_store_ss(pDst, a0);
-		}
+		sPtrValDst<_mm_sub_ps, _mm_sub_ss>(pSrc, val, pDst, len);
 	}
 
 	template <> void mulC(const float * pSrc, float val, float * pDst, int len)
 	{
-		const __m128 b = _mm_set1_ps(val);
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-			a0 = _mm_mul_ps(a0, b);
-			a1 = _mm_mul_ps(a1, b);
-			a2 = _mm_mul_ps(a2, b);
-			a3 = _mm_mul_ps(a3, b);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-			a0 = _mm_mul_ps(a0, b);
-			a1 = _mm_mul_ps(a1, b);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			a0 = _mm_mul_ps(a0, b);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc);
-			a0 = _mm_mul_ss(a0, b);
-			_mm_store_ss(pDst, a0);
-		}
-	}
-
-	template <> void mul(const float * pSrc1, const float * pSrc2, float * pDst, int len)
-	{
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc1+=16, pSrc2+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 a1 = _mm_loadu_ps(pSrc1+4);
-			__m128 a2 = _mm_loadu_ps(pSrc1+8);
-			__m128 a3 = _mm_loadu_ps(pSrc1+12);
-
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-			__m128 b2 = _mm_loadu_ps(pSrc2+8);
-			__m128 b3 = _mm_loadu_ps(pSrc2+12);
-
-			a0 = _mm_mul_ps(a0, b0);
-			a1 = _mm_mul_ps(a1, b1);
-			a2 = _mm_mul_ps(a2, b2);
-			a3 = _mm_mul_ps(a3, b3);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 a1 = _mm_loadu_ps(pSrc1+4);
-
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-
-			a0 = _mm_mul_ps(a0, b0);
-			a1 = _mm_mul_ps(a1, b1);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-
-			a0 = _mm_mul_ps(a0, b0);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc1 += 4; pSrc2 += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc1);
-			__m128 b0 = _mm_load_ss(pSrc2);
-
-			a0 = _mm_mul_ss(a0, b0);
-			_mm_store_ss(pDst, a0);
-		}
+		sPtrValDst<_mm_mul_ps, _mm_mul_ss>(pSrc, val, pDst, len);
 	}
 
 	template <> void divC(const float * pSrc, float val, float * pDst, int len)
 	{
-		const __m128 b = _mm_set1_ps(val);
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
+		sPtrValDst<_mm_div_ps, _mm_div_ss>(pSrc, val, pDst, len);
+	}
 
-			a0 = _mm_div_ps(a0, b);
-			a1 = _mm_div_ps(a1, b);
-			a2 = _mm_div_ps(a2, b);
-			a3 = _mm_div_ps(a3, b);
 
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-			a0 = _mm_div_ps(a0, b);
-			a1 = _mm_div_ps(a1, b);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			a0 = _mm_div_ps(a0, b);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc);
-			a0 = _mm_div_ss(a0, b);
-			_mm_store_ss(pDst, a0);
-		}
+	template <> void subCRev(const float * pSrc, float val, float * pDst, int len)
+	{
+		sPtrValDstRev<_mm_sub_ps, _mm_sub_ss>(pSrc, val, pDst, len);
 	}
 
 	template <> void divCRev(const float * pSrc, float val, float * pDst, int len)
 	{
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 a1 = _mm_set1_ps(val);
-			__m128 a2 = _mm_set1_ps(val);
-			__m128 a3 = _mm_set1_ps(val);
+		sPtrValDstRev<_mm_div_ps, _mm_div_ss>(pSrc, val, pDst, len);
+	}
 
-			__m128 b0 = _mm_loadu_ps(pSrc);
-			__m128 b1 = _mm_loadu_ps(pSrc+4);
-			__m128 b2 = _mm_loadu_ps(pSrc+8);
-			__m128 b3 = _mm_loadu_ps(pSrc+12);
 
-			a0 = _mm_div_ps(a0, b0);
-			a1 = _mm_div_ps(a1, b1);
-			a2 = _mm_div_ps(a2, b2);
-			a3 = _mm_div_ps(a3, b3);
+	template <> void add(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+	{
+		sPtrPtrDst<_mm_add_ps, _mm_add_ss>(pSrc1, pSrc2, pDst, len);
+	}
 
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 a1 = _mm_set1_ps(val);
+	template <> void sub(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+	{
+		sPtrPtrDst<_mm_sub_ps, _mm_sub_ss>(pSrc1, pSrc2, pDst, len);
+	}
 
-			__m128 b0 = _mm_loadu_ps(pSrc);
-			__m128 b1 = _mm_loadu_ps(pSrc+4);
-
-			a0 = _mm_div_ps(a0, b0);
-			a1 = _mm_div_ps(a1, b1);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 b0 = _mm_loadu_ps(pSrc);
-
-			a0 = _mm_div_ps(a0, b0);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 b0 = _mm_load_ss(pSrc);
-
-			a0 = _mm_div_ss(a0, b0);
-			_mm_store_ss(pDst, a0);
-		}
+	template <> void mul(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+	{
+		sPtrPtrDst<_mm_mul_ps, _mm_mul_ss>(pSrc1, pSrc2, pDst, len);
 	}
 
 	template <> void div(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc1+=16, pSrc2+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 a1 = _mm_loadu_ps(pSrc1+4);
-			__m128 a2 = _mm_loadu_ps(pSrc1+8);
-			__m128 a3 = _mm_loadu_ps(pSrc1+12);
-
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-			__m128 b2 = _mm_loadu_ps(pSrc2+8);
-			__m128 b3 = _mm_loadu_ps(pSrc2+12);
-
-			a0 = _mm_div_ps(a0, b0);
-			a1 = _mm_div_ps(a1, b1);
-			a2 = _mm_div_ps(a2, b2);
-			a3 = _mm_div_ps(a3, b3);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 a1 = _mm_loadu_ps(pSrc1+4);
-
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-			__m128 b1 = _mm_loadu_ps(pSrc2+4);
-
-			a0 = _mm_div_ps(a0, b0);
-			a1 = _mm_div_ps(a1, b1);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-
-			a0 = _mm_div_ps(a0, b0);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc1 += 4; pSrc2 += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc1);
-			__m128 b0 = _mm_load_ss(pSrc2);
-
-			a0 = _mm_div_ss(a0, b0);
-			_mm_store_ss(pDst, a0);
-		}
+		sPtrPtrDst<_mm_div_ps, _mm_div_ss>(pSrc1, pSrc2, pDst, len);
 	}
 
 	template <> void abs(const float * pSrc, float * pDst, int len)
 	{
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-			a0 = abs_ps(a0);
-			a1 = abs_ps(a1);
-			a2 = abs_ps(a2);
-			a3 = abs_ps(a3);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-			_mm_store_ps(pDst+8, a2);
-			_mm_store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-			a0 = abs_ps(a0);
-			a1 = abs_ps(a1);
-
-			_mm_store_ps(pDst, a0);
-			_mm_store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			a0 = abs_ps(a0);
-			_mm_store_ps(pDst, a0);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc);
-			a0 = abs_ps(a0);
-			_mm_store_ss(pDst, a0);
-		}
+		sPtrDst<abs_ps, abs_ps>(pSrc, pDst, len);
 	}
 
 	// double
 
 	template <> void addC(const double * pSrc, double val, double * pDst, int len)
 	{
-		const __m128d b = _mm_set1_pd(val);
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-			__m128d a2 = _mm_loadu_pd(pSrc+4);
-			__m128d a3 = _mm_loadu_pd(pSrc+6);
-
-			a0 = _mm_add_pd(a0, b);
-			a1 = _mm_add_pd(a1, b);
-			a2 = _mm_add_pd(a2, b);
-			a3 = _mm_add_pd(a3, b);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-
-			a0 = _mm_add_pd(a0, b);
-			a1 = _mm_add_pd(a1, b);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			a0 = _mm_add_pd(a0, b);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc += 2; pDst += 2;
- 		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_load_sd(pSrc);
-			a0 = _mm_add_sd(a0, b);
-			_mm_store_sd(pDst, a0);
-		}
-	}
-
-	template <> void add(const double * pSrc1, const double * pSrc2, double * pDst, int len)
-	{
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d a1 = _mm_loadu_pd(pSrc1+2);
-			__m128d a2 = _mm_loadu_pd(pSrc1+4);
-			__m128d a3 = _mm_loadu_pd(pSrc1+6);
-
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-			__m128d b1 = _mm_loadu_pd(pSrc2+2);
-			__m128d b2 = _mm_loadu_pd(pSrc2+4);
-			__m128d b3 = _mm_loadu_pd(pSrc2+6);
-
-			a0 = _mm_add_pd(a0, b0);
-			a1 = _mm_add_pd(a1, b1);
-			a2 = _mm_add_pd(a2, b2);
-			a3 = _mm_add_pd(a3, b3);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d a1 = _mm_loadu_pd(pSrc1+2);
-
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-			__m128d b1 = _mm_loadu_pd(pSrc2+2);
-
-			a0 = _mm_add_pd(a0, b0);
-			a1 = _mm_add_pd(a1, b1);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-
-			a0 = _mm_add_pd(a0, b0);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc1 += 2; pSrc2 += 2; pDst += 2;
- 		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_load_sd(pSrc1);
-			__m128d b0 = _mm_load_sd(pSrc2);
-
-			a0 = _mm_add_sd(a0, b0);
-			_mm_store_sd(pDst, a0);
-		}
+		dPtrValDst<_mm_add_pd, _mm_add_sd>(pSrc, val, pDst, len);
 	}
 
 	template <> void subC(const double * pSrc, double val, double * pDst, int len)
 	{
-		const __m128d b = _mm_set1_pd(val);
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-			__m128d a2 = _mm_loadu_pd(pSrc+4);
-			__m128d a3 = _mm_loadu_pd(pSrc+6);
-
-			a0 = _mm_sub_pd(a0, b);
-			a1 = _mm_sub_pd(a1, b);
-			a2 = _mm_sub_pd(a2, b);
-			a3 = _mm_sub_pd(a3, b);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-
-			a0 = _mm_sub_pd(a0, b);
-			a1 = _mm_sub_pd(a1, b);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			a0 = _mm_sub_pd(a0, b);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc += 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_load_sd(pSrc);
-			a0 = _mm_sub_sd(a0, b);
-			_mm_store_sd(pDst, a0);
-		}
-	}
-
-	template <> void subCRev(const double * pSrc, double val, double * pDst, int len)
-	{
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_set1_pd(val);
-			__m128d a1 = _mm_set1_pd(val);
-			__m128d a2 = _mm_set1_pd(val);
-			__m128d a3 = _mm_set1_pd(val);
-
-			__m128d b0 = _mm_loadu_pd(pSrc);
-			__m128d b1 = _mm_loadu_pd(pSrc+2);
-			__m128d b2 = _mm_loadu_pd(pSrc+4);
-			__m128d b3 = _mm_loadu_pd(pSrc+6);
-
-			a0 = _mm_sub_pd(a0, b0);
-			a1 = _mm_sub_pd(a1, b1);
-			a2 = _mm_sub_pd(a2, b2);
-			a3 = _mm_sub_pd(a3, b3);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_set1_pd(val);
-			__m128d a1 = _mm_set1_pd(val);
-
-			__m128d b0 = _mm_loadu_pd(pSrc);
-			__m128d b1 = _mm_loadu_pd(pSrc+2);
-
-			a0 = _mm_sub_pd(a0, b0);
-			a1 = _mm_sub_pd(a1, b1);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_set1_pd(val);
-			__m128d b0 = _mm_loadu_pd(pSrc);
-
-			a0 = _mm_sub_pd(a0, b0);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc += 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_set1_pd(val);
-			__m128d b0 = _mm_load_sd(pSrc);
-
-			a0 = _mm_sub_sd(a0, b0);
-			_mm_store_sd(pDst, a0);
-		}
-	}
-
-	template <> void sub(const double * pSrc1, const double * pSrc2, double * pDst, int len)
-	{
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d a1 = _mm_loadu_pd(pSrc1+2);
-			__m128d a2 = _mm_loadu_pd(pSrc1+4);
-			__m128d a3 = _mm_loadu_pd(pSrc1+6);
-
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-			__m128d b1 = _mm_loadu_pd(pSrc2+2);
-			__m128d b2 = _mm_loadu_pd(pSrc2+4);
-			__m128d b3 = _mm_loadu_pd(pSrc2+6);
-
-			a0 = _mm_sub_pd(a0, b0);
-			a1 = _mm_sub_pd(a1, b1);
-			a2 = _mm_sub_pd(a2, b2);
-			a3 = _mm_sub_pd(a3, b3);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d a1 = _mm_loadu_pd(pSrc1+2);
-
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-			__m128d b1 = _mm_loadu_pd(pSrc2+2);
-
-			a0 = _mm_sub_pd(a0, b0);
-			a1 = _mm_sub_pd(a1, b1);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-
-			a0 = _mm_sub_pd(a0, b0);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc1 += 2; pSrc2 += 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_load_sd(pSrc1);
-			__m128d b0 = _mm_load_sd(pSrc2);
-
-			a0 = _mm_sub_sd(a0, b0);
-			_mm_store_sd(pDst, a0);
-		}
+		dPtrValDst<_mm_sub_pd, _mm_sub_sd>(pSrc, val, pDst, len);
 	}
 
 	template <> void mulC(const double * pSrc, double val, double * pDst, int len)
 	{
-		const __m128d b = _mm_set1_pd(val);
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-			__m128d a2 = _mm_loadu_pd(pSrc+4);
-			__m128d a3 = _mm_loadu_pd(pSrc+6);
-
-			a0 = _mm_mul_pd(a0, b);
-			a1 = _mm_mul_pd(a1, b);
-			a2 = _mm_mul_pd(a2, b);
-			a3 = _mm_mul_pd(a3, b);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-
-			a0 = _mm_mul_pd(a0, b);
-			a1 = _mm_mul_pd(a1, b);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			a0 = _mm_mul_pd(a0, b);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc += 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_load_sd(pSrc);
-			a0 = _mm_mul_sd(a0, b);
-			_mm_store_sd(pDst, a0);
-		}
-	}
-
-	template <> void mul(const double * pSrc1, const double * pSrc2, double * pDst, int len)
-	{
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d a1 = _mm_loadu_pd(pSrc1+2);
-			__m128d a2 = _mm_loadu_pd(pSrc1+4);
-			__m128d a3 = _mm_loadu_pd(pSrc1+6);
-
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-			__m128d b1 = _mm_loadu_pd(pSrc2+2);
-			__m128d b2 = _mm_loadu_pd(pSrc2+4);
-			__m128d b3 = _mm_loadu_pd(pSrc2+6);
-
-			a0 = _mm_mul_pd(a0, b0);
-			a1 = _mm_mul_pd(a1, b1);
-			a2 = _mm_mul_pd(a2, b2);
-			a3 = _mm_mul_pd(a3, b3);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d a1 = _mm_loadu_pd(pSrc1+2);
-
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-			__m128d b1 = _mm_loadu_pd(pSrc2+2);
-
-			a0 = _mm_mul_pd(a0, b0);
-			a1 = _mm_mul_pd(a1, b1);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-
-			a0 = _mm_mul_pd(a0, b0);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc1 += 2; pSrc2 += 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_load_sd(pSrc1);
-			__m128d b0 = _mm_load_sd(pSrc2);
-
-			a0 = _mm_mul_sd(a0, b0);
-			_mm_store_sd(pDst, a0);
-		}
+		dPtrValDst<_mm_mul_pd, _mm_mul_sd>(pSrc, val, pDst, len);
 	}
 
 	template <> void divC(const double * pSrc, double val, double * pDst, int len)
 	{
-		const __m128d b = _mm_set1_pd(val);
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-			__m128d a2 = _mm_loadu_pd(pSrc+4);
-			__m128d a3 = _mm_loadu_pd(pSrc+6);
+		dPtrValDst<_mm_div_pd, _mm_div_sd>(pSrc, val, pDst, len);
+	}
 
-			a0 = _mm_div_pd(a0, b);
-			a1 = _mm_div_pd(a1, b);
-			a2 = _mm_div_pd(a2, b);
-			a3 = _mm_div_pd(a3, b);
 
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-
-			a0 = _mm_div_pd(a0, b);
-			a1 = _mm_div_pd(a1, b);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			a0 = _mm_div_pd(a0, b);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc += 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_load_sd(pSrc);
-			a0 = _mm_div_sd(a0, b);
-			_mm_store_sd(pDst, a0);
-		}
+	template <> void subCRev(const double * pSrc, double val, double * pDst, int len)
+	{
+		dPtrValDstRev<_mm_sub_pd, _mm_sub_sd>(pSrc, val, pDst, len);
 	}
 
 	template <> void divCRev(const double * pSrc, double val, double * pDst, int len)
 	{
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_set1_pd(val);
-			__m128d a1 = _mm_set1_pd(val);
-			__m128d a2 = _mm_set1_pd(val);
-			__m128d a3 = _mm_set1_pd(val);
+		dPtrValDstRev<_mm_div_pd, _mm_div_sd>(pSrc, val, pDst, len);
+	}
 
-			__m128d b0 = _mm_loadu_pd(pSrc);
-			__m128d b1 = _mm_loadu_pd(pSrc+2);
-			__m128d b2 = _mm_loadu_pd(pSrc+4);
-			__m128d b3 = _mm_loadu_pd(pSrc+6);
 
-			a0 = _mm_div_pd(a0, b0);
-			a1 = _mm_div_pd(a1, b1);
-			a2 = _mm_div_pd(a2, b2);
-			a3 = _mm_div_pd(a3, b3);
+	template <> void add(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+	{
+		dPtrPtrDst<_mm_add_pd, _mm_add_sd>(pSrc1, pSrc2, pDst, len);
+	}
 
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_set1_pd(val);
-			__m128d a1 = _mm_set1_pd(val);
+	template <> void sub(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+	{
+		dPtrPtrDst<_mm_sub_pd, _mm_sub_sd>(pSrc1, pSrc2, pDst, len);
+	}
 
-			__m128d b0 = _mm_loadu_pd(pSrc);
-			__m128d b1 = _mm_loadu_pd(pSrc+2);
-
-			a0 = _mm_div_pd(a0, b0);
-			a1 = _mm_div_pd(a1, b1);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_set1_pd(val);
-			__m128d b0 = _mm_loadu_pd(pSrc);
-
-			a0 = _mm_div_pd(a0, b0);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc += 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_set1_pd(val);
-			__m128d b0 = _mm_load_sd(pSrc);
-
-			a0 = _mm_div_sd(a0, b0);
-			_mm_store_sd(pDst, a0);
-		}
+	template <> void mul(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+	{
+		dPtrPtrDst<_mm_mul_pd, _mm_mul_sd>(pSrc1, pSrc2, pDst, len);
 	}
 
 	template <> void div(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d a1 = _mm_loadu_pd(pSrc1+2);
-			__m128d a2 = _mm_loadu_pd(pSrc1+4);
-			__m128d a3 = _mm_loadu_pd(pSrc1+6);
-
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-			__m128d b1 = _mm_loadu_pd(pSrc2+2);
-			__m128d b2 = _mm_loadu_pd(pSrc2+4);
-			__m128d b3 = _mm_loadu_pd(pSrc2+6);
-
-			a0 = _mm_div_pd(a0, b0);
-			a1 = _mm_div_pd(a1, b1);
-			a2 = _mm_div_pd(a2, b2);
-			a3 = _mm_div_pd(a3, b3);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d a1 = _mm_loadu_pd(pSrc1+2);
-
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-			__m128d b1 = _mm_loadu_pd(pSrc2+2);
-
-			a0 = _mm_div_pd(a0, b0);
-			a1 = _mm_div_pd(a1, b1);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc1);
-			__m128d b0 = _mm_loadu_pd(pSrc2);
-
-			a0 = _mm_div_pd(a0, b0);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc1 += 2; pSrc2 += 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_load_sd(pSrc1);
-			__m128d b0 = _mm_load_sd(pSrc2);
-
-			a0 = _mm_div_sd(a0, b0);
-			_mm_store_sd(pDst, a0);
-		}
+		dPtrPtrDst<_mm_div_pd, _mm_div_sd>(pSrc1, pSrc2, pDst, len);
 	}
 
 	template <> void abs(const double * pSrc, double * pDst, int len)
 	{
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-			__m128d a2 = _mm_loadu_pd(pSrc+4);
-			__m128d a3 = _mm_loadu_pd(pSrc+6);
-
-			a0 = abs_pd(a0);
-			a1 = abs_pd(a1);
-			a2 = abs_pd(a2);
-			a3 = abs_pd(a3);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
-		}
-#endif
-		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-
-			a0 = abs_pd(a0);
-			a1 = abs_pd(a1);
-
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			a0 = abs_pd(a0);
-			_mm_store_pd(pDst, a0);
-
-			len -= 2; pSrc += 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_load_sd(pSrc);
-			a0 = abs_pd(a0);
-			_mm_store_sd(pDst, a0);
-		}
+		dPtrDst<abs_pd, abs_pd>(pSrc, pDst, len);
 	}
 }
 
@@ -1506,125 +771,17 @@ namespace power
 {
 	template <> void inv(const float * pSrc, float * pDst, int len)
 	{
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-			_mm_store_ps(pDst, 		_mm_rcp_ps(a0));
-			_mm_store_ps(pDst+4,	_mm_rcp_ps(a1));
-			_mm_store_ps(pDst+8,	_mm_rcp_ps(a2));
-			_mm_store_ps(pDst+12,	_mm_rcp_ps(a3));
-		}
-
-		if (len >= 8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-			_mm_store_ps(pDst, 		_mm_rcp_ps(a0));
-			_mm_store_ps(pDst+4,	_mm_rcp_ps(a1));
-
-			len -= 8; pSrc += 8; pDst += 8;
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			_mm_store_ps(pDst,		_mm_rcp_ps(a0));
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc);
-			_mm_store_ss(pDst,		_mm_rcp_ss(a0));
-		}
+		sPtrDst<_mm_rcp_ps, _mm_rcp_ss>(pSrc, pDst, len);
 	}
 
 	template <> void sqrt(const float * pSrc, float * pDst, int len)
 	{
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-			_mm_store_ps(pDst, 		_mm_sqrt_ps(a0));
-			_mm_store_ps(pDst+4,	_mm_sqrt_ps(a1));
-			_mm_store_ps(pDst+8,	_mm_sqrt_ps(a2));
-			_mm_store_ps(pDst+12,	_mm_sqrt_ps(a3));
-		}
-
-		if (len >= 8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-			_mm_store_ps(pDst,		_mm_sqrt_ps(a0));
-			_mm_store_ps(pDst+4,	_mm_sqrt_ps(a1));
-
-			len -= 8; pSrc += 8; pDst += 8;
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			_mm_store_ps(pDst,		_mm_sqrt_ps(a0));
-
-			len -= 4, pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc);
-			_mm_store_ss(pDst,		_mm_sqrt_ss(a0));
-		}
+		sPtrDst<_mm_sqrt_ps, _mm_sqrt_ss>(pSrc, pDst, len);
 	}
 
 	template <> void invSqrt(const float * pSrc, float * pDst, int len)
 	{
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-			__m128 a2 = _mm_loadu_ps(pSrc+8);
-			__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-			_mm_store_ps(pDst,		_mm_rsqrt_ps(a0));
-			_mm_store_ps(pDst+4,	_mm_rsqrt_ps(a1));
-			_mm_store_ps(pDst+8,	_mm_rsqrt_ps(a2));
-			_mm_store_ps(pDst+12,	_mm_rsqrt_ps(a3));
-		}
-
-		if (len >= 8)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-			_mm_store_ps(pDst,		_mm_rsqrt_ps(a0));
-			_mm_store_ps(pDst+4,	_mm_rsqrt_ps(a1));
-
-			len -= 8; pSrc += 8; pDst += 8;
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			_mm_store_ps(pDst, 		_mm_rsqrt_ps(a0));
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_load_ss(pSrc);
-			_mm_store_ss(pDst,		_mm_rsqrt_ss(a0));
-		}
+		sPtrDst<_mm_rsqrt_ps, _mm_rsqrt_ss>(pSrc, pDst, len);
 	}
 
 	// double
@@ -1636,45 +793,7 @@ namespace power
 
 	template <> void sqrt(const double * pSrc, double * pDst, int len)
 	{
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-			__m128d a2 = _mm_loadu_pd(pSrc+4);
-			__m128d a3 = _mm_loadu_pd(pSrc+6);
-
-			_mm_store_pd(pDst,		_mm_sqrt_pd(a0));
-			_mm_store_pd(pDst+2,	_mm_sqrt_pd(a1));
-			_mm_store_pd(pDst+4,	_mm_sqrt_pd(a2));
-			_mm_store_pd(pDst+6,	_mm_sqrt_pd(a3));
-		}
-
-		if (len >= 4)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-
-			_mm_store_pd(pDst,		_mm_sqrt_pd(a0));
-			_mm_store_pd(pDst+2,	_mm_sqrt_pd(a1));
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		if (len >= 2)
-		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			_mm_store_pd(pDst,		_mm_sqrt_pd(a0));
-
-			len -= 2; pSrc += 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			__m128d a0 = _mm_load_sd(pSrc);
-			__m128d r0;
-			_mm_sqrt_sd(a0, r0);
-			_mm_store_sd(pDst, r0);
-		}
+		dPtrDst<_mm_sqrt_pd, _mm_sqrt_pd>(pSrc, pDst, len);
 	}
 
 	template <> void invSqrt(const double * pSrc, double * pDst, int len)
@@ -1933,4 +1052,3 @@ namespace statistical
 	}
 }
 }
-
