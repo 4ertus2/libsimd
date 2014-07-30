@@ -125,16 +125,18 @@ namespace arithmetic
 		ippsAdd_64f(pSrc1, pSrc2, pDst, len)); }
 	template <> void add(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len) { STATUS_CHECK(
 		ippsAdd_8u_Sfs(pSrc1, pSrc2, pDst, len, 0)); }
-	template <> void add(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len) { STATUS_CHECK(
-		ippsAdd_16u(pSrc1, pSrc2, pDst, len)); }
 	template <> void add(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len) { STATUS_CHECK(
 		ippsAdd_16s(pSrc1, pSrc2, pDst, len)); }
-	template <> void add(const uint32_t * pSrc1, const uint32_t * pSrc2, uint32_t * pDst, int len) { STATUS_CHECK(
-		ippsAdd_32u(pSrc1, pSrc2, pDst, len)); }
 	template <> void add(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len) { STATUS_CHECK(
 		ippsAdd_32s_Sfs(pSrc1, pSrc2, pDst, len, 0)); }
+#ifdef DEPRECATED
+	template <> void add(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len) { STATUS_CHECK(
+		ippsAdd_16u(pSrc1, pSrc2, pDst, len)); }
+	template <> void add(const uint32_t * pSrc1, const uint32_t * pSrc2, uint32_t * pDst, int len) { STATUS_CHECK(
+		ippsAdd_32u(pSrc1, pSrc2, pDst, len)); }
 	template <> void add(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len) { STATUS_CHECK(
 		ippsAdd_64s_Sfs((const Ipp64s*)pSrc1, (const Ipp64s*)pSrc2, (Ipp64s*)pDst, len, 0)); }
+#endif
 	namespace f24
 	{
 		void add(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
@@ -433,9 +435,10 @@ namespace exp_log
 		ippsExp_16s_Sfs(pSrc, pDst, len, 0)); }
 	template <> void exp(const int32_t * pSrc, int32_t * pDst, int len) { STATUS_CHECK(
 		ippsExp_32s_Sfs(pSrc, pDst, len, 0)); }
+#ifdef DEPRECATED
 	template <> void exp(const int64_t * pSrc, int64_t * pDst, int len) { STATUS_CHECK(
 		ippsExp_64s_Sfs((const Ipp64s *)pSrc, (Ipp64s *)pDst, len, 0)); }
-
+#endif
 	// ln
 	template <> void ln(const float * pSrc, float * pDst, int len) { STATUS_CHECK(
 		ippsLn_32f(pSrc, pDst, len)); }

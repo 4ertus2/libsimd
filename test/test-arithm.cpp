@@ -250,7 +250,6 @@ int main()
 		test_arithm<uint16_t>(2, 1);
 #ifdef SIMD_IPP
 		test_arithm<int32_t, false>(2, 1);
-		test_abs<int64_t>();
 #else
 		test_arithm<int32_t>(2, 1);
 #endif

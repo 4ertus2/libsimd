@@ -164,9 +164,9 @@ namespace ipp
 		_SIMD_EXT_TU void normL1(const _T* pSrc, int len, _U* pNorm);
 		_SIMD_EXT_TU void normL2(const _T* pSrc, int len, _U* pNorm);
 
-		_SIMD_EXT_T void normDiffInf(const _T* pSrc1, const _T* pSrc2, int len, _T* pNorm);
-		_SIMD_EXT_T void normDiffL1(const _T* pSrc1, const _T* pSrc2, int len, _T* pNorm);
-		_SIMD_EXT_T void normDiffL2(const _T* pSrc1, const _T* pSrc2, int len, _T* pNorm);
+		_SIMD_EXT_TU void normDiffInf(const _T* pSrc1, const _T* pSrc2, int len, _U* pNorm);
+		_SIMD_EXT_TU void normDiffL1(const _T* pSrc1, const _T* pSrc2, int len, _U* pNorm);
+		_SIMD_EXT_TU void normDiffL2(const _T* pSrc1, const _T* pSrc2, int len, _U* pNorm);
 #if 0
 		// MahDistSingle (IPPs p.8 Speech Recording > Model Evalution)
 #endif
