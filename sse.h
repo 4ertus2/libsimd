@@ -73,6 +73,8 @@ namespace sse
 		_SIMD_EXT_T void min(const _T* pSrc, int len, _T* pMin);
 		_SIMD_EXT_T void max(const _T* pSrc, int len, _T* pMax);
 
+		_SIMD_EXT_T void minMax(const _T* pSrc, int len, _T* pMin, _T* pMax);
+
 		_SIMD_EXT_T void sum(const _T* pSrc, int len, _T* pSum);
 		_SIMD_EXT_T void meanStdDev(const _T* pSrc, int len, _T* pMean, _T* pStdDev);
 
@@ -103,6 +105,9 @@ namespace sse
 	using namespace sse::arithmetic;
 	using namespace sse::power;
 	using namespace sse::statistical;
+
+	using namespace nosimd::exp_log;
+	using namespace nosimd::trigonometric;
 }
 
 #endif

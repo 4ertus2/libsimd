@@ -298,7 +298,7 @@ namespace nosimd
 				pDst[i] = exp_cmath(pSrc[i]);
 		}
 
-		template<typename T> void log(const T * pSrc, T * pDst, int len)
+		template<typename T> void ln(const T * pSrc, T * pDst, int len)
 		{
 			for (int i=0; i < len; ++i)
 				pDst[i] = log_cmath(pSrc[i]);
