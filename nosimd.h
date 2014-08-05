@@ -1,6 +1,49 @@
 #ifndef _SIMD_NOSIMD_H_
 #define _SIMD_NOSIMD_H_
 
+#include <cmath>
+
+namespace
+{
+	template<typename T> T sqrt_cmath(T x) { return sqrt(float(x)); }
+	template<> double sqrt_cmath(double x) { return sqrt(x); }
+
+	template<typename T> T exp_cmath(T x) { return exp(float(x)); }
+	template<> double exp_cmath(double x) { return exp(x); }
+
+	template<typename T> T log_cmath(T x) { return log(float(x)); }
+	template<> double log_cmath(double x) { return log(x); }
+
+	template<typename T> T pow_cmath(T x, T y) { return pow(float(x), float(y)); }
+	template<> double pow_cmath(double x, double y) { return pow(x, y); }
+
+	template<typename T> T cbrt_cmath(T x) { return cbrt(float(x)); }
+	template<> double cbrt_cmath(double x) { return cbrt(x); }
+
+	template<typename T> T hypot_cmath(T x, T y) { return hypot(float(x), float(y)); }
+	template<> double hypot_cmath(double x, double y) { return hypot(x, y); }
+
+	//
+
+	template<typename T> T sin_cmath(T x) { return sin(float(x)); }
+	template<> double sin_cmath(double x) { return sin(x); }
+
+	template<typename T> T cos_cmath(T x) { return cos(float(x)); }
+	template<> double cos_cmath(double x) { return cos(x); }
+
+	template<typename T> T tan_cmath(T x) { return tan(float(x)); }
+	template<> double tan_cmath(double x) { return tan(x); }
+
+	template<typename T> T asin_cmath(T x) { return asin(float(x)); }
+	template<> double asin_cmath(double x) { return asin(x); }
+
+	template<typename T> T acos_cmath(T x) { return acos(float(x)); }
+	template<> double acos_cmath(double x) { return acos(x); }
+
+	template<typename T> T atan_cmath(T x) { return atan(float(x)); }
+	template<> double atan_cmath(double x) { return atan(x); }
+}
+
 namespace nosimd
 {
 	namespace common
@@ -210,15 +253,56 @@ namespace nosimd
 				pDst[i] = pSrc[i] * pSrc[i];
 		}
 
-		// sqrt
-		// powx
-		// pow
+		template<typename T> void sqrt(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = sqrt_cmath(pSrc[i]);
+		}
+
+		template<typename T> void invSqrt(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = 1.0f/sqrt_cmath(pSrc[i]);
+		}
+
+		template<typename T> void powx(const T* pSrc, const T constValue, T* pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = pow_cmath(pSrc[i], constValue);
+		}
+
+		template<typename T> void pow(const T* pSrc1, const T* pSrc2, T* pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = pow_cmath(pSrc1[i], pSrc2[i]);
+		}
+
+		template<typename T> void cbrt(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = cbrt_cmath(pSrc[i]);
+		}
+
+		template<typename T> void hypot(const T* pSrc1, const T* pSrc2, T* pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = hypot_cmath(pSrc1[i], pSrc2[i]);
+		}
 	}
 
 	namespace exp_log
 	{
-		// exp
-		// log
+		template<typename T> void exp(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = exp_cmath(pSrc[i]);
+		}
+
+		template<typename T> void log(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = log_cmath(pSrc[i]);
+		}
 	}
 
 	namespace statistical
@@ -321,8 +405,24 @@ namespace nosimd
 			*pMean = s/len;
 		}
 
-		// stdDev
-		// meanStdDev
+		template<typename T, typename U> void meanStdDev(const T * pSrc, int len, U * pMean, U * pStdDev)
+		{
+			mean(pSrc, len, pMean);
+
+			U s = 0;
+			for (int i=0; i < len; ++i)
+			{
+				U x = pSrc[i] - *pMean;
+				s += x * x;
+			}
+			*pStdDev = sqrt_cmath(s/(len-1));
+		}
+
+		template<typename T, typename U> void stdDev(const T * pSrc, int len, U * pStdDev)
+		{
+			U m;
+			meanStdDev(pSrc, len, &m, pStdDev);
+		}
 
 		template<typename T, typename U> void normInf(const T * pSrc, int len, U * pNorm)
 		{
@@ -359,7 +459,64 @@ namespace nosimd
 			*pNorm = norm;
 		}
 
-		// normL2
+		template<typename T, typename U> void normL2(const T * pSrc, int len, U * pNorm)
+		{
+			U norm = 0;
+			for (int i=0; i < len; ++i)
+			{
+				norm += pSrc[i] * pSrc[i];
+			}
+			*pNorm = sqrt_cmath(norm);
+		}
+
+		template<typename T, typename U> void normDiffInf(const T * pSrc1, const T * pSrc2, int len, U * pNorm)
+		{
+			T x = pSrc1[0]-pSrc2[0];
+			U mx = x;
+			if (x < 0)
+				mx = -x;
+
+			for (int i=1; i < len; ++i)
+			{
+				x = pSrc1[i] - pSrc2[i];
+				if (x < 0)
+				{
+					if (mx < -x)
+						mx = -x;
+				}
+				else
+				{
+					if (mx < x)
+						mx = x;
+				}
+			}
+			*pNorm = mx;
+		}
+
+		template<typename T, typename U> void normDiffL1(const T * pSrc1, const T * pSrc2, int len, U * pNorm)
+		{
+			U norm = 0;
+			for (int i=0; i < len; ++i)
+			{
+				T x = pSrc1[i] - pSrc2[i];
+				if (x < 0)
+					norm -= x;
+				else
+					norm += x;
+			}
+			*pNorm = norm;
+		}
+
+		template<typename T, typename U> void normDiffL2(const T * pSrc1, const T * pSrc2, int len, U * pNorm)
+		{
+			U norm = 0;
+			for (int i=0; i < len; ++i)
+			{
+				U x = pSrc1[i] - pSrc2[i];
+				norm += x * x;
+			}
+			*pNorm = sqrt_cmath(norm);
+		}
 
 		template<typename T, typename U> void dotProd(const T * pSrc1, const T * pSrc2, int len, U * pDp)
 		{
@@ -370,12 +527,51 @@ namespace nosimd
 		}
 	}
 
+	namespace trigonometric
+	{
+		template<typename T> void sin(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = sin_cmath(pSrc[i]);
+		}
+
+		template<typename T> void cos(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = cos_cmath(pSrc[i]);
+		}
+
+		template<typename T> void tan(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = tan_cmath(pSrc[i]);
+		}
+
+		template<typename T> void asin(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = asin_cmath(pSrc[i]);
+		}
+
+		template<typename T> void acos(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = acos_cmath(pSrc[i]);
+		}
+
+		template<typename T> void atan(const T * pSrc, T * pDst, int len)
+		{
+			for (int i=0; i < len; ++i)
+				pDst[i] = atan_cmath(pSrc[i]);
+		}
+	}
+
 	using namespace nosimd::common;
 	using namespace nosimd::arithmetic;
 	using namespace nosimd::power;
 	using namespace nosimd::exp_log;
 	using namespace nosimd::statistical;
+	using namespace nosimd::trigonometric;
 }
 
 #endif
-

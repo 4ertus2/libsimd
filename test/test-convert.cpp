@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "simd.h"
+#include "compare.h"
 
 static const unsigned LENGTH = 47;
 
@@ -21,8 +22,11 @@ void test_convert(T valueT, U valueU)
 
 	simd::convert(t, u, LENGTH);
 	for (int i=0; i<LENGTH; ++i)
-		if (u[i] != valueU)
+		if (! equal(u[i], valueU))
+		{
+			std::cerr << u[i] << " != " << valueU << std::endl;
 			throw __PRETTY_FUNCTION__;
+		}
 }
 
 void test_i8(int value)

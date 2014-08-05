@@ -378,8 +378,50 @@ namespace power
 	}
 
 	// invSqrt
+	template <> void invSqrt(const float * pSrc, float * pDst, int len) { f24::invSqrt(pSrc, pDst, len); }
+	template <> void invSqrt(const double * pSrc, double * pDst, int len) { d53::invSqrt(pSrc, pDst, len); }
+	namespace f21
+	{
+		void invSqrt(const float * pSrc, float * pDst, int len) { STATUS_CHECK(ippsInvSqrt_32f_A21(pSrc, pDst, len)); }
+	}
+	namespace f24
+	{
+		void invSqrt(const float * pSrc, float * pDst, int len) { STATUS_CHECK(ippsInvSqrt_32f_A24(pSrc, pDst, len)); }
+	}
+	namespace d50
+	{
+		void invSqrt(const double * pSrc, double * pDst, int len) { STATUS_CHECK(ippsInvSqrt_64f_A50(pSrc, pDst, len)); }
+	}
+	namespace d53
+	{
+		void invSqrt(const double * pSrc, double * pDst, int len) { STATUS_CHECK(ippsInvSqrt_64f_A53(pSrc, pDst, len)); }
+	}
+
+	// cbrt
+	template <> void cbrt(const float * pSrc, float * pDst, int len) { STATUS_CHECK(ippsCubrt_32f(pSrc, pDst, len)); }
+	template <> void cbrt(const double * pSrc, double * pDst, int len) { d53::cbrt(pSrc, pDst, len); }
+	namespace f21
+	{
+		void cbrt(const float * pSrc, float * pDst, int len) { STATUS_CHECK(ippsCbrt_32f_A21(pSrc, pDst, len)); }
+	}
+	namespace f24
+	{
+		void cbrt(const float * pSrc, float * pDst, int len) { STATUS_CHECK(ippsCbrt_32f_A24(pSrc, pDst, len)); }
+	}
+	namespace d50
+	{
+		void cbrt(const double * pSrc, double * pDst, int len) { STATUS_CHECK(ippsCbrt_64f_A50(pSrc, pDst, len)); }
+	}
+	namespace d53
+	{
+		void cbrt(const double * pSrc, double * pDst, int len) { STATUS_CHECK(ippsCbrt_64f_A53(pSrc, pDst, len)); }
+	}
 
 	// powx
+	template <> void powx(const float * pSrc, const float constValue, float * pDst, int len) {
+		f24::powx(pSrc, constValue, pDst, len); }
+	template <> void powx(const double * pSrc, const double constValue, double * pDst, int len) {
+		d53::powx(pSrc, constValue, pDst, len); }
 	namespace f21
 	{
 		void powx(const float * pSrc, const float constValue, float * pDst, int len) { STATUS_CHECK(
@@ -402,6 +444,10 @@ namespace power
 	}
 
 	// pow
+	template <> void pow(const float * pSrc1, const float * pSrc2, float * pDst, int len) {
+		f24::pow(pSrc1, pSrc2, pDst, len); }
+	template <> void pow(const double * pSrc1, const double * pSrc2, double * pDst, int len) {
+		d53::pow(pSrc1, pSrc2, pDst, len); }
 	namespace f21
 	{
 		void pow(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
@@ -421,6 +467,32 @@ namespace power
 	{
 		void pow(const double * pSrc1, const double * pSrc2, double * pDst, int len) { STATUS_CHECK(
 			ippsPow_64f_A53(pSrc1, pSrc2, pDst, len)); }
+	}
+
+	// hypot
+	template <> void hypot(const float * pSrc1, const float * pSrc2, float * pDst, int len) {
+		f24::hypot(pSrc1, pSrc2, pDst, len); }
+	template <> void hypot(const double * pSrc1, const double * pSrc2, double * pDst, int len) {
+		d53::hypot(pSrc1, pSrc2, pDst, len); }
+	namespace f21
+	{
+		void hypot(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
+			ippsHypot_32f_A21(pSrc1, pSrc2, pDst, len)); }
+	}
+	namespace f24
+	{
+		void hypot(const float * pSrc1, const float * pSrc2, float * pDst, int len) { STATUS_CHECK(
+			ippsHypot_32f_A24(pSrc1, pSrc2, pDst, len)); }
+	}
+	namespace d50
+	{
+		void hypot(const double * pSrc1, const double * pSrc2, double * pDst, int len) { STATUS_CHECK(
+			ippsHypot_64f_A50(pSrc1, pSrc2, pDst, len)); }
+	}
+	namespace d53
+	{
+		void hypot(const double * pSrc1, const double * pSrc2, double * pDst, int len) { STATUS_CHECK(
+			ippsHypot_64f_A53(pSrc1, pSrc2, pDst, len)); }
 	}
 }
 

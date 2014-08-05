@@ -86,34 +86,50 @@ namespace ipp
 		_SIMD_EXT_T void invSqrt(const _T* pSrc, _T* pDst, int len);
 		_SIMD_EXT_T void powx(const _T* pSrc, const _T constValue, _T* pDst, int len);
 		_SIMD_EXT_T void pow(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
-#if 0
 		_SIMD_EXT_T void cbrt(const _T* pSrc, _T* pDst, int len);
-		_SIMD_EXT_T void pow2o3(const _T* pSrc, _T* pDst, int len);
-		_SIMD_EXT_T void pow3o2(const _T* pSrc, _T* pDst, int len);
 		_SIMD_EXT_T void hypot(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len); // sqtr(a^2+b^2)
-#endif
 
 		namespace f21
 		{
 			void inv(const float * pSrc, float * pDst, int len);
 			void sqrt(const float * pSrc, float * pDst, int len);
+			void invSqrt(const float * pSrc, float * pDst, int len);
+			void cbrt(const float * pSrc, float * pDst, int len);
+			void powx(const float * pSrc, const float constValue, float * pDst, int len);
+			void pow(const float * pSrc1, const float * pSrc2, float * pDst, int len);
+			void hypot(const float * pSrc1, const float * pSrc2, float * pDst, int len);
 		}
 		namespace f24
 		{
 			void inv(const float * pSrc, float * pDst, int len);
 			void sqr(const float * pSrc, float * pDst, int len);
 			void sqrt(const float * pSrc, float * pDst, int len);
+			void invSqrt(const float * pSrc, float * pDst, int len);
+			void cbrt(const float * pSrc, float * pDst, int len);
+			void powx(const float * pSrc, const float constValue, float * pDst, int len);
+			void pow(const float * pSrc1, const float * pSrc2, float * pDst, int len);
+			void hypot(const float * pSrc1, const float * pSrc2, float * pDst, int len);
 		}
 		namespace d50
 		{
 			void inv(const double * pSrc, double * pDst, int len);
 			void sqrt(const double * pSrc, double * pDst, int len);
+			void invSqrt(const double * pSrc, double * pDst, int len);
+			void cbrt(const double * pSrc, double * pDst, int len);
+			void powx(const double * pSrc, const double constValue, double * pDst, int len);
+			void pow(const double * pSrc1, const double * pSrc2, double * pDst, int len);
+			void hypot(const double * pSrc1, const double * pSrc2, double * pDst, int len);
 		}
 		namespace d53
 		{
 			void inv(const double * pSrc, double * pDst, int len);
 			void sqr(const double * pSrc, double * pDst, int len);
 			void sqrt(const double * pSrc, double * pDst, int len);
+			void invSqrt(const double * pSrc, double * pDst, int len);
+			void cbrt(const double * pSrc, double * pDst, int len);
+			void powx(const double * pSrc, const double constValue, double * pDst, int len);
+			void pow(const double * pSrc1, const double * pSrc2, double * pDst, int len);
+			void hypot(const double * pSrc1, const double * pSrc2, double * pDst, int len);
 		}
 	}
 
@@ -174,23 +190,6 @@ namespace ipp
 		_SIMD_EXT_TU void dotProd(const _T* pSrc1, const _T* pSrc2, int len, _U* pDp);
 	}
 
-#if 0
-	namespace matrix
-	{
-		// IPPs p.8 Speech Recording > Basic Arithmetics
-
-		// SumColumn
-		// SumRow
-		// SubRow
-		// VecMatMul
-		// MatVecMul
-
-		// IPPs p.8 Speech Recording > ModelAdaptation
-
-		// DotProdColumn
-	}
-#endif
-
 	namespace trigonometric
 	{
 		namespace f21
@@ -229,6 +228,9 @@ namespace ipp
 			void asin(const double * pSrc, double * pDst, int len);
 			void atan(const double * pSrc, double * pDst, int len);
 		}
+
+		using namespace ipp::trigonometric::f24;
+		using namespace ipp::trigonometric::d53;
 	}
 
 	using namespace ipp::common;
@@ -236,6 +238,7 @@ namespace ipp
 	using namespace ipp::power;
 	using namespace ipp::exp_log;
 	using namespace ipp::statistical;
+	using namespace ipp::trigonometric;
 
 	namespace f21
 	{
@@ -271,4 +274,3 @@ namespace ipp
 }
 
 #endif
-
