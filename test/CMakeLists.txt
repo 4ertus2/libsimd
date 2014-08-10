@@ -18,10 +18,10 @@ set_target_properties(test-common-sse-unroll PROPERTIES COMPILE_FLAGS "-DSIMD_SS
 set_target_properties(test-arithm-float-sse PROPERTIES COMPILE_FLAGS "-DSIMD_SSE -DTEST_FLOAT")
 set_target_properties(test-arithm-float-sse-unroll PROPERTIES COMPILE_FLAGS "-DSIMD_SSE -DTEST_FLOAT")
 #
-target_link_libraries(test-common-sse simdsse)
-target_link_libraries(test-common-sse-unroll simdsse_ur)
-target_link_libraries(test-arithm-float-sse simdsse)
-target_link_libraries(test-arithm-float-sse-unroll simdsse_ur)
+target_link_libraries(test-common-sse simdssef simdssed)
+target_link_libraries(test-common-sse-unroll simdssef_ur simdssed_ur)
+target_link_libraries(test-arithm-float-sse simdssef simdssed)
+target_link_libraries(test-arithm-float-sse-unroll simdssef_ur simdssed_ur)
 
 if(IPP_DIR)
 # ipp
