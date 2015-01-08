@@ -1,10 +1,13 @@
+#ifndef _SIMD_SSE_FLOAT_H_
+#define _SIMD_SSE_FLOAT_H_
+
 #include <stdint.h>
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
 #include "sse.h"
 
-namespace
+namespace sse_float_internal
 {
 	typedef __m128 (*IntrS)(__m128);
 	typedef __m128 (*IntrSS)(__m128, __m128);
@@ -13,15 +16,15 @@ namespace
 
 	//
 
-	inline __m128 nop_ps(__m128 x) { return x; }
+	INLINE __m128 nop_ps(__m128 x) { return x; }
 
-	inline __m128 abs_ps(__m128 x)
+	INLINE __m128 abs_ps(__m128 x)
 	{
 		static const __m128 sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
 		return _mm_andnot_ps(sign_mask, x); // !sign_mask & x
 	}
 
-	inline __m128 horizontal_sum(__m128 x)
+	INLINE __m128 horizontal_sum(__m128 x)
 	{
 		// some magic here
 		const __m128 t = _mm_add_ps(x, _mm_movehl_ps(x, x));
@@ -36,7 +39,7 @@ namespace
 				IntrPs load_ss = _mm_load_ss,
 				IntrPS store_ps = _mm_store_ps,
 				IntrPS store_ss = _mm_store_ss>
-	void sPtrDst(const float * pSrc, float * pDst, int len)
+	INLINE void sPtrDst(const float * pSrc, float * pDst, int len)
 	{
 #ifdef UNROLL_MORE
 		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
@@ -92,7 +95,7 @@ namespace
 				IntrPs load_ss = _mm_load_ss,
 				IntrPS store_ps = _mm_store_ps,
 				IntrPS store_ss = _mm_store_ss>
-	void sPtrValDst(const float * pSrc, float val, float * pDst, int len)
+	INLINE void sPtrValDst(const float * pSrc, float val, float * pDst, int len)
 	{
 		const __m128 b = _mm_set1_ps(val);
 #ifdef UNROLL_MORE
@@ -149,7 +152,7 @@ namespace
 				IntrPs load_ss = _mm_load_ss,
 				IntrPS store_ps = _mm_store_ps,
 				IntrPS store_ss = _mm_store_ss>
-	void sPtrValDstRev(const float * pSrc, float val, float * pDst, int len)
+	INLINE void sPtrValDstRev(const float * pSrc, float val, float * pDst, int len)
 	{
 #ifdef UNROLL_MORE
 		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
@@ -217,7 +220,7 @@ namespace
 				IntrPs load_ss = _mm_load_ss,
 				IntrPS store_ps = _mm_store_ps,
 				IntrPS store_ss = _mm_store_ss>
-	void sPtrPtrDst(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+	INLINE void sPtrPtrDst(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
 #ifdef UNROLL_MORE
 		for (; len >= 16; len-=16, pSrc1+=16, pSrc2+=16, pDst+=16)
@@ -282,9 +285,11 @@ namespace
 
 namespace sse
 {
+	using namespace sse_float_internal;
+
 namespace common
 {
-	template <> void set(float val, float * pDst, int len)
+	_SIMD_SSE_SPEC void set(float val, float * pDst, int len)
 	{
 		__m128 a = _mm_set1_ps(val);
 #ifdef UNROLL_MORE
@@ -328,7 +333,7 @@ namespace common
 			*pDst = val;
 	}
 
-	template <> void copy(const float * pSrc, float * pDst, int len)
+	_SIMD_SSE_SPEC void copy(const float * pSrc, float * pDst, int len)
 	{
 		sPtrDst<nop_ps, nop_ps>(pSrc, pDst, len);
 	}
@@ -336,59 +341,59 @@ namespace common
 
 namespace arithmetic
 {
-	template <> void addC(const float * pSrc, float val, float * pDst, int len)
+	_SIMD_SSE_SPEC void addC(const float * pSrc, float val, float * pDst, int len)
 	{
 		sPtrValDst<_mm_add_ps, _mm_add_ss>(pSrc, val, pDst, len);
 	}
 
-	template <> void subC(const float * pSrc, float val, float * pDst, int len)
+	_SIMD_SSE_SPEC void subC(const float * pSrc, float val, float * pDst, int len)
 	{
 		sPtrValDst<_mm_sub_ps, _mm_sub_ss>(pSrc, val, pDst, len);
 	}
 
-	template <> void mulC(const float * pSrc, float val, float * pDst, int len)
+	_SIMD_SSE_SPEC void mulC(const float * pSrc, float val, float * pDst, int len)
 	{
 		sPtrValDst<_mm_mul_ps, _mm_mul_ss>(pSrc, val, pDst, len);
 	}
 
-	template <> void divC(const float * pSrc, float val, float * pDst, int len)
+	_SIMD_SSE_SPEC void divC(const float * pSrc, float val, float * pDst, int len)
 	{
 		sPtrValDst<_mm_div_ps, _mm_div_ss>(pSrc, val, pDst, len);
 	}
 
 
-	template <> void subCRev(const float * pSrc, float val, float * pDst, int len)
+	_SIMD_SSE_SPEC void subCRev(const float * pSrc, float val, float * pDst, int len)
 	{
 		sPtrValDstRev<_mm_sub_ps, _mm_sub_ss>(pSrc, val, pDst, len);
 	}
 
-	template <> void divCRev(const float * pSrc, float val, float * pDst, int len)
+	_SIMD_SSE_SPEC void divCRev(const float * pSrc, float val, float * pDst, int len)
 	{
 		sPtrValDstRev<_mm_div_ps, _mm_div_ss>(pSrc, val, pDst, len);
 	}
 
 
-	template <> void add(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+	_SIMD_SSE_SPEC void add(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
 		sPtrPtrDst<_mm_add_ps, _mm_add_ss>(pSrc1, pSrc2, pDst, len);
 	}
 
-	template <> void sub(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+	_SIMD_SSE_SPEC void sub(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
 		sPtrPtrDst<_mm_sub_ps, _mm_sub_ss>(pSrc1, pSrc2, pDst, len);
 	}
 
-	template <> void mul(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+	_SIMD_SSE_SPEC void mul(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
 		sPtrPtrDst<_mm_mul_ps, _mm_mul_ss>(pSrc1, pSrc2, pDst, len);
 	}
 
-	template <> void div(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+	_SIMD_SSE_SPEC void div(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
 		sPtrPtrDst<_mm_div_ps, _mm_div_ss>(pSrc1, pSrc2, pDst, len);
 	}
 
-	template <> void abs(const float * pSrc, float * pDst, int len)
+	_SIMD_SSE_SPEC void abs(const float * pSrc, float * pDst, int len)
 	{
 		sPtrDst<abs_ps, abs_ps>(pSrc, pDst, len);
 	}
@@ -396,17 +401,17 @@ namespace arithmetic
 
 namespace power
 {
-	template <> void inv(const float * pSrc, float * pDst, int len)
+	_SIMD_SSE_SPEC void inv(const float * pSrc, float * pDst, int len)
 	{
 		sPtrDst<_mm_rcp_ps, _mm_rcp_ss>(pSrc, pDst, len);
 	}
 
-	template <> void sqrt(const float * pSrc, float * pDst, int len)
+	_SIMD_SSE_SPEC void sqrt(const float * pSrc, float * pDst, int len)
 	{
 		sPtrDst<_mm_sqrt_ps, _mm_sqrt_ss>(pSrc, pDst, len);
 	}
 
-	template <> void invSqrt(const float * pSrc, float * pDst, int len)
+	_SIMD_SSE_SPEC void invSqrt(const float * pSrc, float * pDst, int len)
 	{
 		sPtrDst<_mm_rsqrt_ps, _mm_rsqrt_ss>(pSrc, pDst, len);
 	}
@@ -414,7 +419,7 @@ namespace power
 
 namespace statistical
 {
-	template <> void min(const float * pSrc, int len, float * pMin)
+	_SIMD_SSE_SPEC void min(const float * pSrc, int len, float * pMin)
 	{
 		__m128 r0;
 
@@ -494,7 +499,7 @@ namespace statistical
 
 	// TODO: max
 
-	template <> void sum(const float * pSrc, int len, float * pSum)
+	_SIMD_SSE_SPEC void sum(const float * pSrc, int len, float * pSum)
 	{
 		__m128 r0 = _mm_setzero_ps();
 
@@ -559,7 +564,7 @@ namespace statistical
 		*pSum = _mm_cvtss_f32(r0);
 	}
 
-	template <> void meanStdDev(const float * pSrc, int len, float * pMean, float * pStdDev)
+	_SIMD_SSE_SPEC void meanStdDev(const float * pSrc, int len, float * pMean, float * pStdDev)
 	{
 		const float coef = len-1;
 		mean(pSrc, len, pMean);
@@ -614,7 +619,7 @@ namespace statistical
 		*pStdDev = _mm_cvtss_f32(r1);
 	}
 
-	template <> void dotProd(const float * pSrc1, const float * pSrc2, int len, float * pDp)
+	_SIMD_SSE_SPEC void dotProd(const float * pSrc1, const float * pSrc2, int len, float * pDp)
 	{
 		__m128 r0 = _mm_setzero_ps();
 		__m128 r1 = _mm_setzero_ps();
@@ -661,3 +666,5 @@ namespace statistical
 	}
 }
 }
+
+#endif

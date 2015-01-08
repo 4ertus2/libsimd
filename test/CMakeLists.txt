@@ -5,7 +5,11 @@ add_executable(test-common test-common.cpp)
 add_executable(test-convert test-convert.cpp)
 add_executable(test-arithm test-arithm.cpp)
 add_executable(test-arithm-float test-arithm.cpp)
-set_target_properties(test-arithm-float PROPERTIES COMPILE_FLAGS -DTEST_FLOAT)
+#
+set_target_properties(test-common PROPERTIES COMPILE_FLAGS "-DNO_SSE")
+set_target_properties(test-convert PROPERTIES COMPILE_FLAGS "-DNO_SSE")
+set_target_properties(test-arithm PROPERTIES COMPILE_FLAGS "-DNO_SSE")
+set_target_properties(test-arithm-float PROPERTIES COMPILE_FLAGS "-DNO_SSE -DTEST_FLOAT")
 
 # sse
 add_executable(test-common-sse test-common.cpp)
@@ -13,15 +17,15 @@ add_executable(test-common-sse-unroll test-common.cpp)
 add_executable(test-arithm-float-sse test-arithm.cpp)
 add_executable(test-arithm-float-sse-unroll test-arithm.cpp)
 #
-set_target_properties(test-common-sse PROPERTIES COMPILE_FLAGS "-DSIMD_SSE -DTEST_FLOAT")
-set_target_properties(test-common-sse-unroll PROPERTIES COMPILE_FLAGS "-DSIMD_SSE -DTEST_FLOAT")
-set_target_properties(test-arithm-float-sse PROPERTIES COMPILE_FLAGS "-DSIMD_SSE -DTEST_FLOAT")
-set_target_properties(test-arithm-float-sse-unroll PROPERTIES COMPILE_FLAGS "-DSIMD_SSE -DTEST_FLOAT")
+set_target_properties(test-common-sse PROPERTIES COMPILE_FLAGS "-DTEST_FLOAT")
+set_target_properties(test-common-sse-unroll PROPERTIES COMPILE_FLAGS "-DTEST_FLOAT -DUNROLL_MORE")
+set_target_properties(test-arithm-float-sse PROPERTIES COMPILE_FLAGS "-DTEST_FLOAT")
+set_target_properties(test-arithm-float-sse-unroll PROPERTIES COMPILE_FLAGS "-DTEST_FLOAT -DUNROLL_MORE")
 #
-target_link_libraries(test-common-sse simdssef simdssed)
-target_link_libraries(test-common-sse-unroll simdssef_ur simdssed_ur)
-target_link_libraries(test-arithm-float-sse simdssef simdssed)
-target_link_libraries(test-arithm-float-sse-unroll simdssef_ur simdssed_ur)
+#target_link_libraries(test-common-sse simdssef simdssed)
+#target_link_libraries(test-common-sse-unroll simdssef_ur simdssed_ur)
+#target_link_libraries(test-arithm-float-sse simdssef simdssed)
+#target_link_libraries(test-arithm-float-sse-unroll simdssef_ur simdssed_ur)
 
 if(IPP_DIR)
 # ipp

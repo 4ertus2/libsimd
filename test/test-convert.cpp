@@ -63,7 +63,7 @@ void test_i64(int64_t value)
 	test_convert<int64_t, double>(value, value);
 }
 
-void test_float(int value)
+void test_float(float value)
 {
 	test_convert<float, double>(value, value);
 	test_convert<double, float>(value, value);

@@ -2,19 +2,23 @@
 #define _SIMD_H_
 
 #include "nosimd.h"
-#include "sse.h"
-#include "sse_ipp.h"
 
-namespace simd
-{
-#if defined(SIMD_SSE)
-	using namespace sse;
+// NEON
+#if defined(__arm__) && !defined(NO_NEON)
+#include "neon.h"
+namespace simd { using namespace neon; }
+// IPP
 #elif defined(SIMD_IPP)
-	using namespace ipp;
+#include "sse_ipp.h"
+namespace simd { using namespace ipp; }
+// SSE
+#elif (defined(__amd64__) || defined(__i386__) || defined(_M_AMD64)) && !defined(NO_SSE)
+#include "sse-float.h"
+#include "sse-double.h"
+namespace simd { using namespace sse; }
+// NO SIMD
 #else
-	using namespace nosimd;
-#endif
-}
-
+namespace simd { using namespace nosimd; }
 #endif
 
+#endif

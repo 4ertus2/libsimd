@@ -1,10 +1,13 @@
+#ifndef _SIMD_SSE_DOUBLE_H_
+#define _SIMD_SSE_DOUBLE_H_
+
 #include <stdint.h>
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
 #include "sse.h"
 
-namespace
+namespace sse_double_internal
 {
 	typedef __m128d (*IntrD)(__m128d);
 	typedef __m128d (*IntrDD)(__m128d, __m128d);
@@ -13,9 +16,9 @@ namespace
 
 	//
 
-	inline __m128d nop_pd(__m128d x) { return x; }
+	INLINE  __m128d nop_pd(__m128d x) { return x; }
 
-	inline __m128d abs_pd(__m128d x)
+	INLINE  __m128d abs_pd(__m128d x)
 	{
 		static const __m128d sign_mask = _mm_set1_pd(-0.); // -0. = 1 << 63
 		return _mm_andnot_pd(sign_mask, x);
@@ -29,7 +32,7 @@ namespace
 				IntrPd load_sd = _mm_load_sd,
 				IntrPD store_pd = _mm_store_pd,
 				IntrPD store_sd = _mm_store_sd>
-	void dPtrDst(const double * pSrc, double * pDst, int len)
+	INLINE void dPtrDst(const double * pSrc, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
@@ -85,7 +88,7 @@ namespace
 				IntrPd load_sd = _mm_load_sd,
 				IntrPD store_pd = _mm_store_pd,
 				IntrPD store_sd = _mm_store_sd>
-	void dPtrValDst(const double * pSrc, double val, double * pDst, int len)
+	INLINE void dPtrValDst(const double * pSrc, double val, double * pDst, int len)
 	{
 		const __m128d b = _mm_set1_pd(val);
 #ifdef UNROLL_MORE
@@ -142,7 +145,7 @@ namespace
 				IntrPd load_sd = _mm_load_sd,
 				IntrPD store_pd = _mm_store_pd,
 				IntrPD store_sd = _mm_store_sd>
-	void dPtrValDstRev(const double * pSrc, double val, double * pDst, int len)
+	INLINE void dPtrValDstRev(const double * pSrc, double val, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
@@ -210,7 +213,7 @@ namespace
 				IntrPd load_sd = _mm_load_sd,
 				IntrPD store_pd = _mm_store_pd,
 				IntrPD store_sd = _mm_store_sd>
-	void dPtrPtrDst(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+	INLINE void dPtrPtrDst(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
 		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8, pDst+=8)
@@ -275,9 +278,11 @@ namespace
 
 namespace sse
 {
+	using namespace sse_double_internal;
+
 namespace common
 {
-	template <> void set(double val, double * pDst, int len)
+	_SIMD_SSE_SPEC void set(double val, double * pDst, int len)
 	{
 		__m128d a = _mm_set1_pd(val);
 #ifdef UNROLL_MORE
@@ -321,7 +326,7 @@ namespace common
 			*pDst = val;
 	}
 
-	template <> void copy(const double * pSrc, double * pDst, int len)
+	_SIMD_SSE_SPEC void copy(const double * pSrc, double * pDst, int len)
 	{
 		dPtrDst<nop_pd, nop_pd>(pSrc, pDst, len);
 	}
@@ -329,59 +334,59 @@ namespace common
 
 namespace arithmetic
 {
-	template <> void addC(const double * pSrc, double val, double * pDst, int len)
+	_SIMD_SSE_SPEC void addC(const double * pSrc, double val, double * pDst, int len)
 	{
 		dPtrValDst<_mm_add_pd, _mm_add_sd>(pSrc, val, pDst, len);
 	}
 
-	template <> void subC(const double * pSrc, double val, double * pDst, int len)
+	_SIMD_SSE_SPEC void subC(const double * pSrc, double val, double * pDst, int len)
 	{
 		dPtrValDst<_mm_sub_pd, _mm_sub_sd>(pSrc, val, pDst, len);
 	}
 
-	template <> void mulC(const double * pSrc, double val, double * pDst, int len)
+	_SIMD_SSE_SPEC void mulC(const double * pSrc, double val, double * pDst, int len)
 	{
 		dPtrValDst<_mm_mul_pd, _mm_mul_sd>(pSrc, val, pDst, len);
 	}
 
-	template <> void divC(const double * pSrc, double val, double * pDst, int len)
+	_SIMD_SSE_SPEC void divC(const double * pSrc, double val, double * pDst, int len)
 	{
 		dPtrValDst<_mm_div_pd, _mm_div_sd>(pSrc, val, pDst, len);
 	}
 
 
-	template <> void subCRev(const double * pSrc, double val, double * pDst, int len)
+	_SIMD_SSE_SPEC void subCRev(const double * pSrc, double val, double * pDst, int len)
 	{
 		dPtrValDstRev<_mm_sub_pd, _mm_sub_sd>(pSrc, val, pDst, len);
 	}
 
-	template <> void divCRev(const double * pSrc, double val, double * pDst, int len)
+	_SIMD_SSE_SPEC void divCRev(const double * pSrc, double val, double * pDst, int len)
 	{
 		dPtrValDstRev<_mm_div_pd, _mm_div_sd>(pSrc, val, pDst, len);
 	}
 
 
-	template <> void add(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+	_SIMD_SSE_SPEC void add(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
 		dPtrPtrDst<_mm_add_pd, _mm_add_sd>(pSrc1, pSrc2, pDst, len);
 	}
 
-	template <> void sub(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+	_SIMD_SSE_SPEC void sub(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
 		dPtrPtrDst<_mm_sub_pd, _mm_sub_sd>(pSrc1, pSrc2, pDst, len);
 	}
 
-	template <> void mul(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+	_SIMD_SSE_SPEC void mul(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
 		dPtrPtrDst<_mm_mul_pd, _mm_mul_sd>(pSrc1, pSrc2, pDst, len);
 	}
 
-	template <> void div(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+	_SIMD_SSE_SPEC void div(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
 		dPtrPtrDst<_mm_div_pd, _mm_div_sd>(pSrc1, pSrc2, pDst, len);
 	}
 
-	template <> void abs(const double * pSrc, double * pDst, int len)
+	_SIMD_SSE_SPEC void abs(const double * pSrc, double * pDst, int len)
 	{
 		dPtrDst<abs_pd, abs_pd>(pSrc, pDst, len);
 	}
@@ -389,20 +394,22 @@ namespace arithmetic
 
 namespace power
 {
-	template <> void inv(const double * pSrc, double * pDst, int len)
+	_SIMD_SSE_SPEC void inv(const double * pSrc, double * pDst, int len)
 	{
 		divCRev(pSrc, 1.0, pDst, len);
 	}
 
-	template <> void sqrt(const double * pSrc, double * pDst, int len)
+	_SIMD_SSE_SPEC void sqrt(const double * pSrc, double * pDst, int len)
 	{
 		dPtrDst<_mm_sqrt_pd, _mm_sqrt_pd>(pSrc, pDst, len);
 	}
 
-	template <> void invSqrt(const double * pSrc, double * pDst, int len)
+	_SIMD_SSE_SPEC void invSqrt(const double * pSrc, double * pDst, int len)
 	{
 		sqrt(pSrc, pDst, len);
 		inv(pDst, pDst, len);
 	}
 }
 }
+
+#endif
