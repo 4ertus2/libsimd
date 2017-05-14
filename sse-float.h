@@ -12,6 +12,14 @@ namespace sse_float_internal
 	typedef __m128 (*IntrPs)(float const *);
 	typedef void (*IntrPS)(float *, __m128);
 
+#ifdef SSE_ALIGNED_LOAD
+	INLINE __m128 xx_load_ps(float const * x) { return _mm_load_ps(x); }
+	INLINE void xx_store_ps(float * x, __m128 y) { _mm_store_ps(x, y); }
+#else
+	INLINE __m128 xx_load_ps(float const * x) { return _mm_loadu_ps(x); }
+	INLINE void xx_store_ps(float * x, __m128 y) { _mm_storeu_ps(x, y); }
+#endif
+
 	//
 
 	INLINE __m128 nop_ps(__m128 x) { return x; }
@@ -33,9 +41,9 @@ namespace sse_float_internal
 
 	template <	IntrS op_ps,
 				IntrS op_ss,
-				IntrPs load_ps = _mm_loadu_ps,
+				IntrPs load_ps = xx_load_ps,
 				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = _mm_storeu_ps,
+				IntrPS store_ps = xx_store_ps,
 				IntrPS store_ss = _mm_store_ss>
 	INLINE void sPtrDst(const float * pSrc, float * pDst, int len)
 	{
@@ -89,9 +97,9 @@ namespace sse_float_internal
 
 	template <	IntrSS op_ps,
 				IntrSS op_ss,
-				IntrPs load_ps = _mm_loadu_ps,
+				IntrPs load_ps = xx_load_ps,
 				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = _mm_storeu_ps,
+				IntrPS store_ps = xx_store_ps,
 				IntrPS store_ss = _mm_store_ss>
 	INLINE void sPtrValDst(const float * pSrc, float val, float * pDst, int len)
 	{
@@ -146,9 +154,9 @@ namespace sse_float_internal
 
 	template <	IntrSS op_ps,
 				IntrSS op_ss,
-				IntrPs load_ps = _mm_loadu_ps,
+				IntrPs load_ps = xx_load_ps,
 				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = _mm_storeu_ps,
+				IntrPS store_ps = xx_store_ps,
 				IntrPS store_ss = _mm_store_ss>
 	INLINE void sPtrValDstRev(const float * pSrc, float val, float * pDst, int len)
 	{
@@ -214,9 +222,9 @@ namespace sse_float_internal
 
 	template <	IntrSS op_ps,
 				IntrSS op_ss,
-				IntrPs load_ps = _mm_loadu_ps,
+				IntrPs load_ps = xx_load_ps,
 				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = _mm_storeu_ps,
+				IntrPS store_ps = xx_store_ps,
 				IntrPS store_ss = _mm_store_ss>
 	INLINE void sPtrPtrDst(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
@@ -283,7 +291,7 @@ namespace sse_float_internal
 	template <	IntrSS op_ps,
 				IntrSS op_ss,
 				IntrPs load_one,
-				IntrPs load_ps = _mm_loadu_ps,
+				IntrPs load_ps = xx_load_ps,
 				IntrPs load_ss = _mm_load_ss>
 	INLINE void aggregate(const float * pSrc, int len, __m128& r0)
 	{
@@ -361,7 +369,7 @@ namespace sse
 
 namespace common
 {
-	template <IntrPS store_ps = _mm_store_ps>
+	template <IntrPS store_ps = xx_store_ps>
 	INLINE void setT(float val, float * pDst, int len)
 	{
 		__m128 a = _mm_set1_ps(val);
@@ -406,7 +414,7 @@ namespace common
 
 	_SIMD_SSE_SPEC void set(float val, float * pDst, int len)
 	{
-		setT<_mm_storeu_ps>(val, pDst, len);
+		setT(val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void copy(const float * pSrc, float * pDst, int len)
@@ -533,7 +541,8 @@ namespace statistical
 		*pSum = _mm_cvtss_f32(r0);
 	}
 
-	_SIMD_SSE_SPEC void meanStdDev(const float * pSrc, int len, float * pMean, float * pStdDev)
+	template <IntrPs load_ps = xx_load_ps>
+	INLINE void meanStdDevT(const float * pSrc, int len, float * pMean, float * pStdDev)
 	{
 		const float coef = len-1;
 		mean(pSrc, len, pMean);
@@ -544,8 +553,8 @@ namespace statistical
 
 		for (; len >= 8; len-=8, pSrc+=8)
 		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
-			__m128 a1 = _mm_loadu_ps(pSrc+4);
+			__m128 a0 = load_ps(pSrc);
+			__m128 a1 = load_ps(pSrc+4);
 
 			a0 = _mm_sub_ps(a0, b);
 			a1 = _mm_sub_ps(a1, b);
@@ -561,7 +570,7 @@ namespace statistical
 
 		if (len >= 4)
 		{
-			__m128 a0 = _mm_loadu_ps(pSrc);
+			__m128 a0 = load_ps(pSrc);
 			a0 = _mm_sub_ps(a0, b);
 			a0 = _mm_mul_ps(a0, a0);
 			r0 = _mm_add_ps(r0, a0);
@@ -588,18 +597,24 @@ namespace statistical
 		*pStdDev = _mm_cvtss_f32(r1);
 	}
 
-	_SIMD_SSE_SPEC void dotProd(const float * pSrc1, const float * pSrc2, int len, float * pDp)
+	_SIMD_SSE_SPEC void meanStdDev(const float * pSrc, int len, float * pMean, float * pStdDev)
+	{
+		meanStdDevT(pSrc, len, pMean, pStdDev);
+	}
+
+	template <IntrPs load_ps = xx_load_ps>
+	INLINE void dotProd(const float * pSrc1, const float * pSrc2, int len, float * pDp)
 	{
 		__m128 r0 = _mm_setzero_ps();
 		__m128 r1 = _mm_setzero_ps();
 
 		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8)
 		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 a1 = _mm_loadu_ps(pSrc1+4);
+			__m128 a0 = load_ps(pSrc1);
+			__m128 a1 = load_ps(pSrc1+4);
 
-			__m128 b0 = _mm_loadu_ps(pSrc2);
-			__m128 b1 = _mm_loadu_ps(pSrc2+4);
+			__m128 b0 = load_ps(pSrc2);
+			__m128 b1 = load_ps(pSrc2+4);
 
 			a0 = _mm_mul_ps(a0, b0);
 			a1 = _mm_mul_ps(a1, b1);
@@ -612,8 +627,8 @@ namespace statistical
 
 		if (len >= 4)
 		{
-			__m128 a0 = _mm_loadu_ps(pSrc1);
-			__m128 b0 = _mm_loadu_ps(pSrc2);
+			__m128 a0 = load_ps(pSrc1);
+			__m128 b0 = load_ps(pSrc2);
 
 			a0 = _mm_mul_ps(a0, b0);
 			r0 = _mm_add_ps(r0, a0);
@@ -632,6 +647,11 @@ namespace statistical
 
 		r0 = horizontal_sum(r0);
 		*pDp = _mm_cvtss_f32(r0);
+	}
+
+	_SIMD_SSE_SPEC void dotProd(const float * pSrc1, const float * pSrc2, int len, float * pDp)
+	{
+		dotProd(pSrc1, pSrc2, len, pDp);
 	}
 }
 }

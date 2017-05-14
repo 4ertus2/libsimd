@@ -12,6 +12,14 @@ namespace sse_double_internal
 	typedef __m128d (*IntrPd)(double const *);
 	typedef void (*IntrPD)(double *, __m128d);
 
+#ifdef SSE_ALIGNED_LOAD
+	INLINE __m128d xx_load_pd(double const * x) { return _mm_load_pd(x); }
+	INLINE void xx_store_pd(double * x, __m128d y) { _mm_store_pd(x, y); }
+#else
+	INLINE __m128d xx_load_pd(double const * x) { return _mm_loadu_pd(x); }
+	INLINE void xx_store_pd(double * x, __m128d y) { _mm_storeu_pd(x, y); }
+#endif
+
 	//
 
 	INLINE  __m128d nop_pd(__m128d x) { return x; }
@@ -26,9 +34,9 @@ namespace sse_double_internal
 
 	template <	IntrD op_pd,
 				IntrD op_sd,
-				IntrPd load_pd = _mm_loadu_pd,
+				IntrPd load_pd = xx_load_pd,
 				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = _mm_storeu_pd,
+				IntrPD store_pd = xx_store_pd,
 				IntrPD store_sd = _mm_store_sd>
 	INLINE void dPtrDst(const double * pSrc, double * pDst, int len)
 	{
@@ -82,9 +90,9 @@ namespace sse_double_internal
 
 	template <	IntrDD op_pd,
 				IntrDD op_sd,
-				IntrPd load_pd = _mm_loadu_pd,
+				IntrPd load_pd = xx_load_pd,
 				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = _mm_storeu_pd,
+				IntrPD store_pd = xx_store_pd,
 				IntrPD store_sd = _mm_store_sd>
 	INLINE void dPtrValDst(const double * pSrc, double val, double * pDst, int len)
 	{
@@ -139,9 +147,9 @@ namespace sse_double_internal
 
 	template <	IntrDD op_pd,
 				IntrDD op_sd,
-				IntrPd load_pd = _mm_loadu_pd,
+				IntrPd load_pd = xx_load_pd,
 				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = _mm_storeu_pd,
+				IntrPD store_pd = xx_store_pd,
 				IntrPD store_sd = _mm_store_sd>
 	INLINE void dPtrValDstRev(const double * pSrc, double val, double * pDst, int len)
 	{
@@ -207,9 +215,9 @@ namespace sse_double_internal
 
 	template <	IntrDD op_pd,
 				IntrDD op_sd,
-				IntrPd load_pd = _mm_loadu_pd,
+				IntrPd load_pd = xx_load_pd,
 				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = _mm_storeu_pd,
+				IntrPD store_pd = xx_store_pd,
 				IntrPD store_sd = _mm_store_sd>
 	INLINE void dPtrPtrDst(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
@@ -280,7 +288,7 @@ namespace sse
 
 namespace common
 {
-	template <IntrPD store_pd = _mm_store_pd>
+	template <IntrPD store_pd = xx_store_pd>
 	INLINE void setT(double val, double * pDst, int len)
 	{
 		__m128d a = _mm_set1_pd(val);
@@ -325,7 +333,7 @@ namespace common
 
 	_SIMD_SSE_SPEC void set(double val, double * pDst, int len)
 	{
-		setT<_mm_storeu_pd>(val, pDst, len);
+		setT(val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void copy(const double * pSrc, double * pDst, int len)
