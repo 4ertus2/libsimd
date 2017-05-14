@@ -34,9 +34,20 @@ namespace sse
 		{
 			set<_T>((_T)0, pDst, len);
 		}
+#if 0
+		template<typename _T> _T* malloc(int len)
+		{
+			return (_T*)_mm_malloc(len, 64);
+		}
 
+		template<typename _T> void free(_T* ptr)
+		{
+			_mm_free(ptr);
+		}
+#else
 		using nosimd::common::malloc;
 		using nosimd::common::free;
+#endif
 		using nosimd::common::move;
 		using nosimd::common::convert;
 	}

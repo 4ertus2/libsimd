@@ -1,6 +1,6 @@
 #include <iostream>
 #include <memory>
-#include <stdint.h>
+#include <cstdint>
 
 #include "simd.h"
 

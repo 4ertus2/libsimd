@@ -1,7 +1,7 @@
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <stdint.h>
+#include <cstdint>
 
 #include "simd.h"
 #include "compare.h"

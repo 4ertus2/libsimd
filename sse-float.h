@@ -1,7 +1,7 @@
 #ifndef _SIMD_SSE_FLOAT_H_
 #define _SIMD_SSE_FLOAT_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
@@ -281,6 +281,80 @@ namespace sse_float_internal
 			store_ss(pDst, a0);
 		}
 	}
+
+	template <	IntrSS op_ps,
+				IntrSS op_ss,
+				IntrPs load_one,
+				IntrPs load_ps = _mm_loadu_ps,
+				IntrPs load_ss = _mm_load_ss>
+	INLINE void aggregate(const float * pSrc, int len, __m128& r0)
+	{
+		if (len >= 4)
+		{
+			r0 = load_ps(pSrc);
+			len -= 4; pSrc += 4;
+
+			if (len >= 8)
+			{
+				__m128 r1 = load_ps(pSrc);
+				len -= 4; pSrc += 4;
+
+				if (len >= 16)
+				{
+					__m128 r2 = load_ps(pSrc);
+					__m128 r3 = load_ps(pSrc+4);
+					len -= 8; pSrc += 8;
+
+					for (; len >= 16; len-=16, pSrc+=16)
+					{
+						__m128 a0 = load_ps(pSrc);
+						__m128 a1 = load_ps(pSrc+4);
+						__m128 a2 = load_ps(pSrc+8);
+						__m128 a3 = load_ps(pSrc+12);
+
+						r0 = op_ps(r0, a0);
+						r1 = op_ps(r1, a1);
+						r2 = op_ps(r2, a2);
+						r3 = op_ps(r3, a3);
+					}
+
+					r0 = op_ps(r0, r2);
+					r1 = op_ps(r1, r3);
+				}
+
+				if (len >= 8)
+				{
+					__m128 a0 = load_ps(pSrc);
+					__m128 a1 = load_ps(pSrc+4);
+
+					r0 = op_ps(r0, a0);
+					r1 = op_ps(r1, a1);
+
+					len -=8; pSrc += 8;
+				}
+
+				r0 = op_ps(r0, r1);
+			}
+
+			if (len >= 4)
+			{
+				__m128 a0 = load_ps(pSrc);
+				r0 = op_ps(r0, a0);
+				len -= 4; pSrc += 4;
+			}
+		}
+		else
+		{
+			r0 = load_one(pSrc);
+			--len; ++pSrc;
+		}
+
+		for (; len; --len, ++pSrc)
+		{
+			__m128 a0 = load_ss(pSrc);
+			r0 = op_ss(r0, a0);
+		}
+	}
 }
 
 namespace sse
@@ -422,74 +496,8 @@ namespace statistical
 	_SIMD_SSE_SPEC void min(const float * pSrc, int len, float * pMin)
 	{
 		__m128 r0;
-
-		if (len >= 4)
-		{
-			r0 = _mm_loadu_ps(pSrc);
-			len -= 4; pSrc += 4;
-
-			if (len >= 8)
-			{
-				__m128 r1 = _mm_loadu_ps(pSrc);
-				len -= 4; pSrc += 4;
-
-				if (len >= 16)
-				{
-					__m128 r2 = _mm_loadu_ps(pSrc);
-					__m128 r3 = _mm_loadu_ps(pSrc+4);
-					len -= 8; pSrc += 8;
-
-					for (; len >= 16; len-=16, pSrc+=16)
-					{
-						__m128 a0 = _mm_loadu_ps(pSrc);
-						__m128 a1 = _mm_loadu_ps(pSrc+4);
-						__m128 a2 = _mm_loadu_ps(pSrc+8);
-						__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-						r0 = _mm_min_ps(r0, a0);
-						r1 = _mm_min_ps(r1, a1);
-						r2 = _mm_min_ps(r2, a2);
-						r3 = _mm_min_ps(r3, a3);
-					}
-
-					r0 = _mm_min_ps(r0, r2);
-					r1 = _mm_min_ps(r1, r3);
-				}
-
-				if (len >= 8)
-				{
-					__m128 a0 = _mm_loadu_ps(pSrc);
-					__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-					r0 = _mm_min_ps(r0, a0);
-					r1 = _mm_min_ps(r1, a1);
-
-					len -=8; pSrc += 8;
-				}
-
-				r0 = _mm_min_ps(r0, r1);
-			}
-
-			if (len >= 4)
-			{
-				__m128 a0 = _mm_loadu_ps(pSrc);
-				r0 = _mm_min_ps(r0, a0);
-				len -= 4; pSrc += 4;
-			}
-		}
-		else
-		{
-			r0 = _mm_load1_ps(pSrc);
-			--len; ++pSrc;
-		}
-
-		for (; len; --len, ++pSrc)
-		{
-			__m128 a0 = _mm_load_ss(pSrc);
-			r0 = _mm_min_ss(r0, a0);
-		}
-
 		float res[4];
+		aggregate<_mm_min_ps, _mm_min_ss, _mm_load1_ps>(pSrc, len, r0);
 		_mm_store_ps(res, r0);
 
 		res[0] = (res[0] < res[1]) ? res[0] : res[1];
@@ -497,68 +505,27 @@ namespace statistical
 		*pMin = (res[0] < res[2]) ? res[0] : res[2];
 	}
 
-	// TODO: max
+	_SIMD_SSE_SPEC void max(const float * pSrc, int len, float * pMin)
+	{
+		__m128 r0;
+		float res[4];
+		aggregate<_mm_max_ps, _mm_max_ss, _mm_load1_ps>(pSrc, len, r0);
+		_mm_store_ps(res, r0);
+
+		res[0] = (res[0] > res[1]) ? res[0] : res[1];
+		res[2] = (res[2] > res[3]) ? res[2] : res[3];
+		*pMin = (res[0] > res[2]) ? res[0] : res[2];
+	}
+
+	_SIMD_SSE_SPEC void minMax(const float * pSrc, int len, float * pMin, float * pMax)
+	{
+		return nosimd::statistical::minMax(pSrc, len, pMin, pMax);
+	}
 
 	_SIMD_SSE_SPEC void sum(const float * pSrc, int len, float * pSum)
 	{
 		__m128 r0 = _mm_setzero_ps();
-
-		if (len >= 4)
-		{
-			if (len >= 8)
-			{
-				__m128 r1 = _mm_setzero_ps();
-
-				if (len >= 16)
-				{
-					__m128 r2 = _mm_setzero_ps();
-					__m128 r3 = _mm_setzero_ps();
-
-					for (; len >= 16; len-=16, pSrc+=16)
-					{
-						__m128 a0 = _mm_loadu_ps(pSrc);
-						__m128 a1 = _mm_loadu_ps(pSrc+4);
-						__m128 a2 = _mm_loadu_ps(pSrc+8);
-						__m128 a3 = _mm_loadu_ps(pSrc+12);
-
-						r0 = _mm_add_ps(r0, a0);
-						r1 = _mm_add_ps(r1, a1);
-						r2 = _mm_add_ps(r2, a2);
-						r3 = _mm_add_ps(r3, a3);
-					}
-
-					r0 = _mm_add_ps(r0, r2);
-					r1 = _mm_add_ps(r1, r3);
-				}
-
-				if (len >= 8)
-				{
-					__m128 a0 = _mm_loadu_ps(pSrc);
-					__m128 a1 = _mm_loadu_ps(pSrc+4);
-
-					r0 = _mm_add_ps(r0, a0);
-					r1 = _mm_add_ps(r1, a1);
-
-					len -= 8; pSrc += 8;
-				}
-
-				r0 = _mm_add_ps(r0, r1);
-			}
-
-			if (len >= 4)
-			{
-				__m128 a0 = _mm_loadu_ps(pSrc);
-				r0 = _mm_add_ps(r0, a0);
-
-				len -= 4; pSrc += 4;
-			}
-		}
-
-		for (; len; --len, ++pSrc)
-		{
-			__m128 a0 = _mm_load_ss(pSrc);
-			r0 = _mm_add_ss(r0, a0);
-		}
+		aggregate<_mm_add_ps, _mm_add_ss, _mm_load_ss>(pSrc, len, r0);
 
 		r0 = horizontal_sum(r0);
 		*pSum = _mm_cvtss_f32(r0);
