@@ -42,9 +42,7 @@ namespace sse_float_internal
 	template <	IntrS op_ps,
 				IntrS op_ss,
 				IntrPs load_ps = xx_load_ps,
-				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = xx_store_ps,
-				IntrPS store_ss = _mm_store_ss>
+				IntrPS store_ps = xx_store_ps>
 	INLINE void sPtrDst(const float * pSrc, float * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -89,18 +87,16 @@ namespace sse_float_internal
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
 		{
-			__m128 a0 = load_ss(pSrc);
+			__m128 a0 = _mm_load_ss(pSrc);
 			a0 = op_ps(a0);
-			store_ss(pDst, a0);
+			_mm_store_ss(pDst, a0);
 		}
 	}
 
 	template <	IntrSS op_ps,
 				IntrSS op_ss,
 				IntrPs load_ps = xx_load_ps,
-				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = xx_store_ps,
-				IntrPS store_ss = _mm_store_ss>
+				IntrPS store_ps = xx_store_ps>
 	INLINE void sPtrValDst(const float * pSrc, float val, float * pDst, int len)
 	{
 		const __m128 b = _mm_set1_ps(val);
@@ -146,18 +142,16 @@ namespace sse_float_internal
 
 		for (; len > 0; --len, ++pSrc, ++pDst)
 		{
-			__m128 a0 = load_ss(pSrc);
+			__m128 a0 = _mm_load_ss(pSrc);
 			a0 = op_ss(a0, b);
-			store_ss(pDst, a0);
+			_mm_store_ss(pDst, a0);
 		}
 	}
 
 	template <	IntrSS op_ps,
 				IntrSS op_ss,
 				IntrPs load_ps = xx_load_ps,
-				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = xx_store_ps,
-				IntrPS store_ss = _mm_store_ss>
+				IntrPS store_ps = xx_store_ps>
 	INLINE void sPtrValDstRev(const float * pSrc, float val, float * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -213,19 +207,17 @@ namespace sse_float_internal
 		for (; len > 0; --len, ++pSrc, ++pDst)
 		{
 			__m128 a0 = _mm_set1_ps(val);
-			__m128 b0 = load_ss(pSrc);
+			__m128 b0 = _mm_load_ss(pSrc);
 
 			a0 = op_ss(a0, b0);
-			store_ss(pDst, a0);
+			_mm_store_ss(pDst, a0);
 		}
 	}
 
 	template <	IntrSS op_ps,
 				IntrSS op_ss,
 				IntrPs load_ps = xx_load_ps,
-				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = xx_store_ps,
-				IntrPS store_ss = _mm_store_ss>
+				IntrPS store_ps = xx_store_ps>
 	INLINE void sPtrPtrDst(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -280,19 +272,18 @@ namespace sse_float_internal
 
 		for (; len > 0; --len, ++pSrc1, ++pSrc2, ++pDst)
 		{
-			__m128 a0 = load_ss(pSrc1);
-			__m128 b0 = load_ss(pSrc2);
+			__m128 a0 = _mm_load_ss(pSrc1);
+			__m128 b0 = _mm_load_ss(pSrc2);
 
 			a0 = op_ss(a0, b0);
-			store_ss(pDst, a0);
+			_mm_store_ss(pDst, a0);
 		}
 	}
 
 	template <	IntrSS op_ps,
 				IntrSS op_ss,
 				IntrPs load_one,
-				IntrPs load_ps = xx_load_ps,
-				IntrPs load_ss = _mm_load_ss>
+				IntrPs load_ps = xx_load_ps>
 	INLINE void aggregate(const float * pSrc, int len, __m128& r0)
 	{
 		if (len >= 4)
@@ -357,7 +348,7 @@ namespace sse_float_internal
 
 		for (; len; --len, ++pSrc)
 		{
-			__m128 a0 = load_ss(pSrc);
+			__m128 a0 = _mm_load_ss(pSrc);
 			r0 = op_ss(r0, a0);
 		}
 	}

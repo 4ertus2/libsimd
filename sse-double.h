@@ -35,9 +35,7 @@ namespace sse_double_internal
 	template <	IntrD op_pd,
 				IntrD op_sd,
 				IntrPd load_pd = xx_load_pd,
-				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = xx_store_pd,
-				IntrPD store_sd = _mm_store_sd>
+				IntrPD store_pd = xx_store_pd>
 	INLINE void dPtrDst(const double * pSrc, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -91,9 +89,7 @@ namespace sse_double_internal
 	template <	IntrDD op_pd,
 				IntrDD op_sd,
 				IntrPd load_pd = xx_load_pd,
-				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = xx_store_pd,
-				IntrPD store_sd = _mm_store_sd>
+				IntrPD store_pd = xx_store_pd>
 	INLINE void dPtrValDst(const double * pSrc, double val, double * pDst, int len)
 	{
 		const __m128d b = _mm_set1_pd(val);
@@ -139,18 +135,16 @@ namespace sse_double_internal
 
 		if (len)
 		{
-			__m128d a0 = load_sd(pSrc);
+			__m128d a0 = _mm_load_sd(pSrc);
 			a0 = op_sd(a0, b);
-			store_sd(pDst, a0);
+			_mm_store_sd(pDst, a0);
 		}
 	}
 
 	template <	IntrDD op_pd,
 				IntrDD op_sd,
 				IntrPd load_pd = xx_load_pd,
-				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = xx_store_pd,
-				IntrPD store_sd = _mm_store_sd>
+				IntrPD store_pd = xx_store_pd>
 	INLINE void dPtrValDstRev(const double * pSrc, double val, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -206,19 +200,17 @@ namespace sse_double_internal
 		if (len)
 		{
 			__m128d a0 = _mm_set1_pd(val);
-			__m128d b0 = load_sd(pSrc);
+			__m128d b0 = _mm_load_sd(pSrc);
 
 			a0 = op_sd(a0, b0);
-			store_sd(pDst, a0);
+			_mm_store_sd(pDst, a0);
 		}
 	}
 
 	template <	IntrDD op_pd,
 				IntrDD op_sd,
 				IntrPd load_pd = xx_load_pd,
-				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = xx_store_pd,
-				IntrPD store_sd = _mm_store_sd>
+				IntrPD store_pd = xx_store_pd>
 	INLINE void dPtrPtrDst(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -273,11 +265,11 @@ namespace sse_double_internal
 
 		if (len)
 		{
-			__m128d a0 = load_sd(pSrc1);
-			__m128d b0 = load_sd(pSrc2);
+			__m128d a0 = _mm_load_sd(pSrc1);
+			__m128d b0 = _mm_load_sd(pSrc2);
 
 			a0 = op_sd(a0, b0);
-			store_sd(pDst, a0);
+			_mm_store_sd(pDst, a0);
 		}
 	}
 }
