@@ -1,8 +1,4 @@
-// $Id$
-
-#ifndef _IPP_EXCEPTION_H_
-#define _IPP_EXCEPTION_H_
-
+#pragma once
 #include <ippcore.h>
 
 namespace ipp
@@ -29,6 +25,4 @@ namespace ipp
  #define STATUS_CHECK(x) {IppStatus s=(x); if(s != ippStsNoErr) {int* p=0; *p = *p;} }
 #else
  #define STATUS_CHECK(x) {IppStatus s=(x); if(s != ippStsNoErr) throw ipp::IppException(s, __FUNCTION__);}
-#endif
-
 #endif

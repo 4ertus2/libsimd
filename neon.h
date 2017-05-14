@@ -1,6 +1,3 @@
-#ifndef _SIMD_NEON_H_
-#define _SIMD_NEON_H_
+#pragma once
 
 // TODO
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef _SIMD_SSE_H_
-#define _SIMD_SSE_H_
-
+#pragma once
 #include "nosimd.h"
 
 #ifdef max
@@ -124,5 +122,3 @@ namespace sse
 	using namespace nosimd::exp_log;
 	using namespace nosimd::trigonometric;
 }
-
-#endif

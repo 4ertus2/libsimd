@@ -1,5 +1,4 @@
-#ifndef _SIMD_SSE_IPP_H_
-#define _SIMD_SSE_IPP_H_
+#pragma once
 
 #ifdef max
 #undef max
@@ -272,5 +271,3 @@ namespace ipp
 		using namespace ipp::trigonometric::d53;
 	}
 }
-
-#endif

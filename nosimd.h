@@ -1,6 +1,4 @@
-#ifndef _SIMD_NOSIMD_H_
-#define _SIMD_NOSIMD_H_
-
+#pragma once
 #include <cmath>
 
 namespace
@@ -573,5 +571,3 @@ namespace nosimd
 	using namespace nosimd::statistical;
 	using namespace nosimd::trigonometric;
 }
-
-#endif

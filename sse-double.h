@@ -1,7 +1,5 @@
-#ifndef _SIMD_SSE_DOUBLE_H_
-#define _SIMD_SSE_DOUBLE_H_
-
-#include <stdint.h>
+#pragma once
+#include <cstdint>
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
@@ -30,46 +28,46 @@ namespace sse_double_internal
 				IntrD op_sd,
 				IntrPd load_pd = _mm_loadu_pd,
 				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = _mm_store_pd,
+				IntrPD store_pd = _mm_storeu_pd,
 				IntrPD store_sd = _mm_store_sd>
 	INLINE void dPtrDst(const double * pSrc, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
 		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
 		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
-			__m128d a2 = _mm_loadu_pd(pSrc+4);
-			__m128d a3 = _mm_loadu_pd(pSrc+6);
+			__m128d a0 = load_pd(pSrc);
+			__m128d a1 = load_pd(pSrc+2);
+			__m128d a2 = load_pd(pSrc+4);
+			__m128d a3 = load_pd(pSrc+6);
 
 			a0 = abs_pd(a0);
 			a1 = abs_pd(a1);
 			a2 = abs_pd(a2);
 			a3 = abs_pd(a3);
 
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
-			_mm_store_pd(pDst+4, a2);
-			_mm_store_pd(pDst+6, a3);
+			store_pd(pDst, a0);
+			store_pd(pDst+2, a1);
+			store_pd(pDst+4, a2);
+			store_pd(pDst+6, a3);
 		}
 #endif
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
 		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
-			__m128d a1 = _mm_loadu_pd(pSrc+2);
+			__m128d a0 = load_pd(pSrc);
+			__m128d a1 = load_pd(pSrc+2);
 
 			a0 = abs_pd(a0);
 			a1 = abs_pd(a1);
 
-			_mm_store_pd(pDst, a0);
-			_mm_store_pd(pDst+2, a1);
+			store_pd(pDst, a0);
+			store_pd(pDst+2, a1);
 		}
 
 		if (len >= 2)
 		{
-			__m128d a0 = _mm_loadu_pd(pSrc);
+			__m128d a0 = load_pd(pSrc);
 			a0 = abs_pd(a0);
-			_mm_store_pd(pDst, a0);
+			store_pd(pDst, a0);
 
 			len -= 2; pSrc += 2; pDst += 2;
 		}
@@ -86,7 +84,7 @@ namespace sse_double_internal
 				IntrDD op_sd,
 				IntrPd load_pd = _mm_loadu_pd,
 				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = _mm_store_pd,
+				IntrPD store_pd = _mm_storeu_pd,
 				IntrPD store_sd = _mm_store_sd>
 	INLINE void dPtrValDst(const double * pSrc, double val, double * pDst, int len)
 	{
@@ -143,7 +141,7 @@ namespace sse_double_internal
 				IntrDD op_sd,
 				IntrPd load_pd = _mm_loadu_pd,
 				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = _mm_store_pd,
+				IntrPD store_pd = _mm_storeu_pd,
 				IntrPD store_sd = _mm_store_sd>
 	INLINE void dPtrValDstRev(const double * pSrc, double val, double * pDst, int len)
 	{
@@ -211,7 +209,7 @@ namespace sse_double_internal
 				IntrDD op_sd,
 				IntrPd load_pd = _mm_loadu_pd,
 				IntrPd load_sd = _mm_load_sd,
-				IntrPD store_pd = _mm_store_pd,
+				IntrPD store_pd = _mm_storeu_pd,
 				IntrPD store_sd = _mm_store_sd>
 	INLINE void dPtrPtrDst(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
@@ -282,48 +280,52 @@ namespace sse
 
 namespace common
 {
-	_SIMD_SSE_SPEC void set(double val, double * pDst, int len)
+	template <IntrPD store_pd = _mm_store_pd>
+	INLINE void setT(double val, double * pDst, int len)
 	{
 		__m128d a = _mm_set1_pd(val);
 #ifdef UNROLL_MORE
 		for (; len >= 16; len-=16, pDst+=16)
 		{
-			_mm_store_pd(pDst, a);
-			_mm_store_pd(pDst+2, a);
-			_mm_store_pd(pDst+4, a);
-			_mm_store_pd(pDst+6, a);
+			store_pd(pDst, a);
+			store_pd(pDst+2, a);
+			store_pd(pDst+4, a);
+			store_pd(pDst+6, a);
 
-			_mm_store_pd(pDst+8, a);
-			_mm_store_pd(pDst+10, a);
-			_mm_store_pd(pDst+12, a);
-			_mm_store_pd(pDst+14, a);
+			store_pd(pDst+8, a);
+			store_pd(pDst+10, a);
+			store_pd(pDst+12, a);
+			store_pd(pDst+14, a);
 		}
 #endif
 		for (; len >= 8; len-=8, pDst+=8)
 		{
-			_mm_store_pd(pDst, a);
-			_mm_store_pd(pDst+2, a);
-			_mm_store_pd(pDst+4, a);
-			_mm_store_pd(pDst+6, a);
+			store_pd(pDst, a);
+			store_pd(pDst+2, a);
+			store_pd(pDst+4, a);
+			store_pd(pDst+6, a);
 		}
 
 		if (len >= 4)
 		{
-			_mm_store_pd(pDst, a);
-			_mm_store_pd(pDst+2, a);
-
+			store_pd(pDst, a);
+			store_pd(pDst+2, a);
 			len -= 4; pDst += 4;
 		}
 
 		if (len >= 2)
 		{
-			_mm_store_pd(pDst, a);
-
+			store_pd(pDst, a);
 			len -= 2; pDst += 2;
 		}
 
 		if (len)
 			*pDst = val;
+	}
+
+	_SIMD_SSE_SPEC void set(double val, double * pDst, int len)
+	{
+		setT<_mm_storeu_pd>(val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void copy(const double * pSrc, double * pDst, int len)
@@ -445,5 +447,3 @@ namespace statistical
 	}
 }
 }
-
-#endif

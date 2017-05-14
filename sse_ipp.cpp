@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <cstdint>
 #include <ipp.h>
 
 #include "sse_ipp.h"

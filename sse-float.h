@@ -1,6 +1,4 @@
-#ifndef _SIMD_SSE_FLOAT_H_
-#define _SIMD_SSE_FLOAT_H_
-
+#pragma once
 #include <cstdint>
 #include <xmmintrin.h>
 #include <emmintrin.h>
@@ -37,7 +35,7 @@ namespace sse_float_internal
 				IntrS op_ss,
 				IntrPs load_ps = _mm_loadu_ps,
 				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = _mm_store_ps,
+				IntrPS store_ps = _mm_storeu_ps,
 				IntrPS store_ss = _mm_store_ss>
 	INLINE void sPtrDst(const float * pSrc, float * pDst, int len)
 	{
@@ -93,7 +91,7 @@ namespace sse_float_internal
 				IntrSS op_ss,
 				IntrPs load_ps = _mm_loadu_ps,
 				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = _mm_store_ps,
+				IntrPS store_ps = _mm_storeu_ps,
 				IntrPS store_ss = _mm_store_ss>
 	INLINE void sPtrValDst(const float * pSrc, float val, float * pDst, int len)
 	{
@@ -150,7 +148,7 @@ namespace sse_float_internal
 				IntrSS op_ss,
 				IntrPs load_ps = _mm_loadu_ps,
 				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = _mm_store_ps,
+				IntrPS store_ps = _mm_storeu_ps,
 				IntrPS store_ss = _mm_store_ss>
 	INLINE void sPtrValDstRev(const float * pSrc, float val, float * pDst, int len)
 	{
@@ -218,7 +216,7 @@ namespace sse_float_internal
 				IntrSS op_ss,
 				IntrPs load_ps = _mm_loadu_ps,
 				IntrPs load_ss = _mm_load_ss,
-				IntrPS store_ps = _mm_store_ps,
+				IntrPS store_ps = _mm_storeu_ps,
 				IntrPS store_ss = _mm_store_ss>
 	INLINE void sPtrPtrDst(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
@@ -363,48 +361,52 @@ namespace sse
 
 namespace common
 {
-	_SIMD_SSE_SPEC void set(float val, float * pDst, int len)
+	template <IntrPS store_ps = _mm_store_ps>
+	INLINE void setT(float val, float * pDst, int len)
 	{
 		__m128 a = _mm_set1_ps(val);
 #ifdef UNROLL_MORE
 		for (; len >= 32; len-=32, pDst+=32)
 		{
-			_mm_store_ps(pDst, a);
-			_mm_store_ps(pDst+4, a);
-			_mm_store_ps(pDst+8, a);
-			_mm_store_ps(pDst+12, a);
+			store_ps(pDst, a);
+			store_ps(pDst+4, a);
+			store_ps(pDst+8, a);
+			store_ps(pDst+12, a);
 
-			_mm_store_ps(pDst+16, a);
-			_mm_store_ps(pDst+20, a);
-			_mm_store_ps(pDst+24, a);
-			_mm_store_ps(pDst+28, a);
+			store_ps(pDst+16, a);
+			store_ps(pDst+20, a);
+			store_ps(pDst+24, a);
+			store_ps(pDst+28, a);
 		}
 #endif
 		for (; len >= 16; len-=16, pDst+=16)
 		{
-			_mm_store_ps(pDst, a);
-			_mm_store_ps(pDst+4, a);
-			_mm_store_ps(pDst+8, a);
-			_mm_store_ps(pDst+12, a);
+			store_ps(pDst, a);
+			store_ps(pDst+4, a);
+			store_ps(pDst+8, a);
+			store_ps(pDst+12, a);
 		}
 
 		if (len >= 8)
 		{
-			_mm_store_ps(pDst, a);
-			_mm_store_ps(pDst+4, a);
-
+			store_ps(pDst, a);
+			store_ps(pDst+4, a);
 			len -= 8; pDst += 8;
 		}
 
 		if (len >= 4)
 		{
-			_mm_store_ps(pDst, a);
-
+			store_ps(pDst, a);
 			len -= 4; pDst += 4;
 		}
 
 		for (; len > 0; --len, ++pDst)
 			*pDst = val;
+	}
+
+	_SIMD_SSE_SPEC void set(float val, float * pDst, int len)
+	{
+		setT<_mm_storeu_ps>(val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void copy(const float * pSrc, float * pDst, int len)
@@ -498,7 +500,7 @@ namespace statistical
 		__m128 r0;
 		float res[4];
 		aggregate<_mm_min_ps, _mm_min_ss, _mm_load1_ps>(pSrc, len, r0);
-		_mm_store_ps(res, r0);
+		_mm_storeu_ps(res, r0);
 
 		res[0] = (res[0] < res[1]) ? res[0] : res[1];
 		res[2] = (res[2] < res[3]) ? res[2] : res[3];
@@ -510,7 +512,7 @@ namespace statistical
 		__m128 r0;
 		float res[4];
 		aggregate<_mm_max_ps, _mm_max_ss, _mm_load1_ps>(pSrc, len, r0);
-		_mm_store_ps(res, r0);
+		_mm_storeu_ps(res, r0);
 
 		res[0] = (res[0] > res[1]) ? res[0] : res[1];
 		res[2] = (res[2] > res[3]) ? res[2] : res[3];
@@ -633,5 +635,3 @@ namespace statistical
 	}
 }
 }
-
-#endif

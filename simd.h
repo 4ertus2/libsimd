@@ -1,6 +1,4 @@
-#ifndef _SIMD_H_
-#define _SIMD_H_
-
+#pragma once
 #include "nosimd.h"
 
 // NEON
@@ -19,6 +17,4 @@ namespace simd { using namespace sse; }
 // NO SIMD
 #else
 namespace simd { using namespace nosimd; }
-#endif
-
 #endif
