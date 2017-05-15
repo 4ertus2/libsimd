@@ -4,91 +4,83 @@
 
 #include "simd.h"
 
-static const unsigned LENGTH = 47;
+struct Exception
+{
+	const char * func_;
+	unsigned line_;
+	unsigned length_;
+};
+
+#define FAIL() throw Exception({__PRETTY_FUNCTION__, __LINE__, length})
 
 template<typename T>
-void test_common()
+void test_common(unsigned length, T value = 42)
 {
-	using std::shared_ptr;
-	using std::cerr;
-	using std::endl;
-
-	static const T VALUE = 42;
-
-	shared_ptr<T> pa = shared_ptr<T>(simd::malloc<T>(LENGTH+1), simd::free<T>);
-	shared_ptr<T> pb = shared_ptr<T>(simd::malloc<T>(LENGTH+1), simd::free<T>);
+	std::shared_ptr<T> pa = std::shared_ptr<T>(simd::malloc<T>(length+1), simd::free<T>);
+	std::shared_ptr<T> pb = std::shared_ptr<T>(simd::malloc<T>(length+1), simd::free<T>);
 	T * a = pa.get();
 	T * b = pb.get();
-	a[LENGTH] = 0x7f;
-	b[LENGTH] = 0x7f;
+	a[length] = 0x7f;
+	b[length] = 0x3f;
 
-	bool failed = false;
-
-	simd::set(VALUE, a, LENGTH);
-	for (unsigned i=0; i<LENGTH; ++i)
-		if (a[i] != VALUE)
-		{
-			cerr << "set" << endl;
-			failed = true;
-		}
-
-	simd::copy(a, b, LENGTH);
-	for (unsigned i=0; i<LENGTH; ++i)
-		if (b[i] != VALUE)
-		{
-			cerr << "copy" << endl;
-			failed = true;
-		}
-
-	simd::zero(b, LENGTH);
-	for (unsigned i=0; i<LENGTH; ++i)
-		if (b[i] != 0)
-		{
-			cerr << "zero" << endl;
-			failed = true;
-		}
-
-	for (unsigned i=0; i<LENGTH; ++i)
-		a[i] = i;
-	simd::copy(a, b, LENGTH);
-	for (unsigned i=0; i<LENGTH; ++i)
-		if (b[i] != i)
-		{
-			cerr << "copy(2)" << endl;
-			failed = true;
-		}
-
-	if (a[LENGTH] != 0x7f || b[LENGTH] != 0x7f)
+	simd::set(value, a, length);
+	for (unsigned i=0; i<length; ++i)
 	{
-		cerr << "length" << endl;
-		failed = true;
+		if (a[i] != value)
+			FAIL();
 	}
 
-	if (failed)
-		throw __PRETTY_FUNCTION__;
+	simd::copy(a, b, length);
+	for (unsigned i=0; i<length; ++i)
+	{
+		if (b[i] != value)
+			FAIL();
+	}
+
+	simd::zero(b, length);
+	for (unsigned i=0; i<length; ++i)
+	{
+		if (b[i] != 0)
+			FAIL();
+	}
+
+	for (unsigned i=0; i<length; ++i)
+		a[i] = i;
+	simd::copy(a, b, length);
+	for (unsigned i=0; i<length; ++i)
+	{
+		if (b[i] != i)
+			FAIL();
+	}
+
+	if (a[length] != 0x7f || b[length] != 0x3f)
+		FAIL();
 }
 
 int main()
 {
 	try
 	{
-#ifndef TEST_FLOAT
-		test_common<uint8_t>();
-		test_common<uint16_t>();
-		test_common<uint32_t>();
-		test_common<uint64_t>();
-
-		test_common<int8_t>();
-		test_common<int16_t>();
-		test_common<int32_t>();
-		test_common<int64_t>();
+		for (unsigned len = 0; len < 128; ++len)
+		{
+#ifndef NO_8_16
+			test_common<uint8_t>(len);
+			test_common<int8_t>(len);
+			test_common<uint16_t>(len);
+			test_common<int16_t>(len);
 #endif
-		test_common<float>();
-		test_common<double>();
+			test_common<uint32_t>(len);
+			test_common<int32_t>(len);
+			test_common<uint64_t>(len);
+			test_common<int64_t>(len);
+
+			test_common<float>(len);
+			test_common<double>(len);
+		}
 	}
-	catch (const char * msg)
+	catch (const Exception& ex)
 	{
-		std::cerr << msg << std::endl;
+		std::cerr << "func: " << ex.func_ << " line: " << ex.line_ << " len: " << ex.length_ << std::endl;
 		return 1;
 	}
 

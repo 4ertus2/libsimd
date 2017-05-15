@@ -17,8 +17,8 @@ add_executable(test-common-sse-unroll test-common.cpp)
 add_executable(test-arithm-float-sse test-arithm.cpp)
 add_executable(test-arithm-float-sse-unroll test-arithm.cpp)
 #
-set_target_properties(test-common-sse PROPERTIES COMPILE_FLAGS "-DTEST_FLOAT")
-set_target_properties(test-common-sse-unroll PROPERTIES COMPILE_FLAGS "-DTEST_FLOAT -DUNROLL_MORE")
+set_target_properties(test-common-sse PROPERTIES COMPILE_FLAGS "-DNO_8_16")
+set_target_properties(test-common-sse-unroll PROPERTIES COMPILE_FLAGS "-DNO_8_16 -DUNROLL_MORE")
 set_target_properties(test-arithm-float-sse PROPERTIES COMPILE_FLAGS "-DTEST_FLOAT")
 set_target_properties(test-arithm-float-sse-unroll PROPERTIES COMPILE_FLAGS "-DTEST_FLOAT -DUNROLL_MORE")
 #
