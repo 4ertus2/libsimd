@@ -3,6 +3,15 @@
 
 #include <limits>
 
+struct Exception
+{
+	const char * func_;
+	unsigned line_;
+	unsigned length_;
+};
+
+#define FAIL() throw Exception({__PRETTY_FUNCTION__, __LINE__, length})
+
 namespace
 {
 	template <typename T> T epsilon() { return 0; }

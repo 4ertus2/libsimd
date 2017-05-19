@@ -3,15 +3,7 @@
 #include <cstdint>
 
 #include "simd.h"
-
-struct Exception
-{
-	const char * func_;
-	unsigned line_;
-	unsigned length_;
-};
-
-#define FAIL() throw Exception({__PRETTY_FUNCTION__, __LINE__, length})
+#include "compare.h"
 
 template<typename T>
 void test_common(unsigned length, T value = 42)

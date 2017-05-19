@@ -22,11 +22,7 @@ set(LIB_IPP
 if(WIN32)
 	set(CXX_OPT /EHsc)
 else()
-	if(OLDGCC)
-		set(CXX_OPT "-std=c++0x -m64 -msse3 -mssse3")
-	else()
-		set(CXX_OPT "-std=c++11 -m64 -msse3 -mssse3")
-	endif()
+	set(CXX_OPT "-std=c++11 -m64 -msse4.1")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CXX_OPT}")

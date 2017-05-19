@@ -23,6 +23,9 @@ namespace sse_float_internal
 
 	INLINE __m128 nop_ps(__m128 x) { return x; }
 
+	template <IntrSS op>
+	INLINE __m128 rev_op(__m128 x, __m128 y) { return op(y, x); }
+
 	INLINE __m128 abs_ps(__m128 x)
 	{
 		static const __m128 sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
@@ -143,72 +146,6 @@ namespace sse_float_internal
 		{
 			__m128 a0 = _mm_load_ss(pSrc);
 			a0 = op_ss(a0, b);
-			_mm_store_ss(pDst, a0);
-		}
-	}
-
-	template <	IntrSS op_ps,
-				IntrSS op_ss,
-				IntrPs load_ps = xx_load_ps,
-				IntrPS store_ps = xx_store_ps>
-	INLINE void sPtrValDstRev(const float * pSrc, float val, float * pDst, int len)
-	{
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pSrc+=16, pDst+=16)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 a1 = _mm_set1_ps(val);
-			__m128 a2 = _mm_set1_ps(val);
-			__m128 a3 = _mm_set1_ps(val);
-
-			__m128 b0 = load_ps(pSrc);
-			__m128 b1 = load_ps(pSrc+4);
-			__m128 b2 = load_ps(pSrc+8);
-			__m128 b3 = load_ps(pSrc+16);
-
-			a0 = op_ps(a0, b0);
-			a1 = op_ps(a1, b1);
-			a2 = op_ps(a2, b2);
-			a3 = op_ps(a3, b3);
-
-			store_ps(pDst, a0);
-			store_ps(pDst+4, a1);
-			store_ps(pDst+8, a2);
-			store_ps(pDst+12, a3);
-		}
-#endif
-		for (; len >= 8; len-=8, pSrc+=8, pDst+=8)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 a1 = _mm_set1_ps(val);
-
-			__m128 b0 = load_ps(pSrc);
-			__m128 b1 = load_ps(pSrc+4);
-
-			a0 = op_ps(a0, b0);
-			a1 = op_ps(a1, b1);
-
-			store_ps(pDst, a0);
-			store_ps(pDst+4, a1);
-		}
-
-		if (len >= 4)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 b0 = load_ps(pSrc);
-
-			a0 = op_ps(a0, b0);
-			store_ps(pDst, a0);
-
-			len -= 4; pSrc += 4; pDst += 4;
-		}
-
-		for (; len > 0; --len, ++pSrc, ++pDst)
-		{
-			__m128 a0 = _mm_set1_ps(val);
-			__m128 b0 = _mm_load_ss(pSrc);
-
-			a0 = op_ss(a0, b0);
 			_mm_store_ss(pDst, a0);
 		}
 	}
@@ -438,12 +375,12 @@ namespace arithmetic
 
 	_SIMD_SSE_SPEC void subCRev(const float * pSrc, float val, float * pDst, int len)
 	{
-		sPtrValDstRev<_mm_sub_ps, _mm_sub_ss>(pSrc, val, pDst, len);
+		sPtrValDst<rev_op<_mm_sub_ps>, rev_op<_mm_sub_ss>>(pSrc, val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void divCRev(const float * pSrc, float val, float * pDst, int len)
 	{
-		sPtrValDstRev<_mm_div_ps, _mm_div_ss>(pSrc, val, pDst, len);
+		sPtrValDst<rev_op<_mm_div_ps>, rev_op<_mm_div_ss>>(pSrc, val, pDst, len);
 	}
 
 

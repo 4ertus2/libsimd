@@ -6,27 +6,22 @@
 #include "simd.h"
 #include "compare.h"
 
-static const unsigned LENGTH = 47;
-
 template<typename T, typename U>
-void test_convert(T valueT, U valueU)
+void test_convert(T valueT, U valueU, unsigned length = 47)
 {
-	using std::shared_ptr;
-
-	shared_ptr<T> pt = shared_ptr<T>(simd::malloc<T>(LENGTH), simd::free<T>);
-	shared_ptr<U> pu = shared_ptr<U>(simd::malloc<U>(LENGTH), simd::free<U>);
+	auto pt = std::shared_ptr<T>(simd::malloc<T>(length), simd::free<T>);
+	auto pu = std::shared_ptr<U>(simd::malloc<U>(length), simd::free<U>);
 	T * t = pt.get();
 	U * u = pu.get();
 
-	simd::set(valueT, t, LENGTH);
+	simd::set(valueT, t, length);
 
-	simd::convert(t, u, LENGTH);
-	for (int i=0; i<LENGTH; ++i)
+	simd::convert(t, u, length);
+	for (int i=0; i<length; ++i)
+	{
 		if (! equal(u[i], valueU))
-		{
-			std::cerr << u[i] << " != " << valueU << std::endl;
-			throw __PRETTY_FUNCTION__;
-		}
+			FAIL();
+	}
 }
 
 void test_i8(int value)
@@ -105,12 +100,11 @@ int main()
 		test_float(numeric_limits<float>::denorm_min());
 		test_float(numeric_limits<float>::epsilon());
 	}
-	catch (const char * msg)
+	catch (const Exception& ex)
 	{
-		std::cerr << msg << std::endl;
+		std::cerr << "func: " << ex.func_ << " line: " << ex.line_ << " len: " << ex.length_ << std::endl;
 		return 1;
 	}
 
 	return 0;
 }
-
