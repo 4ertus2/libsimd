@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <xmmintrin.h>
 #include <emmintrin.h>
 
 #include "sse.h"
@@ -12,7 +11,7 @@ namespace sse_double_internal
 	typedef __m128d (*IntrPd)(double const *);
 	typedef void (*IntrPD)(double *, __m128d);
 
-#ifdef SSE_ALIGNED_LOAD
+#ifdef SSE_ALIGNED
 	INLINE __m128d xx_load_pd(double const * x) { return _mm_load_pd(x); }
 	INLINE void xx_store_pd(double * x, __m128d y) { _mm_store_pd(x, y); }
 #else

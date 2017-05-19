@@ -1,8 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <xmmintrin.h>
-#include <emmintrin.h>
-//#include <smmintrin.h>
+#include <smmintrin.h>
 
 #include "sse.h"
 
@@ -13,7 +11,7 @@ namespace sse_i128_internal
 	typedef __m128i (*IntrPi)(const __m128i *);
 	typedef void (*IntrPI)(__m128i*, __m128i);
 
-#ifdef SSE_ALIGNED_LOAD
+#ifdef SSE_ALIGNED
 	INLINE __m128i xx_load_si128(const __m128i * x) { return _mm_load_si128(x); }
 	//INLINE __m128i xx_load_si128(const __m128i * x) { return _mm_stream_load_si128(x); }
 	INLINE void xx_store_si128(__m128i * x, __m128i y) { _mm_store_si128(x, y); }
