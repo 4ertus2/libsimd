@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <emmintrin.h>
+#include <smmintrin.h>
 
 #include "sse.h"
 
@@ -32,6 +32,7 @@ namespace sse_float_internal
 		return _mm_andnot_ps(sign_mask, x); // !sign_mask & x
 	}
 
+	// TODO: replace with _mm_hadd_ps?
 	INLINE __m128 horizontal_sum(__m128 x)
 	{
 		// some magic here
@@ -516,8 +517,9 @@ namespace statistical
 		meanStdDevT(pSrc, len, pMean, pStdDev);
 	}
 
+	// TODO: perf tests
 	template <IntrPs load_ps = xx_load_ps>
-	INLINE void dotProd(const float * pSrc1, const float * pSrc2, int len, float * pDp)
+	INLINE void dotProd_v1(const float * pSrc1, const float * pSrc2, int len, float * pDp)
 	{
 		__m128 r0 = _mm_setzero_ps();
 		__m128 r1 = _mm_setzero_ps();
@@ -530,11 +532,8 @@ namespace statistical
 			__m128 b0 = load_ps(pSrc2);
 			__m128 b1 = load_ps(pSrc2+4);
 
-			a0 = _mm_mul_ps(a0, b0);
-			a1 = _mm_mul_ps(a1, b1);
-
-			r0 = _mm_add_ps(r0, a0);
-			r1 = _mm_add_ps(r1, a1);
+			r0 = _mm_add_ps(r0, _mm_mul_ps(a0, b0));
+			r1 = _mm_add_ps(r1, _mm_mul_ps(a1, b1));
 		}
 
 		r0 = _mm_add_ps(r0, r1);
@@ -544,8 +543,7 @@ namespace statistical
 			__m128 a0 = load_ps(pSrc1);
 			__m128 b0 = load_ps(pSrc2);
 
-			a0 = _mm_mul_ps(a0, b0);
-			r0 = _mm_add_ps(r0, a0);
+			r0 = _mm_add_ps(r0, _mm_mul_ps(a0, b0));
 
 			len -= 4; pSrc1 += 4; pSrc2 += 4;
 		}
@@ -555,17 +553,51 @@ namespace statistical
 			__m128 a0 = _mm_load_ss(pSrc1);
 			__m128 b0 = _mm_load_ss(pSrc2);
 
-			a0 = _mm_mul_ss(a0, b0);
-			r0 = _mm_add_ss(r0, a0);
+			r0 = _mm_add_ss(r0, _mm_mul_ss(a0, b0));
 		}
 
 		r0 = horizontal_sum(r0);
 		*pDp = _mm_cvtss_f32(r0);
 	}
 
+	template <IntrPs load_ps = xx_load_ps>
+	INLINE void dotProd_v2(const float * pSrc1, const float * pSrc2, int len, float * pDp)
+	{
+		__m128 dp = _mm_setzero_ps();
+
+		for (; len >= 8; len-=8, pSrc1+=8, pSrc2+=8)
+		{
+			__m128 a0 = load_ps(pSrc1);
+			__m128 a1 = load_ps(pSrc1+4);
+			__m128 b0 = load_ps(pSrc2);
+			__m128 b1 = load_ps(pSrc2+4);
+
+			__m128 sum = _mm_add_ss(_mm_dp_ps(a0, b0, 0xf1), _mm_dp_ps(a1, b1, 0xf1));
+			dp = _mm_add_ss(dp, sum);
+		}
+
+		if (len >= 4)
+		{
+			__m128 a0 = load_ps(pSrc1);
+			__m128 b0 = load_ps(pSrc2);
+			dp = _mm_add_ss(dp, _mm_dp_ps(a0, b0, 0xf1));
+
+			len -= 4; pSrc1 += 4; pSrc2 += 4;
+		}
+
+		for (; len; --len, ++pSrc1, ++pSrc2)
+		{
+			__m128 a0 = _mm_load_ss(pSrc1);
+			__m128 b0 = _mm_load_ss(pSrc2);
+			dp = _mm_add_ss(dp, _mm_mul_ss(a0, b0));
+		}
+
+		*pDp = _mm_cvtss_f32(dp);
+	}
+
 	_SIMD_SSE_SPEC void dotProd(const float * pSrc1, const float * pSrc2, int len, float * pDp)
 	{
-		dotProd(pSrc1, pSrc2, len, pDp);
+		dotProd_v1(pSrc1, pSrc2, len, pDp);
 	}
 }
 }
