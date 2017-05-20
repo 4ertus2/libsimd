@@ -27,11 +27,35 @@ namespace sse_i128_internal
 	//
 
 	template <	IntrI op,
+				IntrPI store = xx_store_si128>
+	INLINE void iValDst(__m128i * pDst, __m128i&& a, int len)
+	{
+		for (; len >= 4; len-=4, pDst+=4)
+		{
+			store(pDst, op(a));
+			store(pDst+1, op(a));
+			store(pDst+2, op(a));
+			store(pDst+3, op(a));
+		}
+
+		if (len >= 2)
+		{
+			store(pDst, op(a));
+			store(pDst+1, op(a));
+			len -= 2; pDst += 2;
+		}
+
+		if (len)
+		{
+			store(pDst, op(a));
+		}
+	}
+
+	template <	IntrI op,
 				IntrPi load = xx_load_si128,
 				IntrPI store = xx_store_si128>
 	INLINE void iPtrDst(const __m128i * pSrc, __m128i * pDst, int len)
 	{
-#ifdef UNROLL_MORE
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
 		{
 			store(pDst, op(load(pSrc)));
@@ -39,11 +63,13 @@ namespace sse_i128_internal
 			store(pDst+2, op(load(pSrc+2)));
 			store(pDst+3, op(load(pSrc+3)));
 		}
-#endif
-		for (; len >= 2; len-=2, pSrc+=2, pDst+=2)
+
+		if (len >= 2)
 		{
 			store(pDst, op(load(pSrc)));
 			store(pDst+1, op(load(pSrc+1)));
+
+			len -= 2; pSrc += 2; pDst += 2;
 		}
 
 		if (len)
@@ -57,7 +83,6 @@ namespace sse_i128_internal
 				IntrPI store = xx_store_si128>
 	INLINE void iPtrValDst(const __m128i * pSrc, __m128i&& b, __m128i * pDst, int len)
 	{
-#ifdef UNROLL_MORE
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
 		{
 			store(pDst, op(load(pSrc), b));
@@ -65,11 +90,13 @@ namespace sse_i128_internal
 			store(pDst+2, op(load(pSrc+2), b));
 			store(pDst+3, op(load(pSrc+3), b));
 		}
-#endif
-		for (; len >= 2; len-=2, pSrc+=2, pDst+=2)
+
+		if (len >= 2)
 		{
 			store(pDst, op(load(pSrc), b));
 			store(pDst+1, op(load(pSrc+1), b));
+
+			len -= 2; pSrc += 2; pDst += 2;
 		}
 
 		if (len)
@@ -83,7 +110,6 @@ namespace sse_i128_internal
 				IntrPI store = xx_store_si128>
 	INLINE void iPtrPtrDst(const __m128i * pSrc1, const __m128i * pSrc2, __m128i * pDst, int len)
 	{
-#ifdef UNROLL_MORE
 		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
 		{
 			__m128i a0 = load(pSrc1);
@@ -101,25 +127,18 @@ namespace sse_i128_internal
 			store(pDst+2, op(a2, b2));
 			store(pDst+3, op(a3, b3));
 		}
-#endif
-		for (; len >= 2; len-=2, pSrc1+=2, pSrc2+=2, pDst+=2)
+
+		if (len >= 2)
 		{
-			__m128i a0 = load(pSrc1);
-			__m128i a1 = load(pSrc1+1);
+			store(pDst, op(load(pSrc1), load(pSrc2)));
+			store(pDst+1, op(load(pSrc1+1), load(pSrc2+1)));
 
-			__m128i b0 = load(pSrc2);
-			__m128i b1 = load(pSrc2+1);
-
-			store(pDst, op(a0, b0));
-			store(pDst+1, op(a1, b1));
+			len -= 2; pSrc1 += 2; pSrc2 += 2; pDst += 2;
 		}
 
 		if (len)
 		{
-			__m128i a0 = load(pSrc1);
-			__m128i b0 = load(pSrc2);
-
-			store(pDst, op(a0, b0));
+			store(pDst, op(load(pSrc1), load(pSrc2)));
 		}
 	}
 }
@@ -130,48 +149,9 @@ namespace sse
 
 namespace common
 {
-	template <IntrPI store_si128 = xx_store_si128>
-	INLINE void setT128(__m128i&& a, __m128i * pDst, int len)
-	{
-#ifdef UNROLL_MORE
-		for (; len >= 8; len-=8, pDst+=8)
-		{
-			store_si128(pDst, a);
-			store_si128(pDst+1, a);
-			store_si128(pDst+2, a);
-			store_si128(pDst+3, a);
-
-			store_si128(pDst+4, a);
-			store_si128(pDst+5, a);
-			store_si128(pDst+6, a);
-			store_si128(pDst+7, a);
-		}
-#endif
-		for (; len >= 4; len-=4, pDst+=4)
-		{
-			store_si128(pDst, a);
-			store_si128(pDst+1, a);
-			store_si128(pDst+2, a);
-			store_si128(pDst+3, a);
-		}
-
-		if (len >= 2)
-		{
-			store_si128(pDst, a);
-			store_si128(pDst+1, a);
-			len -= 2; pDst += 2;
-		}
-
-		if (len)
-		{
-			store_si128(pDst, a);
-			--len; --pDst;
-		}
-	}
-
 	_SIMD_SSE_SPEC void set(int32_t val, int32_t * pDst, int len)
 	{
-		setT128(_mm_set1_epi32(val), (__m128i*)pDst, (len>>2));
+		iValDst<nop_128>((__m128i*)pDst, _mm_set1_epi32(val), (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = val;
 	}
@@ -183,7 +163,7 @@ namespace common
 
 	_SIMD_SSE_SPEC void set(int64_t val, int64_t * pDst, int len)
 	{
-		setT128(_mm_set1_epi64x(val), (__m128i*)pDst, (len>>1));
+		iValDst<nop_128>((__m128i*)pDst, _mm_set1_epi64x(val), (len>>1));
 		if (len)
 			pDst[len-1] = val;
 	}

@@ -300,20 +300,7 @@ namespace common
 	INLINE void setT(float val, float * pDst, int len)
 	{
 		__m128 a = _mm_set1_ps(val);
-#ifdef UNROLL_MORE
-		for (; len >= 32; len-=32, pDst+=32)
-		{
-			store_ps(pDst, a);
-			store_ps(pDst+4, a);
-			store_ps(pDst+8, a);
-			store_ps(pDst+12, a);
 
-			store_ps(pDst+16, a);
-			store_ps(pDst+20, a);
-			store_ps(pDst+24, a);
-			store_ps(pDst+28, a);
-		}
-#endif
 		for (; len >= 16; len-=16, pDst+=16)
 		{
 			store_ps(pDst, a);

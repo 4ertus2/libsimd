@@ -220,20 +220,7 @@ namespace common
 	INLINE void setT(double val, double * pDst, int len)
 	{
 		__m128d a = _mm_set1_pd(val);
-#ifdef UNROLL_MORE
-		for (; len >= 16; len-=16, pDst+=16)
-		{
-			store_pd(pDst, a);
-			store_pd(pDst+2, a);
-			store_pd(pDst+4, a);
-			store_pd(pDst+6, a);
 
-			store_pd(pDst+8, a);
-			store_pd(pDst+10, a);
-			store_pd(pDst+12, a);
-			store_pd(pDst+14, a);
-		}
-#endif
 		for (; len >= 8; len-=8, pDst+=8)
 		{
 			store_pd(pDst, a);
