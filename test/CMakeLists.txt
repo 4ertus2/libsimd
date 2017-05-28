@@ -5,9 +5,9 @@ add_executable(test-common test-common.cpp)
 add_executable(test-convert test-convert.cpp)
 add_executable(test-arithm test-arithm.cpp)
 #
-set_target_properties(test-common PROPERTIES COMPILE_FLAGS "-DNO_SSE")
-set_target_properties(test-convert PROPERTIES COMPILE_FLAGS "-DNO_SSE")
-set_target_properties(test-arithm PROPERTIES COMPILE_FLAGS "-DNO_SSE")
+set_target_properties(test-common PROPERTIES COMPILE_FLAGS "-DNO_SIMD")
+set_target_properties(test-convert PROPERTIES COMPILE_FLAGS "-DNO_SIMD")
+set_target_properties(test-arithm PROPERTIES COMPILE_FLAGS "-DNO_SIMD")
 
 # sse
 add_executable(test-common-sse test-common.cpp)

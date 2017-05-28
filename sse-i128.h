@@ -4,30 +4,12 @@
 
 #include "sse.h"
 
-namespace sse_i128_internal
+namespace sse
 {
-	typedef __m128i (*IntrI)(__m128i);
-	typedef __m128i (*IntrII)(__m128i, __m128i);
-	typedef __m128i (*IntrPi)(const __m128i *);
-	typedef void (*IntrPI)(__m128i*, __m128i);
-
-#ifdef SSE_ALIGNED
-	INLINE __m128i xx_load_si128(const __m128i * x) { return _mm_load_si128(x); }
-	//INLINE __m128i xx_load_si128(const __m128i * x) { return _mm_stream_load_si128(x); }
-	INLINE void xx_store_si128(__m128i * x, __m128i y) { _mm_store_si128(x, y); }
-#else
-	INLINE __m128i xx_load_si128(const __m128i * x) { return _mm_loadu_si128(x); }
-	INLINE void xx_store_si128(__m128i * x, __m128i y) { _mm_storeu_si128(x, y); }
-#endif
-	INLINE __m128i nop_128(__m128i x) { return x; }
-
-	template <IntrII op>
-	INLINE __m128i rev_op128(__m128i x, __m128i y) { return op(y, x); }
-
-	//
-
-	template <	IntrI op,
-				IntrPI store = xx_store_si128>
+namespace internals
+{
+	template <	IntrI::Unary op,
+				IntrI::Store store = xx_store_si>
 	INLINE void iValDst(__m128i * pDst, __m128i&& a, int len)
 	{
 		for (; len >= 4; len-=4, pDst+=4)
@@ -51,9 +33,9 @@ namespace sse_i128_internal
 		}
 	}
 
-	template <	IntrI op,
-				IntrPi load = xx_load_si128,
-				IntrPI store = xx_store_si128>
+	template <	IntrI::Unary op,
+				IntrI::Load load = xx_load_si,
+				IntrI::Store store = xx_store_si>
 	INLINE void iPtrDst(const __m128i * pSrc, __m128i * pDst, int len)
 	{
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
@@ -78,9 +60,9 @@ namespace sse_i128_internal
 		}
 	}
 
-	template <	IntrII op,
-				IntrPi load = xx_load_si128,
-				IntrPI store = xx_store_si128>
+	template <	IntrI::Binary op,
+				IntrI::Load load = xx_load_si,
+				IntrI::Store store = xx_store_si>
 	INLINE void iPtrValDst(const __m128i * pSrc, __m128i&& b, __m128i * pDst, int len)
 	{
 		for (; len >= 4; len-=4, pSrc+=4, pDst+=4)
@@ -105,9 +87,9 @@ namespace sse_i128_internal
 		}
 	}
 
-	template <	IntrII op,
-				IntrPi load = xx_load_si128,
-				IntrPI store = xx_store_si128>
+	template <	IntrI::Binary op,
+				IntrI::Load load = xx_load_si,
+				IntrI::Store store = xx_store_si>
 	INLINE void iPtrPtrDst(const __m128i * pSrc1, const __m128i * pSrc2, __m128i * pDst, int len)
 	{
 		for (; len >= 4; len-=4, pSrc1+=4, pSrc2+=4, pDst+=4)
@@ -143,15 +125,11 @@ namespace sse_i128_internal
 	}
 }
 
-namespace sse
-{
-	using namespace sse_i128_internal;
-
 namespace common
 {
 	_SIMD_SSE_SPEC void set(int32_t val, int32_t * pDst, int len)
 	{
-		iValDst<nop_128>((__m128i*)pDst, _mm_set1_epi32(val), (len>>2));
+		internals::iValDst<nop>((__m128i*)pDst, _mm_set1_epi32(val), (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = val;
 	}
@@ -163,7 +141,7 @@ namespace common
 
 	_SIMD_SSE_SPEC void set(int64_t val, int64_t * pDst, int len)
 	{
-		iValDst<nop_128>((__m128i*)pDst, _mm_set1_epi64x(val), (len>>1));
+		internals::iValDst<nop>((__m128i*)pDst, _mm_set1_epi64x(val), (len>>1));
 		if (len)
 			pDst[len-1] = val;
 	}
@@ -175,7 +153,7 @@ namespace common
 
 	_SIMD_SSE_SPEC void copy(const int32_t * pSrc, int32_t * pDst, int len)
 	{
-		iPtrDst<nop_128>((const __m128i*)pSrc, (__m128i*)pDst, (len>>2));
+		internals::iPtrDst<nop>((const __m128i*)pSrc, (__m128i*)pDst, (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = pSrc[i];
 	}
@@ -187,7 +165,7 @@ namespace common
 
 	_SIMD_SSE_SPEC void copy(const int64_t * pSrc, int64_t * pDst, int len)
 	{
-		iPtrDst<nop_128>((const __m128i*)pSrc, (__m128i*)pDst, (len>>1));
+		internals::iPtrDst<nop>((const __m128i*)pSrc, (__m128i*)pDst, (len>>1));
 		if (len)
 			pDst[len-1] = pSrc[len-1];
 	}
@@ -202,28 +180,28 @@ namespace arithmetic
 {
 	_SIMD_SSE_SPEC void addC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
 	{
-		iPtrValDst<_mm_add_epi32>((const __m128i*)pSrc, _mm_set1_epi32(val), (__m128i*)pDst, (len>>2));
+		internals::iPtrValDst<_mm_add_epi32>((const __m128i*)pSrc, _mm_set1_epi32(val), (__m128i*)pDst, (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = pSrc[i] + val;
 	}
 
 	_SIMD_SSE_SPEC void subC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
 	{
-		iPtrValDst<_mm_sub_epi32>((const __m128i*)pSrc, _mm_set1_epi32(val), (__m128i*)pDst, (len>>2));
+		internals::iPtrValDst<_mm_sub_epi32>((const __m128i*)pSrc, _mm_set1_epi32(val), (__m128i*)pDst, (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = pSrc[i] - val;
 	}
 
 	_SIMD_SSE_SPEC void subCRev(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
 	{
-		iPtrValDst<rev_op128<_mm_sub_epi32>>((const __m128i*)pSrc, _mm_set1_epi32(val), (__m128i*)pDst, (len>>2));
+		internals::iPtrValDst<IntrI::rev_op<_mm_sub_epi32>>((const __m128i*)pSrc, _mm_set1_epi32(val), (__m128i*)pDst, (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = val - pSrc[i];
 	}
 
 	_SIMD_SSE_SPEC void mulC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
 	{
-		iPtrValDst<_mm_mullo_epi32>((const __m128i*)pSrc, _mm_set1_epi32(val), (__m128i*)pDst, (len>>2));
+		internals::iPtrValDst<_mm_mullo_epi32>((const __m128i*)pSrc, _mm_set1_epi32(val), (__m128i*)pDst, (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = pSrc[i] * val;
 	}
@@ -241,21 +219,21 @@ namespace arithmetic
 
 	_SIMD_SSE_SPEC void add(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
 	{
-		iPtrPtrDst<_mm_add_epi32>((const __m128i*)pSrc1, (const __m128i*)pSrc2, (__m128i*)pDst, (len>>2));
+		internals::iPtrPtrDst<_mm_add_epi32>((const __m128i*)pSrc1, (const __m128i*)pSrc2, (__m128i*)pDst, (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = pSrc1[i] + pSrc2[i];
 	}
 
 	_SIMD_SSE_SPEC void sub(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
 	{
-		iPtrPtrDst<_mm_sub_epi32>((const __m128i*)pSrc1, (const __m128i*)pSrc2, (__m128i*)pDst, (len>>2));
+		internals::iPtrPtrDst<_mm_sub_epi32>((const __m128i*)pSrc1, (const __m128i*)pSrc2, (__m128i*)pDst, (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = pSrc1[i] - pSrc2[i];
 	}
 
 	_SIMD_SSE_SPEC void mul(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
 	{
-		iPtrPtrDst<_mm_mullo_epi32>((const __m128i*)pSrc1, (const __m128i*)pSrc2, (__m128i*)pDst, (len>>2));
+		internals::iPtrPtrDst<_mm_mullo_epi32>((const __m128i*)pSrc1, (const __m128i*)pSrc2, (__m128i*)pDst, (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = pSrc1[i] * pSrc2[i];
 	}
@@ -267,7 +245,7 @@ namespace arithmetic
 
 	_SIMD_SSE_SPEC void abs(const int32_t * pSrc, int32_t * pDst, int len)
 	{
-		iPtrDst<_mm_abs_epi32>((const __m128i*)pSrc, (__m128i*)pDst, (len>>2));
+		internals::iPtrDst<_mm_abs_epi32>((const __m128i*)pSrc, (__m128i*)pDst, (len>>2));
 		for (int i = len - (len & 0x3); i < len; ++i)
 			pDst[i] = (pSrc[i] > 0) ? pSrc[i] : (-pSrc[i]);
 	}
@@ -343,21 +321,21 @@ namespace arithmetic
 
 	_SIMD_SSE_SPEC void addC(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
 	{
-		iPtrValDst<_mm_add_epi64>((const __m128i*)pSrc, _mm_set1_epi64x(val), (__m128i*)pDst, (len>>1));
+		internals::iPtrValDst<_mm_add_epi64>((const __m128i*)pSrc, _mm_set1_epi64x(val), (__m128i*)pDst, (len>>1));
 		if (len)
 			pDst[len-1] = pSrc[len-1] + val;
 	}
 
 	_SIMD_SSE_SPEC void subC(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
 	{
-		iPtrValDst<_mm_sub_epi64>((const __m128i*)pSrc, _mm_set1_epi64x(val), (__m128i*)pDst, (len>>1));
+		internals::iPtrValDst<_mm_sub_epi64>((const __m128i*)pSrc, _mm_set1_epi64x(val), (__m128i*)pDst, (len>>1));
 		if (len)
 			pDst[len-1] = pSrc[len-1] - val;
 	}
 
 	_SIMD_SSE_SPEC void subCRev(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
 	{
-		iPtrValDst<rev_op128<_mm_sub_epi64>>((const __m128i*)pSrc, _mm_set1_epi64x(val), (__m128i*)pDst, (len>>1));
+		internals::iPtrValDst<IntrI::rev_op<_mm_sub_epi64>>((const __m128i*)pSrc, _mm_set1_epi64x(val), (__m128i*)pDst, (len>>1));
 		if (len)
 			pDst[len-1] = val - pSrc[len-1];
 	}
@@ -380,14 +358,14 @@ namespace arithmetic
 
 	_SIMD_SSE_SPEC void add(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len)
 	{
-		iPtrPtrDst<_mm_add_epi64>((const __m128i*)pSrc1, (const __m128i*)pSrc2, (__m128i*)pDst, (len>>1));
+		internals::iPtrPtrDst<_mm_add_epi64>((const __m128i*)pSrc1, (const __m128i*)pSrc2, (__m128i*)pDst, (len>>1));
 		if (len)
 			pDst[len-1] = pSrc1[len-1] + pSrc2[len-1];
 	}
 
 	_SIMD_SSE_SPEC void sub(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len)
 	{
-		iPtrPtrDst<_mm_sub_epi64>((const __m128i*)pSrc1, (const __m128i*)pSrc2, (__m128i*)pDst, (len>>1));
+		internals::iPtrPtrDst<_mm_sub_epi64>((const __m128i*)pSrc1, (const __m128i*)pSrc2, (__m128i*)pDst, (len>>1));
 		if (len)
 			pDst[len-1] = pSrc1[len-1] - pSrc2[len-1];
 	}

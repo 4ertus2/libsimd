@@ -4,28 +4,10 @@
 
 #include "sse.h"
 
-namespace sse_double_internal
+namespace sse
 {
-	typedef __m128d (*IntrD)(__m128d);
-	typedef __m128d (*IntrDD)(__m128d, __m128d);
-	typedef __m128d (*IntrPd)(double const *);
-	typedef void (*IntrPD)(double *, __m128d);
-
-#ifdef SSE_ALIGNED
-	INLINE __m128d xx_load_pd(double const * x) { return _mm_load_pd(x); }
-	INLINE void xx_store_pd(double * x, __m128d y) { _mm_store_pd(x, y); }
-#else
-	INLINE __m128d xx_load_pd(double const * x) { return _mm_loadu_pd(x); }
-	INLINE void xx_store_pd(double * x, __m128d y) { _mm_storeu_pd(x, y); }
-#endif
-
-	//
-
-	INLINE  __m128d nop_pd(__m128d x) { return x; }
-
-	template <IntrDD op>
-	INLINE __m128d rev_op(__m128d x, __m128d y) { return op(y, x); }
-
+namespace internals
+{
 	INLINE  __m128d abs_pd(__m128d x)
 	{
 		static const __m128d sign_mask = _mm_set1_pd(-0.); // -0. = 1 << 63
@@ -34,10 +16,10 @@ namespace sse_double_internal
 
 	//
 
-	template <	IntrD op_pd,
-				IntrD op_sd,
-				IntrPd load_pd = xx_load_pd,
-				IntrPD store_pd = xx_store_pd>
+	template <	IntrD::Unary op_pd,
+				IntrD::Unary op_sd,
+				IntrD::Load load_pd = xx_load_pd,
+				IntrD::Store store_pd = xx_store_pd>
 	INLINE void dPtrDst(const double * pSrc, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -88,10 +70,10 @@ namespace sse_double_internal
 		}
 	}
 
-	template <	IntrDD op_pd,
-				IntrDD op_sd,
-				IntrPd load_pd = xx_load_pd,
-				IntrPD store_pd = xx_store_pd>
+	template <	IntrD::Binary op_pd,
+				IntrD::Binary op_sd,
+				IntrD::Load load_pd = xx_load_pd,
+				IntrD::Store store_pd = xx_store_pd>
 	INLINE void dPtrValDst(const double * pSrc, double val, double * pDst, int len)
 	{
 		const __m128d b = _mm_set1_pd(val);
@@ -143,10 +125,10 @@ namespace sse_double_internal
 		}
 	}
 
-	template <	IntrDD op_pd,
-				IntrDD op_sd,
-				IntrPd load_pd = xx_load_pd,
-				IntrPD store_pd = xx_store_pd>
+	template <	IntrD::Binary op_pd,
+				IntrD::Binary op_sd,
+				IntrD::Load load_pd = xx_load_pd,
+				IntrD::Store store_pd = xx_store_pd>
 	INLINE void dPtrPtrDst(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -210,13 +192,9 @@ namespace sse_double_internal
 	}
 }
 
-namespace sse
-{
-	using namespace sse_double_internal;
-
 namespace common
 {
-	template <IntrPD store_pd = xx_store_pd>
+	template <IntrD::Store store_pd = xx_store_pd>
 	INLINE void setT(double val, double * pDst, int len)
 	{
 		__m128d a = _mm_set1_pd(val);
@@ -253,7 +231,7 @@ namespace common
 
 	_SIMD_SSE_SPEC void copy(const double * pSrc, double * pDst, int len)
 	{
-		dPtrDst<nop_pd, nop_pd>(pSrc, pDst, len);
+		internals::dPtrDst<nop, nop>(pSrc, pDst, len);
 	}
 }
 
@@ -261,59 +239,59 @@ namespace arithmetic
 {
 	_SIMD_SSE_SPEC void addC(const double * pSrc, double val, double * pDst, int len)
 	{
-		dPtrValDst<_mm_add_pd, _mm_add_sd>(pSrc, val, pDst, len);
+		internals::dPtrValDst<_mm_add_pd, _mm_add_sd>(pSrc, val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void subC(const double * pSrc, double val, double * pDst, int len)
 	{
-		dPtrValDst<_mm_sub_pd, _mm_sub_sd>(pSrc, val, pDst, len);
+		internals::dPtrValDst<_mm_sub_pd, _mm_sub_sd>(pSrc, val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void mulC(const double * pSrc, double val, double * pDst, int len)
 	{
-		dPtrValDst<_mm_mul_pd, _mm_mul_sd>(pSrc, val, pDst, len);
+		internals::dPtrValDst<_mm_mul_pd, _mm_mul_sd>(pSrc, val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void divC(const double * pSrc, double val, double * pDst, int len)
 	{
-		dPtrValDst<_mm_div_pd, _mm_div_sd>(pSrc, val, pDst, len);
+		internals::dPtrValDst<_mm_div_pd, _mm_div_sd>(pSrc, val, pDst, len);
 	}
 
 
 	_SIMD_SSE_SPEC void subCRev(const double * pSrc, double val, double * pDst, int len)
 	{
-		dPtrValDst<rev_op<_mm_sub_pd>, rev_op<_mm_sub_sd>>(pSrc, val, pDst, len);
+		internals::dPtrValDst<IntrD::rev_op<_mm_sub_pd>, IntrD::rev_op<_mm_sub_sd>>(pSrc, val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void divCRev(const double * pSrc, double val, double * pDst, int len)
 	{
-		dPtrValDst<rev_op<_mm_div_pd>, rev_op<_mm_div_sd>>(pSrc, val, pDst, len);
+		internals::dPtrValDst<IntrD::rev_op<_mm_div_pd>, IntrD::rev_op<_mm_div_sd>>(pSrc, val, pDst, len);
 	}
 
 
 	_SIMD_SSE_SPEC void add(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
-		dPtrPtrDst<_mm_add_pd, _mm_add_sd>(pSrc1, pSrc2, pDst, len);
+		internals::dPtrPtrDst<_mm_add_pd, _mm_add_sd>(pSrc1, pSrc2, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void sub(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
-		dPtrPtrDst<_mm_sub_pd, _mm_sub_sd>(pSrc1, pSrc2, pDst, len);
+		internals::dPtrPtrDst<_mm_sub_pd, _mm_sub_sd>(pSrc1, pSrc2, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void mul(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
-		dPtrPtrDst<_mm_mul_pd, _mm_mul_sd>(pSrc1, pSrc2, pDst, len);
+		internals::dPtrPtrDst<_mm_mul_pd, _mm_mul_sd>(pSrc1, pSrc2, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void div(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
-		dPtrPtrDst<_mm_div_pd, _mm_div_sd>(pSrc1, pSrc2, pDst, len);
+		internals::dPtrPtrDst<_mm_div_pd, _mm_div_sd>(pSrc1, pSrc2, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void abs(const double * pSrc, double * pDst, int len)
 	{
-		dPtrDst<abs_pd, abs_pd>(pSrc, pDst, len);
+		internals::dPtrDst<internals::abs_pd, internals::abs_pd>(pSrc, pDst, len);
 	}
 }
 
@@ -326,7 +304,7 @@ namespace power
 
 	_SIMD_SSE_SPEC void sqrt(const double * pSrc, double * pDst, int len)
 	{
-		dPtrDst<_mm_sqrt_pd, _mm_sqrt_pd>(pSrc, pDst, len);
+		internals::dPtrDst<_mm_sqrt_pd, _mm_sqrt_pd>(pSrc, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void invSqrt(const double * pSrc, double * pDst, int len)

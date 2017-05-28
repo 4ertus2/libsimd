@@ -23,6 +23,67 @@
 
 namespace sse
 {
+    template <typename _T>
+    INLINE _T nop(_T x) { return x; }
+
+    template <typename _T, typename _U>
+    struct Intrinsic
+    {
+        typedef _T (*Unary)(_T);
+        typedef _T (*Binary)(_T, _T);
+        typedef _T (*Load)(const _U *);
+        typedef void (*Store)(_U *, _T);
+
+        template<Binary op>
+        static INLINE _T rev_op(_T x, _T y) { return op(y, x); }
+    };
+
+#ifdef SIMD_AVX
+
+    using IntrS = Intrinsic<__m256, float>;
+    using IntrD = Intrinsic<__m256d, double>;
+    using IntrI = Intrinsic<__m256i, __m256i>;
+
+#ifdef SSE_ALIGNED
+    INLINE __m256 xx_load_ps(float const * x) { return _mm256_load_ps(x); }
+    INLINE __m256d xx_load_pd(double const * x) { return _mm256_load_pd(x); }
+    INLINE __m256i xx_load_si(const __m256i * x) { return _mm256_load_si256(x); }
+    INLINE void xx_store_ps(float * x, __m256 y) { _mm256_store_ps(x, y); }
+    INLINE void xx_store_pd(double * x, __m256d y) { _mm256_store_pd(x, y); }
+    INLINE void xx_store_si(__m256i * x, __m256i y) { _mm256_store_si256(x, y); }
+#else
+    INLINE __m256 xx_load_ps(float const * x) { return _mm256_loadu_ps(x); }
+    INLINE __m256d xx_load_pd(double const * x) { return _mm256_loadu_pd(x); }
+    INLINE __m256i xx_load_si(const __m256i * x) { return _mm256_loadu_si256(x); }
+    INLINE void xx_store_ps(float * x, __m256 y) { _mm256_storeu_ps(x, y); }
+    INLINE void xx_store_pd(double * x, __m256d y) { _mm256_storeu_pd(x, y); }
+    INLINE void xx_store_si(__m256i * x, __m256i y) { _mm256_storeu_si256(x, y); }
+#endif
+
+#else // SIMD_AVX
+
+    using IntrS = Intrinsic<__m128, float>;
+    using IntrD = Intrinsic<__m128d, double>;
+    using IntrI = Intrinsic<__m128i, __m128i>;
+
+#ifdef SSE_ALIGNED
+    INLINE __m128 xx_load_ps(float const * x) { return _mm_load_ps(x); }
+    INLINE __m128d xx_load_pd(double const * x) { return _mm_load_pd(x); }
+    INLINE __m128i xx_load_si(const __m128i * x) { return _mm_load_si128(x); }
+    INLINE void xx_store_ps(float * x, __m128 y) { _mm_store_ps(x, y); }
+    INLINE void xx_store_pd(double * x, __m128d y) { _mm_store_pd(x, y); }
+    INLINE void xx_store_si(__m128i * x, __m128i y) { _mm_store_si128(x, y); }
+#else
+    INLINE __m128 xx_load_ps(float const * x) { return _mm_loadu_ps(x); }
+    INLINE __m128d xx_load_pd(double const * x) { return _mm_loadu_pd(x); }
+    INLINE __m128i xx_load_si(const __m128i * x) { return _mm_loadu_si128(x); }
+    INLINE void xx_store_ps(float * x, __m128 y) { _mm_storeu_ps(x, y); }
+    INLINE void xx_store_pd(double * x, __m128d y) { _mm_storeu_pd(x, y); }
+    INLINE void xx_store_si(__m128i * x, __m128i y) { _mm_storeu_si128(x, y); }
+#endif
+
+#endif // SIMD_AVX
+
 	namespace common
 	{
 		_SIMD_SSE_T void set(_T val, _T* pDst, int len);

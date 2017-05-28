@@ -4,28 +4,10 @@
 
 #include "sse.h"
 
-namespace sse_float_internal
+namespace sse
 {
-	typedef __m128 (*IntrS)(__m128);
-	typedef __m128 (*IntrSS)(__m128, __m128);
-	typedef __m128 (*IntrPs)(float const *);
-	typedef void (*IntrPS)(float *, __m128);
-
-#ifdef SSE_ALIGNED
-	INLINE __m128 xx_load_ps(float const * x) { return _mm_load_ps(x); }
-	INLINE void xx_store_ps(float * x, __m128 y) { _mm_store_ps(x, y); }
-#else
-	INLINE __m128 xx_load_ps(float const * x) { return _mm_loadu_ps(x); }
-	INLINE void xx_store_ps(float * x, __m128 y) { _mm_storeu_ps(x, y); }
-#endif
-
-	//
-
-	INLINE __m128 nop_ps(__m128 x) { return x; }
-
-	template <IntrSS op>
-	INLINE __m128 rev_op(__m128 x, __m128 y) { return op(y, x); }
-
+namespace internals
+{
 	INLINE __m128 abs_ps(__m128 x)
 	{
 		static const __m128 sign_mask = _mm_set1_ps(-0.f); // -0.f = 1 << 31
@@ -42,10 +24,10 @@ namespace sse_float_internal
 
 	//
 
-	template <	IntrS op_ps,
-				IntrS op_ss,
-				IntrPs load_ps = xx_load_ps,
-				IntrPS store_ps = xx_store_ps>
+	template <	IntrS::Unary op_ps,
+				IntrS::Unary op_ss,
+				IntrS::Load load_ps = xx_load_ps,
+				IntrS::Store store_ps = xx_store_ps>
 	INLINE void sPtrDst(const float * pSrc, float * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -96,10 +78,10 @@ namespace sse_float_internal
 		}
 	}
 
-	template <	IntrSS op_ps,
-				IntrSS op_ss,
-				IntrPs load_ps = xx_load_ps,
-				IntrPS store_ps = xx_store_ps>
+	template <	IntrS::Binary op_ps,
+				IntrS::Binary op_ss,
+				IntrS::Load load_ps = xx_load_ps,
+				IntrS::Store store_ps = xx_store_ps>
 	INLINE void sPtrValDst(const float * pSrc, float val, float * pDst, int len)
 	{
 		const __m128 b = _mm_set1_ps(val);
@@ -151,10 +133,10 @@ namespace sse_float_internal
 		}
 	}
 
-	template <	IntrSS op_ps,
-				IntrSS op_ss,
-				IntrPs load_ps = xx_load_ps,
-				IntrPS store_ps = xx_store_ps>
+	template <	IntrS::Binary op_ps,
+				IntrS::Binary op_ss,
+				IntrS::Load load_ps = xx_load_ps,
+				IntrS::Store store_ps = xx_store_ps>
 	INLINE void sPtrPtrDst(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -217,10 +199,10 @@ namespace sse_float_internal
 		}
 	}
 
-	template <	IntrSS op_ps,
-				IntrSS op_ss,
-				IntrPs load_one,
-				IntrPs load_ps = xx_load_ps>
+	template <	IntrS::Binary op_ps,
+				IntrS::Binary op_ss,
+				IntrS::Load load_one,
+				IntrS::Load load_ps = xx_load_ps>
 	INLINE void aggregate(const float * pSrc, int len, __m128& r0)
 	{
 		if (len >= 4)
@@ -291,13 +273,9 @@ namespace sse_float_internal
 	}
 }
 
-namespace sse
-{
-	using namespace sse_float_internal;
-
 namespace common
 {
-	template <IntrPS store_ps = xx_store_ps>
+	template <IntrS::Store store_ps = xx_store_ps>
 	INLINE void setT(float val, float * pDst, int len)
 	{
 		__m128 a = _mm_set1_ps(val);
@@ -334,7 +312,7 @@ namespace common
 
 	_SIMD_SSE_SPEC void copy(const float * pSrc, float * pDst, int len)
 	{
-		sPtrDst<nop_ps, nop_ps>(pSrc, pDst, len);
+		internals::sPtrDst<nop, nop>(pSrc, pDst, len);
 	}
 }
 
@@ -342,59 +320,59 @@ namespace arithmetic
 {
 	_SIMD_SSE_SPEC void addC(const float * pSrc, float val, float * pDst, int len)
 	{
-		sPtrValDst<_mm_add_ps, _mm_add_ss>(pSrc, val, pDst, len);
+		internals::sPtrValDst<_mm_add_ps, _mm_add_ss>(pSrc, val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void subC(const float * pSrc, float val, float * pDst, int len)
 	{
-		sPtrValDst<_mm_sub_ps, _mm_sub_ss>(pSrc, val, pDst, len);
+		internals::sPtrValDst<_mm_sub_ps, _mm_sub_ss>(pSrc, val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void mulC(const float * pSrc, float val, float * pDst, int len)
 	{
-		sPtrValDst<_mm_mul_ps, _mm_mul_ss>(pSrc, val, pDst, len);
+		internals::sPtrValDst<_mm_mul_ps, _mm_mul_ss>(pSrc, val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void divC(const float * pSrc, float val, float * pDst, int len)
 	{
-		sPtrValDst<_mm_div_ps, _mm_div_ss>(pSrc, val, pDst, len);
+		internals::sPtrValDst<_mm_div_ps, _mm_div_ss>(pSrc, val, pDst, len);
 	}
 
 
 	_SIMD_SSE_SPEC void subCRev(const float * pSrc, float val, float * pDst, int len)
 	{
-		sPtrValDst<rev_op<_mm_sub_ps>, rev_op<_mm_sub_ss>>(pSrc, val, pDst, len);
+		internals::sPtrValDst<IntrS::rev_op<_mm_sub_ps>, IntrS::rev_op<_mm_sub_ss>>(pSrc, val, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void divCRev(const float * pSrc, float val, float * pDst, int len)
 	{
-		sPtrValDst<rev_op<_mm_div_ps>, rev_op<_mm_div_ss>>(pSrc, val, pDst, len);
+		internals::sPtrValDst<IntrS::rev_op<_mm_div_ps>, IntrS::rev_op<_mm_div_ss>>(pSrc, val, pDst, len);
 	}
 
 
 	_SIMD_SSE_SPEC void add(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
-		sPtrPtrDst<_mm_add_ps, _mm_add_ss>(pSrc1, pSrc2, pDst, len);
+		internals::sPtrPtrDst<_mm_add_ps, _mm_add_ss>(pSrc1, pSrc2, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void sub(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
-		sPtrPtrDst<_mm_sub_ps, _mm_sub_ss>(pSrc1, pSrc2, pDst, len);
+		internals::sPtrPtrDst<_mm_sub_ps, _mm_sub_ss>(pSrc1, pSrc2, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void mul(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
-		sPtrPtrDst<_mm_mul_ps, _mm_mul_ss>(pSrc1, pSrc2, pDst, len);
+		internals::sPtrPtrDst<_mm_mul_ps, _mm_mul_ss>(pSrc1, pSrc2, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void div(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
-		sPtrPtrDst<_mm_div_ps, _mm_div_ss>(pSrc1, pSrc2, pDst, len);
+		internals::sPtrPtrDst<_mm_div_ps, _mm_div_ss>(pSrc1, pSrc2, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void abs(const float * pSrc, float * pDst, int len)
 	{
-		sPtrDst<abs_ps, abs_ps>(pSrc, pDst, len);
+		internals::sPtrDst<internals::abs_ps, internals::abs_ps>(pSrc, pDst, len);
 	}
 }
 
@@ -402,17 +380,17 @@ namespace power
 {
 	_SIMD_SSE_SPEC void inv(const float * pSrc, float * pDst, int len)
 	{
-		sPtrDst<_mm_rcp_ps, _mm_rcp_ss>(pSrc, pDst, len);
+		internals::sPtrDst<_mm_rcp_ps, _mm_rcp_ss>(pSrc, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void sqrt(const float * pSrc, float * pDst, int len)
 	{
-		sPtrDst<_mm_sqrt_ps, _mm_sqrt_ss>(pSrc, pDst, len);
+		internals::sPtrDst<_mm_sqrt_ps, _mm_sqrt_ss>(pSrc, pDst, len);
 	}
 
 	_SIMD_SSE_SPEC void invSqrt(const float * pSrc, float * pDst, int len)
 	{
-		sPtrDst<_mm_rsqrt_ps, _mm_rsqrt_ss>(pSrc, pDst, len);
+		internals::sPtrDst<_mm_rsqrt_ps, _mm_rsqrt_ss>(pSrc, pDst, len);
 	}
 }
 
@@ -422,7 +400,7 @@ namespace statistical
 	{
 		__m128 r0;
 		float res[4];
-		aggregate<_mm_min_ps, _mm_min_ss, _mm_load1_ps>(pSrc, len, r0);
+		internals::aggregate<_mm_min_ps, _mm_min_ss, _mm_load1_ps>(pSrc, len, r0);
 		_mm_storeu_ps(res, r0);
 
 		res[0] = (res[0] < res[1]) ? res[0] : res[1];
@@ -434,7 +412,7 @@ namespace statistical
 	{
 		__m128 r0;
 		float res[4];
-		aggregate<_mm_max_ps, _mm_max_ss, _mm_load1_ps>(pSrc, len, r0);
+		internals::aggregate<_mm_max_ps, _mm_max_ss, _mm_load1_ps>(pSrc, len, r0);
 		_mm_storeu_ps(res, r0);
 
 		res[0] = (res[0] > res[1]) ? res[0] : res[1];
@@ -450,13 +428,13 @@ namespace statistical
 	_SIMD_SSE_SPEC void sum(const float * pSrc, int len, float * pSum)
 	{
 		__m128 r0 = _mm_setzero_ps();
-		aggregate<_mm_add_ps, _mm_add_ss, _mm_load_ss>(pSrc, len, r0);
+		internals::aggregate<_mm_add_ps, _mm_add_ss, _mm_load_ss>(pSrc, len, r0);
 
-		r0 = horizontal_sum(r0);
+		r0 = internals::horizontal_sum(r0);
 		*pSum = _mm_cvtss_f32(r0);
 	}
 
-	template <IntrPs load_ps = xx_load_ps>
+	template <IntrS::Load load_ps = xx_load_ps>
 	INLINE void meanStdDevT(const float * pSrc, int len, float * pMean, float * pStdDev)
 	{
 		const float coef = len-1;
@@ -518,7 +496,7 @@ namespace statistical
 	}
 
 	// TODO: perf tests
-	template <IntrPs load_ps = xx_load_ps>
+	template <IntrS::Load load_ps = xx_load_ps>
 	INLINE void dotProd_v1(const float * pSrc1, const float * pSrc2, int len, float * pDp)
 	{
 		__m128 r0 = _mm_setzero_ps();
@@ -556,11 +534,11 @@ namespace statistical
 			r0 = _mm_add_ss(r0, _mm_mul_ss(a0, b0));
 		}
 
-		r0 = horizontal_sum(r0);
+		r0 = internals::horizontal_sum(r0);
 		*pDp = _mm_cvtss_f32(r0);
 	}
 
-	template <IntrPs load_ps = xx_load_ps>
+	template <IntrS::Load load_ps = xx_load_ps>
 	INLINE void dotProd_v2(const float * pSrc1, const float * pSrc2, int len, float * pDp)
 	{
 		__m128 dp = _mm_setzero_ps();

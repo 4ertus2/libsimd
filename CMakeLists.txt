@@ -44,12 +44,4 @@ if(IPP_DIR)
 	set_target_properties(simdipp PROPERTIES COMPILE_FLAGS "-DDEPRECATED")
 endif()
 
-#add_library(simdssef STATIC sse-float.cpp)
-#add_library(simdssef_ur STATIC sse-float.cpp)
-#set_target_properties(simdssef_ur PROPERTIES COMPILE_FLAGS "-DUNROLL_MORE")
-
-#add_library(simdssed STATIC sse-double.cpp)
-#add_library(simdssed_ur STATIC sse-double.cpp)
-#set_target_properties(simdssed_ur PROPERTIES COMPILE_FLAGS "-DUNROLL_MORE")
-
 add_subdirectory(test)
