@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include <emmintrin.h>
 
 #include "sse.h"

@@ -10,8 +10,8 @@ namespace simd { using namespace nosimd; }
 namespace simd { using namespace ipp; }
 #elif defined(SIMD_AVX)
 #include "avx-float.h"
-#include "sse-double.h" // TODO
-#include "sse-i128.h" // TODO
+#include "avx-double.h"
+#include "avx-int.h"
 namespace simd { using namespace sse; }
 #else
 #include "sse-float.h"
