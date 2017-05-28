@@ -18,8 +18,8 @@ namespace internals
 
 	template <	IntrD::Unary op_pd,
 				IntrD::Unary op_sd,
-				IntrD::Load load_pd = xx_load_pd,
-				IntrD::Store store_pd = xx_store_pd>
+				IntrD::Load load_pd = sse_load_pd,
+				IntrD::Store store_pd = sse_store_pd>
 	INLINE void dPtrDst(const double * pSrc, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -72,8 +72,8 @@ namespace internals
 
 	template <	IntrD::Binary op_pd,
 				IntrD::Binary op_sd,
-				IntrD::Load load_pd = xx_load_pd,
-				IntrD::Store store_pd = xx_store_pd>
+				IntrD::Load load_pd = sse_load_pd,
+				IntrD::Store store_pd = sse_store_pd>
 	INLINE void dPtrValDst(const double * pSrc, double val, double * pDst, int len)
 	{
 		const __m128d b = _mm_set1_pd(val);
@@ -127,8 +127,8 @@ namespace internals
 
 	template <	IntrD::Binary op_pd,
 				IntrD::Binary op_sd,
-				IntrD::Load load_pd = xx_load_pd,
-				IntrD::Store store_pd = xx_store_pd>
+				IntrD::Load load_pd = sse_load_pd,
+				IntrD::Store store_pd = sse_store_pd>
 	INLINE void dPtrPtrDst(const double * pSrc1, const double * pSrc2, double * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -194,7 +194,7 @@ namespace internals
 
 namespace common
 {
-	template <IntrD::Store store_pd = xx_store_pd>
+	template <IntrD::Store store_pd = sse_store_pd>
 	INLINE void setT(double val, double * pDst, int len)
 	{
 		__m128d a = _mm_set1_pd(val);

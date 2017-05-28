@@ -28,6 +28,18 @@ set_target_properties(test-arithm-sse-unroll PROPERTIES COMPILE_FLAGS "-DNO_8_16
 set_target_properties(test-arithm-sse-a16 PROPERTIES COMPILE_FLAGS "-DNO_8_16 -DSSE_ALIGNED=16")
 set_target_properties(test-arithm-sse-a64 PROPERTIES COMPILE_FLAGS "-DNO_8_16 -DSSE_ALIGNED=64")
 
+if(AVX)
+add_executable(test-common-avx test-common.cpp)
+add_executable(test-common-avx-a32 test-common.cpp)
+add_executable(test-arithm-avx test-arithm.cpp)
+add_executable(test-arithm-avx-a32 test-arithm.cpp)
+#
+set_target_properties(test-common-avx PROPERTIES COMPILE_FLAGS "-DSIMD_AVX -DNO_8_16")
+set_target_properties(test-common-avx-a32 PROPERTIES COMPILE_FLAGS "-DSIMD_AVX -DNO_8_16 -DSSE_ALIGNED=32")
+set_target_properties(test-arithm-avx PROPERTIES COMPILE_FLAGS "-DSIMD_AVX -DNO_8_16")
+set_target_properties(test-arithm-avx-a32 PROPERTIES COMPILE_FLAGS "-DSIMD_AVX -DNO_8_16 -DSSE_ALIGNED=32")
+endif(AVX)
+
 if(IPP_DIR)
 # ipp
 add_executable(test-common-ipp test-common.cpp)
@@ -59,6 +71,13 @@ add_test(arithm-sse		test-arithm-sse)
 add_test(arithm-sse-ur	test-arithm-sse-unroll)
 add_test(arithm-sse-a16	test-arithm-sse-a16)
 add_test(arithm-sse-a64	test-arithm-sse-a64)
+
+if(AVX)
+add_test(common-avx     test-common-avx)
+add_test(common-avx-a32 test-common-avx-a32)
+add_test(arithm-avx     test-arithm-avx)
+add_test(arithm-avx-a32 test-arithm-avx-a32)
+endif()
 
 if(IPP_DIR)
 add_test(common_ipp		test-common-ipp)

@@ -26,8 +26,8 @@ namespace internals
 
 	template <	IntrS::Unary op_ps,
 				IntrS::Unary op_ss,
-				IntrS::Load load_ps = xx_load_ps,
-				IntrS::Store store_ps = xx_store_ps>
+				IntrS::Load load_ps = sse_load_ps,
+				IntrS::Store store_ps = sse_store_ps>
 	INLINE void sPtrDst(const float * pSrc, float * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -80,8 +80,8 @@ namespace internals
 
 	template <	IntrS::Binary op_ps,
 				IntrS::Binary op_ss,
-				IntrS::Load load_ps = xx_load_ps,
-				IntrS::Store store_ps = xx_store_ps>
+				IntrS::Load load_ps = sse_load_ps,
+				IntrS::Store store_ps = sse_store_ps>
 	INLINE void sPtrValDst(const float * pSrc, float val, float * pDst, int len)
 	{
 		const __m128 b = _mm_set1_ps(val);
@@ -135,8 +135,8 @@ namespace internals
 
 	template <	IntrS::Binary op_ps,
 				IntrS::Binary op_ss,
-				IntrS::Load load_ps = xx_load_ps,
-				IntrS::Store store_ps = xx_store_ps>
+				IntrS::Load load_ps = sse_load_ps,
+				IntrS::Store store_ps = sse_store_ps>
 	INLINE void sPtrPtrDst(const float * pSrc1, const float * pSrc2, float * pDst, int len)
 	{
 #ifdef UNROLL_MORE
@@ -202,7 +202,7 @@ namespace internals
 	template <	IntrS::Binary op_ps,
 				IntrS::Binary op_ss,
 				IntrS::Load load_one,
-				IntrS::Load load_ps = xx_load_ps>
+				IntrS::Load load_ps = sse_load_ps>
 	INLINE void aggregate(const float * pSrc, int len, __m128& r0)
 	{
 		if (len >= 4)
@@ -275,7 +275,7 @@ namespace internals
 
 namespace common
 {
-	template <IntrS::Store store_ps = xx_store_ps>
+	template <IntrS::Store store_ps = sse_store_ps>
 	INLINE void setT(float val, float * pDst, int len)
 	{
 		__m128 a = _mm_set1_ps(val);
@@ -408,7 +408,7 @@ namespace statistical
 		*pMin = (res[0] < res[2]) ? res[0] : res[2];
 	}
 
-	_SIMD_SSE_SPEC void max(const float * pSrc, int len, float * pMin)
+	_SIMD_SSE_SPEC void max(const float * pSrc, int len, float * pMax)
 	{
 		__m128 r0;
 		float res[4];
@@ -417,7 +417,7 @@ namespace statistical
 
 		res[0] = (res[0] > res[1]) ? res[0] : res[1];
 		res[2] = (res[2] > res[3]) ? res[2] : res[3];
-		*pMin = (res[0] > res[2]) ? res[0] : res[2];
+		*pMax = (res[0] > res[2]) ? res[0] : res[2];
 	}
 
 	_SIMD_SSE_SPEC void minMax(const float * pSrc, int len, float * pMin, float * pMax)
@@ -434,7 +434,7 @@ namespace statistical
 		*pSum = _mm_cvtss_f32(r0);
 	}
 
-	template <IntrS::Load load_ps = xx_load_ps>
+	template <IntrS::Load load_ps = sse_load_ps>
 	INLINE void meanStdDevT(const float * pSrc, int len, float * pMean, float * pStdDev)
 	{
 		const float coef = len-1;
@@ -496,7 +496,7 @@ namespace statistical
 	}
 
 	// TODO: perf tests
-	template <IntrS::Load load_ps = xx_load_ps>
+	template <IntrS::Load load_ps = sse_load_ps>
 	INLINE void dotProd_v1(const float * pSrc1, const float * pSrc2, int len, float * pDp)
 	{
 		__m128 r0 = _mm_setzero_ps();
@@ -538,7 +538,7 @@ namespace statistical
 		*pDp = _mm_cvtss_f32(r0);
 	}
 
-	template <IntrS::Load load_ps = xx_load_ps>
+	template <IntrS::Load load_ps = sse_load_ps>
 	INLINE void dotProd_v2(const float * pSrc1, const float * pSrc2, int len, float * pDp)
 	{
 		__m128 dp = _mm_setzero_ps();
