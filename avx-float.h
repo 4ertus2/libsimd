@@ -13,38 +13,17 @@ namespace internals
         return _mm256_andnot_ps(sign_mask, x); // !sign_mask & x
     }
 
-    INLINE __m256i tailMask(int len)
-    {
-        switch (len) {
-            case 1:
-                return _mm256_set_epi32(0, 0, 0, 0, 0, 0, 0, -1);
-            case 2:
-                return _mm256_set_epi32(0, 0, 0, 0, 0, 0, -1, -1);
-            case 3:
-                return _mm256_set_epi32(0, 0, 0, 0, 0, -1, -1, -1);
-            case 4:
-                return _mm256_set_epi32(0, 0, 0, 0, -1, -1, -1, -1);
-            case 5:
-                return _mm256_set_epi32(0, 0, 0, -1, -1, -1, -1, -1);
-            case 6:
-                return _mm256_set_epi32(0, 0, -1, -1, -1, -1, -1, -1);
-            case 7:
-                return _mm256_set_epi32(0, -1, -1, -1, -1, -1, -1, -1);
-        }
-        return _mm256_setzero_si256();
-    }
-
     template <  IntrAvxS::Unary op>
     INLINE void sValDstTail(const __m256& a, float * pDst, int len)
     {
-        __m256i mask = tailMask(len);
+        __m256i mask = avxTailMask32(len);
         _mm256_maskstore_ps(pDst, mask, op(a));
     }
 
     template <  IntrAvxS::Unary op>
     INLINE void sPrtDstTail(const float * pSrc, float * pDst, int len)
     {
-        __m256i mask = tailMask(len);
+        __m256i mask = avxTailMask32(len);
         __m256 x = _mm256_maskload_ps(pSrc, mask);
         _mm256_maskstore_ps(pDst, mask, op(x));
     }
@@ -52,7 +31,7 @@ namespace internals
     template <  IntrAvxS::Binary op>
     INLINE void sPrtValDstTail(const float * pSrc, const __m256& b, float * pDst, int len)
     {
-        __m256i mask = tailMask(len);
+        __m256i mask = avxTailMask32(len);
         __m256 x = _mm256_maskload_ps(pSrc, mask);
         _mm256_maskstore_ps(pDst, mask, op(x, b));
     }
@@ -60,7 +39,7 @@ namespace internals
     template <  IntrAvxS::Binary op>
     INLINE void sPrtPtrDstTail(const float * pSrc1, const float * pSrc2, float * pDst, int len)
     {
-        __m256i mask = tailMask(len);
+        __m256i mask = avxTailMask32(len);
         __m256 x = _mm256_maskload_ps(pSrc1, mask);
         __m256 y = _mm256_maskload_ps(pSrc2, mask);
         _mm256_maskstore_ps(pDst, mask, op(x, y));

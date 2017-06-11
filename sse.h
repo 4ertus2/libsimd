@@ -78,6 +78,41 @@ namespace sse
     INLINE void avx_store_pd(double * x, __m256d y) { _mm256_storeu_pd(x, y); }
     INLINE void avx_store_si(__m256i * x, __m256i y) { _mm256_storeu_si256(x, y); }
 #endif
+
+    INLINE __m256i avxTailMask32(int len)
+    {
+        switch (len) {
+            case 1:
+                return _mm256_set_epi32(0, 0, 0, 0, 0, 0, 0, -1);
+            case 2:
+                return _mm256_set_epi32(0, 0, 0, 0, 0, 0, -1, -1);
+            case 3:
+                return _mm256_set_epi32(0, 0, 0, 0, 0, -1, -1, -1);
+            case 4:
+                return _mm256_set_epi32(0, 0, 0, 0, -1, -1, -1, -1);
+            case 5:
+                return _mm256_set_epi32(0, 0, 0, -1, -1, -1, -1, -1);
+            case 6:
+                return _mm256_set_epi32(0, 0, -1, -1, -1, -1, -1, -1);
+            case 7:
+                return _mm256_set_epi32(0, -1, -1, -1, -1, -1, -1, -1);
+        }
+        return _mm256_setzero_si256();
+    }
+
+    INLINE __m256i avxTailMask64(int len)
+    {
+        switch (len) {
+            case 1:
+                return _mm256_set_epi64x(0, 0, 0, -1);
+            case 2:
+                return _mm256_set_epi64x(0, 0, -1, -1);
+            case 3:
+                return _mm256_set_epi64x(0, -1, -1, -1);
+        }
+        return _mm256_setzero_si256();
+    }
+
 #endif // SIMD_AVX
 
 
