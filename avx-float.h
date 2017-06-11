@@ -15,10 +15,23 @@ namespace internals
 
     INLINE __m256i tailMask(int len)
     {
-        const int val = -1;
-        return _mm256_set_epi32(
-            0, (len > 6) ? val : 0, (len > 5) ? val : 0, (len > 4) ? val : 0,
-            (len > 3) ? val : 0, (len > 2) ? val : 0, (len > 1) ? val : 0, val);
+        switch (len) {
+            case 1:
+                return _mm256_set_epi32(0, 0, 0, 0, 0, 0, 0, -1);
+            case 2:
+                return _mm256_set_epi32(0, 0, 0, 0, 0, 0, -1, -1);
+            case 3:
+                return _mm256_set_epi32(0, 0, 0, 0, 0, -1, -1, -1);
+            case 4:
+                return _mm256_set_epi32(0, 0, 0, 0, -1, -1, -1, -1);
+            case 5:
+                return _mm256_set_epi32(0, 0, 0, -1, -1, -1, -1, -1);
+            case 6:
+                return _mm256_set_epi32(0, 0, -1, -1, -1, -1, -1, -1);
+            case 7:
+                return _mm256_set_epi32(0, -1, -1, -1, -1, -1, -1, -1);
+        }
+        return _mm256_setzero_si256();
     }
 
     template <  IntrAvxS::Unary op>
