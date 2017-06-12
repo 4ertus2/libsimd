@@ -16,7 +16,7 @@ namespace simd { using namespace sse; }
 #else
 #include "sse-float.h"
 #include "sse-double.h"
-#include "sse-i128.h"
+#include "sse-int.h"
 namespace simd { using namespace sse; }
 #endif
 
