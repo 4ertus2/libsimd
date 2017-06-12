@@ -7,7 +7,7 @@ namespace sse
 {
 namespace internals
 {
-    template <	IntrI::Unary op,
+    template <  IntrI::Unary op,
                 IntrI::Store store = sse_store_si>
     INLINE void iValDst(__m128i&& a, __m128i * pDst, int len)
     {
@@ -32,7 +32,7 @@ namespace internals
         }
     }
 
-    template <	IntrI::Unary op,
+    template <  IntrI::Unary op,
                 IntrI::Load load = sse_load_si,
                 IntrI::Store store = sse_store_si>
     INLINE void iPtrDst(const __m128i * pSrc, __m128i * pDst, int len)
@@ -59,7 +59,7 @@ namespace internals
         }
     }
 
-    template <	IntrI::Binary op,
+    template <  IntrI::Binary op,
                 IntrI::Load load = sse_load_si,
                 IntrI::Store store = sse_store_si>
     INLINE void iPtrValDst(const __m128i * pSrc, __m128i&& b, __m128i * pDst, int len)
@@ -86,7 +86,7 @@ namespace internals
         }
     }
 
-    template <	IntrI::Binary op,
+    template <  IntrI::Binary op,
                 IntrI::Load load = sse_load_si,
                 IntrI::Store store = sse_store_si>
     INLINE void iPtrPtrDst(const __m128i * pSrc1, const __m128i * pSrc2, __m128i * pDst, int len)

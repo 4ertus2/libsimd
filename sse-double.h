@@ -15,7 +15,7 @@ namespace internals
 
     //
 
-    template <	IntrD::Unary op_pd,
+    template <  IntrD::Unary op_pd,
                 IntrD::Unary op_sd,
                 IntrD::Load load_pd = sse_load_pd,
                 IntrD::Store store_pd = sse_store_pd>
@@ -69,7 +69,7 @@ namespace internals
         }
     }
 
-    template <	IntrD::Binary op_pd,
+    template <  IntrD::Binary op_pd,
                 IntrD::Binary op_sd,
                 IntrD::Load load_pd = sse_load_pd,
                 IntrD::Store store_pd = sse_store_pd>
@@ -124,7 +124,7 @@ namespace internals
         }
     }
 
-    template <	IntrD::Binary op_pd,
+    template <  IntrD::Binary op_pd,
                 IntrD::Binary op_sd,
                 IntrD::Load load_pd = sse_load_pd,
                 IntrD::Store store_pd = sse_store_pd>

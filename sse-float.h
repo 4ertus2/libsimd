@@ -23,7 +23,7 @@ namespace internals
 
     //
 
-    template <	IntrS::Unary op_ps,
+    template <  IntrS::Unary op_ps,
                 IntrS::Unary op_ss,
                 IntrS::Load load_ps = sse_load_ps,
                 IntrS::Store store_ps = sse_store_ps>
@@ -77,7 +77,7 @@ namespace internals
         }
     }
 
-    template <	IntrS::Binary op_ps,
+    template <  IntrS::Binary op_ps,
                 IntrS::Binary op_ss,
                 IntrS::Load load_ps = sse_load_ps,
                 IntrS::Store store_ps = sse_store_ps>
@@ -132,7 +132,7 @@ namespace internals
         }
     }
 
-    template <	IntrS::Binary op_ps,
+    template <  IntrS::Binary op_ps,
                 IntrS::Binary op_ss,
                 IntrS::Load load_ps = sse_load_ps,
                 IntrS::Store store_ps = sse_store_ps>
@@ -198,7 +198,7 @@ namespace internals
         }
     }
 
-    template <	IntrS::Binary op_ps,
+    template <  IntrS::Binary op_ps,
                 IntrS::Binary op_ss,
                 IntrS::Load load_one,
                 IntrS::Load load_ps = sse_load_ps>
