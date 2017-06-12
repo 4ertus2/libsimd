@@ -293,6 +293,70 @@ namespace internals
         iPtrPtrDst<op>((const __m256i*)pSrc1, (const __m256i*)pSrc2, (__m256i*)pDst, (len>>2));
         iPtrPtrDstEnd<int64_t, op>(pSrc1, pSrc2, pDst, len);
     }
+
+    //
+
+    template <IntrAvxI::Unary op>
+    INLINE void valDst(int16_t value, int16_t * pDst, int len)
+    {
+        __m256i a = _mm256_set1_epi16(value);
+        iValDst<op>(a, (__m256i*)pDst, (len>>4));
+        _mm256_zeroall();
+    }
+
+    template <IntrAvxI::Unary op>
+    INLINE void ptrDst(const int16_t * pSrc, int16_t * pDst, int len)
+    {
+        iPtrDst<op>((const __m256i*)pSrc, (__m256i*)pDst, (len>>4));
+        _mm256_zeroall();
+    }
+
+    template <IntrAvxI::Binary op>
+    INLINE void ptrValDst(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        __m256i b = _mm256_set1_epi16(val);
+        iPtrValDst<op>((const __m256i*)pSrc, b, (__m256i*)pDst, (len>>4));
+        _mm256_zeroall();
+    }
+
+    template <IntrAvxI::Binary op>
+    INLINE void ptrPtrDst(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len)
+    {
+        iPtrPtrDst<op>((const __m256i*)pSrc1, (const __m256i*)pSrc2, (__m256i*)pDst, (len>>4));
+        _mm256_zeroall();
+    }
+
+    //
+
+    template <IntrAvxI::Unary op>
+    INLINE void valDst(int8_t value, int8_t * pDst, int len)
+    {
+        __m256i a = _mm256_set1_epi8(value);
+        iValDst<op>(a, (__m256i*)pDst, (len>>5));
+        _mm256_zeroall();
+    }
+
+    template <IntrAvxI::Unary op>
+    INLINE void ptrDst(const int8_t * pSrc, int8_t * pDst, int len)
+    {
+        iPtrDst<op>((const __m256i*)pSrc, (__m256i*)pDst, (len>>5));
+        _mm256_zeroall();
+    }
+
+    template <IntrAvxI::Binary op>
+    INLINE void ptrValDst(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        __m256i b = _mm256_set1_epi8(val);
+        iPtrValDst<op>((const __m256i*)pSrc, b, (__m256i*)pDst, (len>>5));
+        _mm256_zeroall();
+    }
+
+    template <IntrAvxI::Binary op>
+    INLINE void ptrPtrDst(const int8_t * pSrc1, const int8_t * pSrc2, int8_t * pDst, int len)
+    {
+        iPtrPtrDst<op>((const __m256i*)pSrc1, (const __m256i*)pSrc2, (__m256i*)pDst, (len>>5));
+        _mm256_zeroall();
+    }
 }
 
 namespace common
@@ -317,6 +381,32 @@ namespace common
         set((int64_t)val, (int64_t*)pDst, len);
     }
 
+    _SIMD_SSE_SPEC void set(int16_t val, int16_t * pDst, int len)
+    {
+        internals::valDst<nop>(val, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::common::set(val, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void set(uint16_t val, uint16_t * pDst, int len)
+    {
+        set((int16_t)val, (int16_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void set(int8_t val, int8_t * pDst, int len)
+    {
+        internals::valDst<nop>(val, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::common::set(val, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void set(uint8_t val, uint8_t * pDst, int len)
+    {
+        set((int8_t)val, (int8_t*)pDst, len);
+    }
+
     //
 
     _SIMD_SSE_SPEC void copy(const int32_t * pSrc, int32_t * pDst, int len)
@@ -337,6 +427,32 @@ namespace common
     _SIMD_SSE_SPEC void copy(const uint64_t * pSrc, uint64_t * pDst, int len)
     {
         copy((const int64_t*)pSrc, (int64_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void copy(const int16_t * pSrc, int16_t * pDst, int len)
+    {
+        internals::ptrDst<nop>(pSrc, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::common::copy(pSrc+len, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void copy(const uint16_t * pSrc, uint16_t * pDst, int len)
+    {
+        copy((const int16_t*)pSrc, (int16_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void copy(const int8_t * pSrc, int8_t * pDst, int len)
+    {
+        internals::ptrDst<nop>(pSrc, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::common::copy(pSrc+len, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void copy(const uint8_t * pSrc, uint8_t * pDst, int len)
+    {
+        copy((const int8_t*)pSrc, (int8_t*)pDst, len);
     }
 }
 
@@ -582,9 +698,294 @@ namespace arithmetic
         if (pSrc != pDst)
             copy(pSrc, pDst, len);
     }
+
+    //
+
+    _SIMD_SSE_SPEC void addC(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        internals::ptrValDst<_mm256_add_epi16>(pSrc, val, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::addC(pSrc+len, val, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void subC(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        internals::ptrValDst<_mm256_sub_epi16>(pSrc, val, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::subC(pSrc+len, val, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void mulC(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        internals::ptrValDst<_mm256_mullo_epi16>(pSrc, val, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::mulC(pSrc+len, val, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void divC(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        nosimd::arithmetic::divC(pSrc, val, pDst, len);
+    }
+
+
+    _SIMD_SSE_SPEC void subCRev(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        internals::ptrValDst<IntrAvxI::rev_op<_mm256_sub_epi16>>(pSrc, val, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::subCRev(pSrc+len, val, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void divCRev(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        nosimd::arithmetic::divCRev(pSrc, val, pDst, len);
+    }
+
+
+    _SIMD_SSE_SPEC void add(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len)
+    {
+        internals::ptrPtrDst<_mm256_add_epi16>(pSrc1, pSrc2, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::add(pSrc1+len, pSrc2+len, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void sub(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len)
+    {
+        internals::ptrPtrDst<_mm256_sub_epi16>(pSrc1, pSrc2, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::sub(pSrc1+len, pSrc2+len, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void mul(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len)
+    {
+        internals::ptrPtrDst<_mm256_mullo_epi16>(pSrc1, pSrc2, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::mul(pSrc1+len, pSrc2+len, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void div(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len)
+    {
+        nosimd::arithmetic::div(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void abs(const int16_t * pSrc, int16_t * pDst, int len)
+    {
+        internals::ptrDst<_mm256_abs_epi16>(pSrc, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::abs(pSrc+len, pDst+len, tail);
+    }
+
+    //
+
+    _SIMD_SSE_SPEC void addC(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        addC((const int16_t*)pSrc, (int16_t)val, (int16_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void subC(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        subC((const int16_t*)pSrc, (int16_t)val, (int16_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void subCRev(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        subCRev((const int16_t*)pSrc, (int16_t)val, (int16_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void mulC(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+#if 1
+        mulC((const int16_t*)pSrc, (int16_t)val, (int16_t*)pDst, len);
+#else
+        nosimd::arithmetic::mulC(pSrc, val, pDst, len);
+#endif
+    }
+
+    _SIMD_SSE_SPEC void divC(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        nosimd::arithmetic::divC(pSrc, val, pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void divCRev(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        nosimd::arithmetic::divCRev(pSrc, val, pDst, len);
+    }
+
+
+    _SIMD_SSE_SPEC void add(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len)
+    {
+        add((const int16_t*)pSrc1, (const int16_t*)pSrc2, (int16_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void sub(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len)
+    {
+        sub((const int16_t*)pSrc1, (const int16_t*)pSrc2, (int16_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void mul(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len)
+    {
+#if 1
+        mul((const int16_t*)pSrc1, (const int16_t*)pSrc2, (int16_t*)pDst, len);
+#else
+        nosimd::arithmetic::mul(pSrc1, pSrc2, pDst, len);
+#endif
+    }
+
+    _SIMD_SSE_SPEC void div(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len)
+    {
+        nosimd::arithmetic::div(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void abs(const uint16_t * pSrc, uint16_t * pDst, int len)
+    {
+        if (pSrc != pDst)
+            copy(pSrc, pDst, len);
+    }
+
+    //
+
+    _SIMD_SSE_SPEC void addC(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        internals::ptrValDst<_mm256_add_epi8>(pSrc, val, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::addC(pSrc+len, val, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void subC(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        internals::ptrValDst<_mm256_sub_epi8>(pSrc, val, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::subC(pSrc+len, val, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void mulC(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        nosimd::arithmetic::mulC(pSrc, val, pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void divC(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        nosimd::arithmetic::divC(pSrc, val, pDst, len);
+    }
+
+
+    _SIMD_SSE_SPEC void subCRev(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        internals::ptrValDst<IntrAvxI::rev_op<_mm256_sub_epi8>>(pSrc, val, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::subCRev(pSrc+len, val, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void divCRev(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        nosimd::arithmetic::divCRev(pSrc, val, pDst, len);
+    }
+
+
+    _SIMD_SSE_SPEC void add(const int8_t * pSrc1, const int8_t * pSrc2, int8_t * pDst, int len)
+    {
+        internals::ptrPtrDst<_mm256_add_epi8>(pSrc1, pSrc2, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::add(pSrc1+len, pSrc2+len, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void sub(const int8_t * pSrc1, const int8_t * pSrc2, int8_t * pDst, int len)
+    {
+        internals::ptrPtrDst<_mm256_sub_epi8>(pSrc1, pSrc2, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::sub(pSrc1+len, pSrc2+len, pDst+len, tail);
+    }
+
+    _SIMD_SSE_SPEC void mul(const int8_t * pSrc1, const int8_t * pSrc2, int8_t * pDst, int len)
+    {
+        nosimd::arithmetic::mul(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void div(const int8_t * pSrc1, const int8_t * pSrc2, int8_t * pDst, int len)
+    {
+        nosimd::arithmetic::div(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void abs(const int8_t * pSrc, int8_t * pDst, int len)
+    {
+        internals::ptrDst<_mm256_abs_epi8>(pSrc, pDst, len);
+        int tail = len % avxBlockLen(*pDst);
+        len -= tail;
+        nosimd::arithmetic::abs(pSrc+len, pDst+len, tail);
+    }
+
+    //
+
+    _SIMD_SSE_SPEC void addC(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        addC((const int8_t*)pSrc, (int8_t)val, (int8_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void subC(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        subC((const int8_t*)pSrc, (int8_t)val, (int8_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void subCRev(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        subCRev((const int8_t*)pSrc, (int8_t)val, (int8_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void mulC(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        nosimd::arithmetic::mulC(pSrc, val, pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void divC(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        nosimd::arithmetic::divC(pSrc, val, pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void divCRev(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        nosimd::arithmetic::divCRev(pSrc, val, pDst, len);
+    }
+
+
+    _SIMD_SSE_SPEC void add(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len)
+    {
+        add((const int8_t*)pSrc1, (const int8_t*)pSrc2, (int8_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void sub(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len)
+    {
+        sub((const int8_t*)pSrc1, (const int8_t*)pSrc2, (int8_t*)pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void mul(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len)
+    {
+        nosimd::arithmetic::mul(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void div(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len)
+    {
+        nosimd::arithmetic::div(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_SSE_SPEC void abs(const uint8_t * pSrc, uint8_t * pDst, int len)
+    {
+        if (pSrc != pDst)
+            copy(pSrc, pDst, len);
+    }
 }
 
-// TODO
 namespace statistical
 {
     _SIMD_SSE_T void min(const _T * pSrc, int len, _T * pMin)
