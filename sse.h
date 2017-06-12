@@ -121,13 +121,23 @@ namespace sse
         _SIMD_SSE_T void set(_T val, _T* pDst, int len);
         _SIMD_SSE_T void copy(const _T* pSrc, _T* pDst, int len);
 
-        template<typename _T> void zero(_T* pDst, int len)
+        template<typename _T>
+        inline void zero(_T* pDst, int len)
         {
             set<_T>((_T)0, pDst, len);
         }
 #if SSE_ALIGNED
-        template<typename _T> _T* malloc(int len) { return (_T*)_mm_malloc(len * sizeof(_T), SSE_ALIGNED); }
-        template<typename _T> void free(_T* ptr) { _mm_free(ptr); }
+        template<typename _T>
+        inline _T* malloc(int len)
+        {
+            return (_T*)_mm_malloc(len * sizeof(_T), SSE_ALIGNED);
+        }
+
+        template<typename _T>
+        inline void free(_T* ptr)
+        {
+            _mm_free(ptr);
+        }
 #else
         using nosimd::common::malloc;
         using nosimd::common::free;
