@@ -51,7 +51,7 @@ namespace internals
                 IntrAvxS::Store store = avx_store_ps>
     INLINE void sValDst(float value, float * pDst, int len)
     {
-        const int shift = 8;
+        const int shift = avxBlockLen(float());
         int tail = len % shift;
         len /= shift;
 
@@ -88,7 +88,7 @@ namespace internals
                 IntrAvxS::Store store = avx_store_ps>
     INLINE void sPtrDst(const float * pSrc, float * pDst, int len)
     {
-        const int shift = 8;
+        const int shift = avxBlockLen(float());
         int tail = len % shift;
         len /= shift;
 
@@ -124,7 +124,7 @@ namespace internals
                 IntrAvxS::Store store = avx_store_ps>
     INLINE void sPtrValDst(const float * pSrc, float value, float * pDst, int len)
     {
-        const int shift = 8;
+        const int shift = avxBlockLen(float());
         int tail = len % shift;
         len /= shift;
 
@@ -162,7 +162,7 @@ namespace internals
                 IntrAvxS::Store store = avx_store_ps>
     INLINE void sPtrPtrDst(const float * pSrc1, const float * pSrc2, float * pDst, int len)
     {
-        const int shift = 8;
+        const int shift = avxBlockLen(float());
         int tail = len % shift;
         len /= shift;
 
