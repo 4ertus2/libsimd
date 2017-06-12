@@ -100,6 +100,28 @@ namespace nosimd
         }
 
         template<typename _T>
+        inline void findNot(_T * pSrc, _T val, int len, int * pPosition)
+        {
+            int& i = *pPosition;
+            for (i = 0; i < len; ++i)
+            {
+                if (pSrc[i] != val)
+                    break;
+            }
+        }
+
+        template<typename _T>
+        inline void findSame(const _T * pSrc1, _T * pSrc2, int len, int * pPosition)
+        {
+            int& i = *pPosition;
+            for (i = 0; i < len; ++i)
+            {
+                if (pSrc1[i] == pSrc2[i])
+                    break;
+            }
+        }
+
+        template<typename _T>
         inline void findDiff(const _T * pSrc1, _T * pSrc2, int len, int * pPosition)
         {
             int& i = *pPosition;
@@ -109,6 +131,8 @@ namespace nosimd
                     break;
             }
         }
+
+        // TODO: rfind*
     }
 
     namespace arithmetic

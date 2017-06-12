@@ -165,9 +165,13 @@ namespace sse
     {
 #if 0 // TODO
         _SIMD_SSE_T void find(_T * pSrc, _T val, int len, int * pPosition);
+        _SIMD_SSE_T void findNot(_T * pSrc, _T val, int len, int * pPosition);
+        _SIMD_SSE_T void findSame(const _T * pSrc1, _T * pSrc2, int len, int * pPosition);
         _SIMD_SSE_T void findDiff(const _T * pSrc1, _T * pSrc2, int len, int * pPosition);
 #else
         using nosimd::compare::find;
+        using nosimd::compare::findNot;
+        using nosimd::compare::findSame;
         using nosimd::compare::findDiff;
 #endif
     }
