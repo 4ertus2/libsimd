@@ -4,86 +4,92 @@
 
 namespace
 {
-    template<typename T> T sqrt_cmath(T x) { return sqrt(float(x)); }
-    template<> double sqrt_cmath(double x) { return sqrt(x); }
+    template<typename _T> inline _T sqrt_cmath(_T x) { return sqrt(float(x)); }
+    template<> inline double sqrt_cmath(double x) { return sqrt(x); }
 
-    template<typename T> T exp_cmath(T x) { return exp(float(x)); }
-    template<> double exp_cmath(double x) { return exp(x); }
+    template<typename _T> inline _T exp_cmath(_T x) { return exp(float(x)); }
+    template<> inline double exp_cmath(double x) { return exp(x); }
 
-    template<typename T> T log_cmath(T x) { return log(float(x)); }
-    template<> double log_cmath(double x) { return log(x); }
+    template<typename _T> inline _T log_cmath(_T x) { return log(float(x)); }
+    template<> inline double log_cmath(double x) { return log(x); }
 
-    template<typename T> T pow_cmath(T x, T y) { return pow(float(x), float(y)); }
-    template<> double pow_cmath(double x, double y) { return pow(x, y); }
+    template<typename _T> inline _T pow_cmath(_T x, _T y) { return pow(float(x), float(y)); }
+    template<> inline double pow_cmath(double x, double y) { return pow(x, y); }
 
-    template<typename T> T cbrt_cmath(T x) { return cbrt(float(x)); }
-    template<> double cbrt_cmath(double x) { return cbrt(x); }
+    template<typename _T> inline _T cbrt_cmath(_T x) { return cbrt(float(x)); }
+    template<> inline double cbrt_cmath(double x) { return cbrt(x); }
 
-    template<typename T> T hypot_cmath(T x, T y) { return hypot(float(x), float(y)); }
-    template<> double hypot_cmath(double x, double y) { return hypot(x, y); }
+    template<typename _T> inline _T hypot_cmath(_T x, _T y) { return hypot(float(x), float(y)); }
+    template<> inline double hypot_cmath(double x, double y) { return hypot(x, y); }
 
     //
 
-    template<typename T> T sin_cmath(T x) { return sin(float(x)); }
-    template<> double sin_cmath(double x) { return sin(x); }
+    template<typename _T> inline _T sin_cmath(_T x) { return sin(float(x)); }
+    template<> inline double sin_cmath(double x) { return sin(x); }
 
-    template<typename T> T cos_cmath(T x) { return cos(float(x)); }
-    template<> double cos_cmath(double x) { return cos(x); }
+    template<typename _T> inline _T cos_cmath(_T x) { return cos(float(x)); }
+    template<> inline double cos_cmath(double x) { return cos(x); }
 
-    template<typename T> T tan_cmath(T x) { return tan(float(x)); }
-    template<> double tan_cmath(double x) { return tan(x); }
+    template<typename _T> inline _T tan_cmath(_T x) { return tan(float(x)); }
+    template<> inline double tan_cmath(double x) { return tan(x); }
 
-    template<typename T> T asin_cmath(T x) { return asin(float(x)); }
-    template<> double asin_cmath(double x) { return asin(x); }
+    template<typename _T> inline _T asin_cmath(_T x) { return asin(float(x)); }
+    template<> inline double asin_cmath(double x) { return asin(x); }
 
-    template<typename T> T acos_cmath(T x) { return acos(float(x)); }
-    template<> double acos_cmath(double x) { return acos(x); }
+    template<typename _T> inline _T acos_cmath(_T x) { return acos(float(x)); }
+    template<> inline double acos_cmath(double x) { return acos(x); }
 
-    template<typename T> T atan_cmath(T x) { return atan(float(x)); }
-    template<> double atan_cmath(double x) { return atan(x); }
+    template<typename _T> inline _T atan_cmath(_T x) { return atan(float(x)); }
+    template<> inline double atan_cmath(double x) { return atan(x); }
 }
 
 namespace nosimd
 {
     namespace common
     {
-        template<typename T> T * malloc(int len) { return new T[len]; }
-        template<typename T> void free(T * ptr) { delete ptr; }
+        template<typename _T> inline _T * malloc(int len) { return new _T[len]; }
+        template<typename _T> inline void free(_T * ptr) { delete ptr; }
 
-        template<typename T> void zero(T * pDst, int len)
+        template<typename _T>
+        inline void zero(_T * pDst, int len)
         {
-            for (int i=0; i<len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = 0;
         }
 
-        template<typename T> void set(T val, T * pDst, int len)
+        template<typename _T>
+        inline void set(_T val, _T * pDst, int len)
         {
-            for (int i=0; i<len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = val;
         }
 
-        template<typename T> void copy(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void copy(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i<len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = pSrc[i];
         }
 
-        template<typename T> void move(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void move(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = pSrc[i];
         }
 
-        template<typename T, typename U> void convert(const T * pSrc, U * pDst, int len)
+        template<typename _T, typename _U>
+        inline void convert(const _T * pSrc, _U * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = pSrc[i];
         }
     }
 
     namespace compare
     {
-        template<typename _T> void find(_T * pSrc, _T val, int len, int * pPosition)
+        template<typename _T>
+        inline void find(_T * pSrc, _T val, int len, int * pPosition)
         {
             int& i = *pPosition;
             for (i = 0; i < len; ++i)
@@ -93,7 +99,8 @@ namespace nosimd
             }
         }
 
-        template<typename _T> void findDiff(const _T * pSrc1, _T * pSrc2, int len, int * pPosition)
+        template<typename _T>
+        inline void findDiff(const _T * pSrc1, _T * pSrc2, int len, int * pPosition)
         {
             int& i = *pPosition;
             for (i = 0; i < len; ++i)
@@ -106,151 +113,162 @@ namespace nosimd
 
     namespace arithmetic
     {
-        template<typename T> void addC(const T * pSrc, T val, T * pDst, int len)
+        template<typename _T>
+        inline void addC(const _T * pSrc, _T val, _T * pDst, int len)
         {
             if (pSrc == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] += val;
             }
             else
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] = pSrc[i] + val;
             }
         }
 
-        template<typename T> void add(const T * pSrc1, const T * pSrc2, T * pDst, int len)
+        template<typename _T>
+        inline void add(const _T * pSrc1, const _T * pSrc2, _T * pDst, int len)
         {
             if (pSrc1 == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] += pSrc2[i];
             }
             else if(pSrc2 == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] += pSrc1[i];
             }
             else
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] = pSrc1[i] + pSrc2[i];
             }
         }
 
-        template<typename T> void subC(const T * pSrc, T val, T * pDst, int len)
+        template<typename _T>
+        inline void subC(const _T * pSrc, _T val, _T * pDst, int len)
         {
             if (pSrc == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] -= val;
             }
             else
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] = pSrc[i] - val;
             }
         }
 
-        template<typename T> void subCRev(const T * pSrc, T val, T * pDst, int len)
+        template<typename _T>
+        inline void subCRev(const _T * pSrc, _T val, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = val - pSrc[i];
         }
 
-        template<typename T> void sub(const T * pSrc1, const T * pSrc2, T * pDst, int len)
+        template<typename _T>
+        inline void sub(const _T * pSrc1, const _T * pSrc2, _T * pDst, int len)
         {
             if (pSrc1 == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] -= pSrc2[i];
             }
             else
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] = pSrc1[i] - pSrc2[i];
             }
         }
 
-        template<typename T> void mulC(const T * pSrc, T val, T * pDst, int len)
+        template<typename _T>
+        inline void mulC(const _T * pSrc, _T val, _T * pDst, int len)
         {
             if (pSrc == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] *= val;
             }
             else
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] = pSrc[i] * val;
             }
         }
 
-        template<typename T> void mul(const T * pSrc1, const T * pSrc2, T * pDst, int len)
+        template<typename _T>
+        inline void mul(const _T * pSrc1, const _T * pSrc2, _T * pDst, int len)
         {
             if (pSrc1 == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] *= pSrc2[i];
             }
             else if(pSrc2 == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] *= pSrc1[i];
             }
             else
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] = pSrc1[i] * pSrc2[i];
             }
         }
 
-        template<typename T> void divC(const T * pSrc, T val, T * pDst, int len)
+        template<typename _T>
+        inline void divC(const _T * pSrc, _T val, _T * pDst, int len)
         {
             if (pSrc == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] /= val;
             }
             else
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] = pSrc[i] / val;
             }
         }
 
-        template<typename T> void divCRev(const T * pSrc, T val, T * pDst, int len)
+        template<typename _T>
+        inline void divCRev(const _T * pSrc, _T val, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = val / pSrc[i];
         }
 
-        template<typename T> void div(const T * pSrc1, const T * pSrc2, T * pDst, int len)
+        template<typename _T>
+        inline void div(const _T * pSrc1, const _T * pSrc2, _T * pDst, int len)
         {
             if (pSrc1 == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] /= pSrc2[i];
             }
             else
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     pDst[i] = pSrc1[i] / pSrc2[i];
             }
         }
 
-        template<typename T> void abs(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void abs(const _T * pSrc, _T * pDst, int len)
         {
             if (pSrc == pDst)
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                     if (pDst[i] < 0)
                         pDst[i] = -pDst[i];
             }
             else
             {
-                for (int i=0; i < len; ++i)
+                for (int i = 0; i < len; ++i)
                 {
                     if (pSrc[i] >= 0)
                         pDst[i] = pSrc[i];
@@ -263,192 +281,207 @@ namespace nosimd
 
     namespace power
     {
-        template<typename T> void inv(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void inv(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
-                pDst[i] = T(1) / pSrc[i];
+            for (int i = 0; i < len; ++i)
+                pDst[i] = _T(1) / pSrc[i];
         }
 
-        template<typename T> void sqr(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void sqr(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = pSrc[i] * pSrc[i];
         }
 
-        template<typename T> void sqrt(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void sqrt(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = sqrt_cmath(pSrc[i]);
         }
 
-        template<typename T> void invSqrt(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void invSqrt(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = 1.0f/sqrt_cmath(pSrc[i]);
         }
 
-        template<typename T> void powx(const T* pSrc, const T constValue, T* pDst, int len)
+        template<typename _T>
+        inline void powx(const _T * pSrc, const _T constValue, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = pow_cmath(pSrc[i], constValue);
         }
 
-        template<typename T> void pow(const T* pSrc1, const T* pSrc2, T* pDst, int len)
+        template<typename _T>
+        inline void pow(const _T * pSrc1, const _T * pSrc2, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = pow_cmath(pSrc1[i], pSrc2[i]);
         }
 
-        template<typename T> void cbrt(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void cbrt(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = cbrt_cmath(pSrc[i]);
         }
 
-        template<typename T> void hypot(const T* pSrc1, const T* pSrc2, T* pDst, int len)
+        template<typename _T>
+        inline void hypot(const _T * pSrc1, const _T * pSrc2, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = hypot_cmath(pSrc1[i], pSrc2[i]);
         }
     }
 
     namespace exp_log
     {
-        template<typename T> void exp(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void exp(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = exp_cmath(pSrc[i]);
         }
 
-        template<typename T> void ln(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void ln(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = log_cmath(pSrc[i]);
         }
     }
 
     namespace statistical
     {
-        template<typename T> void max(const T * pSrc, int len, T * pMax)
+        template<typename _T>
+        inline void maxIndx(const _T * pSrc, int len, _T * pMax, int * pIndx)
         {
-            T mx = pSrc[0];
-            for (int i=1; i < len; ++i)
-                if (pSrc[i] > mx)
-                    mx = pSrc[i];
-            *pMax = mx;
-        }
-
-        template<typename T> void maxIndx(const T * pSrc, int len, T * pMax, int * pIndx)
-        {
-            T mx = pSrc[0];
-            int idx = 0;
-            for (int i=1; i < len; ++i)
-                if (pSrc[i] > mx) {
-                    mx = pSrc[i];
-                    idx = i;
-                }
-            *pMax = mx;
-            *pIndx = idx;
-        }
-
-        template<typename T> void min(const T * pSrc, int len, T * pMin)
-        {
-            T mn = pSrc[0];
-            for (int i=1; i < len; ++i)
-                if (pSrc[i] < mn)
-                    mn = pSrc[i];
-            *pMin = mn;
-        }
-
-        template<typename T> void minIndx(const T * pSrc, int len, T * pMin, int * pIndx)
-        {
-            T mn = pSrc[0];
-            int idx = 0;
-            for (int i=1; i < len; ++i)
-                if (pSrc[i] < mn) {
-                    mn = pSrc[i];
-                    idx = i;
-                }
-            *pMin = mn;
-            *pIndx = idx;
-        }
-
-        template<typename T> void minMax(const T * pSrc, int len, T * pMin, T * pMax)
-        {
-            T mn = pSrc[0];
-            T mx = pSrc[0];
+            _T& maxVal = *pMax;
+            maxVal = pSrc[0];
             for (int i=1; i < len; ++i)
             {
-                if (pSrc[i] < mn)
-                    mn = pSrc[i];
-                if (pSrc[i] > mx)
-                    mx = pSrc[i];
+                if (pSrc[i] > maxVal) {
+                    maxVal = pSrc[i];
+                    *pIndx = i;
+                }
             }
-            *pMin = mn;
-            *pMax = mx;
         }
 
-        template<typename T> void minMaxIndx(const T * pSrc, int len, T * pMin, int * pMinIndx, T * pMax, int * pMaxIndx)
+        template<typename _T>
+        inline void minIndx(const _T * pSrc, int len, _T * pMin, int * pIndx)
         {
-            T mn = pSrc[0];
-            T mx = pSrc[0];
-            int idxMin = 0;
-            int idxMax = 0;
+            _T& minVal = *pMin;
+            minVal = pSrc[0];
             for (int i=1; i < len; ++i)
             {
-                if (pSrc[i] < mn) {
-                    mn = pSrc[i];
-                    idxMin = i;
-                }
-                if (pSrc[i] > mx) {
-                    mx = pSrc[i];
-                    idxMax = i;
+                if (pSrc[i] < minVal) {
+                    minVal = pSrc[i];
+                    *pIndx = i;
                 }
             }
-            *pMin = mn;
-            *pMinIndx = idxMin;
-            *pMax = mx;
-            *pMaxIndx = idxMax;
         }
 
-        template<typename T, typename U> void sum(const T * pSrc, int len, U * pSum)
+        template<typename _T>
+        inline void minMaxIndx(const _T * pSrc, int len, _T * pMin, int * pMinIndx, _T * pMax, int * pMaxIndx)
         {
-            U s = 0;
-            for (int i=0; i < len; ++i)
-                s += pSrc[i];
-            *pSum = s;
+            _T& minVal = *pMin;
+            _T& maxVal = *pMax;
+            minVal = maxVal = pSrc[0];
+            for (int i=1; i < len; ++i)
+            {
+                if (pSrc[i] < minVal) {
+                    minVal = pSrc[i];
+                    *pMinIndx = i;
+                }
+                if (pSrc[i] > maxVal) {
+                    maxVal = pSrc[i];
+                    *pMaxIndx = i;
+                }
+            }
         }
 
-        template<typename T, typename U> void mean(const T * pSrc, int len, U * pMean)
+        template<typename _T>
+        inline void max(const _T * pSrc, int len, _T * pMax)
         {
-            U s = 0;
-            for (int i=0; i < len; ++i)
-                s += pSrc[i];
-            *pMean = s/len;
+            int pos;
+            maxIndx(pSrc, len, pMax, &pos);
         }
 
-        template<typename T, typename U> void meanStdDev(const T * pSrc, int len, U * pMean, U * pStdDev)
+        template<typename _T>
+        inline void min(const _T * pSrc, int len, _T * pMin)
+        {
+            int pos;
+            minIndx(pSrc, len, pMin, &pos);
+        }
+
+        template<typename _T>
+        inline void minMax(const _T * pSrc, int len, _T * pMin, _T * pMax)
+        {
+            int posMin, posMax;
+            minMaxIndx(pSrc, len, pMin, &posMin, pMax, &posMax);
+        }
+
+        template<typename _T, typename _U>
+        inline void sum(const _T * pSrc, int len, _U * pSum)
+        {
+            *pSum = 0;
+            for (int i = 0; i < len; ++i)
+                *pSum += pSrc[i];
+        }
+
+        template<typename _T, typename _U>
+        inline void mean(const _T * pSrc, int len, _U * pMean)
+        {
+            *pMean = 0;
+            for (int i = 0; i < len; ++i)
+                *pMean += pSrc[i];
+            *pMean /= len;
+        }
+
+        template<typename _T, typename _U>
+        inline void meanStdDev(const _T * pSrc, int len, _U * pMean, _U * pStdDev)
         {
             mean(pSrc, len, pMean);
 
-            U s = 0;
-            for (int i=0; i < len; ++i)
+            _U s = 0;
+            for (int i = 0; i < len; ++i)
             {
-                U x = pSrc[i] - *pMean;
+                _U x = pSrc[i] - *pMean;
                 s += x * x;
             }
             *pStdDev = sqrt_cmath(s/(len-1));
         }
 
-        template<typename T, typename U> void stdDev(const T * pSrc, int len, U * pStdDev)
+        template<typename _T, typename _U>
+        inline void stdDev(const _T * pSrc, int len, _U * pStdDev)
         {
-            U m;
+            _U m;
             meanStdDev(pSrc, len, &m, pStdDev);
         }
 
-        template<typename T, typename U> void normInf(const T * pSrc, int len, U * pNorm)
+        template<typename _T, typename _U>
+        inline void dotProd(const _T * pSrc1, const _T * pSrc2, int len, _U * pDp)
         {
-            U mx = pSrc[0];
+            *pDp = 0;
+            for (int i = 0; i < len; ++i)
+                *pDp += pSrc1[i] * pSrc2[i];
+        }
+
+        template<typename _T, typename _U>
+        inline void normL2(const _T * pSrc, int len, _U * pNorm)
+        {
+            dotProd(pSrc, len, pNorm);
+            *pNorm = sqrt_cmath(*pNorm);
+        }
+
+        template<typename _T, typename _U>
+        inline void normInf(const _T * pSrc, int len, _U * pNorm)
+        {
+            _U mx = pSrc[0];
             if (pSrc[0] < 0)
                 mx = -pSrc[0];
 
@@ -468,10 +501,11 @@ namespace nosimd
             *pNorm = mx;
         }
 
-        template<typename T, typename U> void normL1(const T * pSrc, int len, U * pNorm)
+        template<typename _T, typename _U>
+        inline void normL1(const _T * pSrc, int len, _U * pNorm)
         {
-            U norm = 0;
-            for (int i=0; i < len; ++i)
+            _U norm = 0;
+            for (int i = 0; i < len; ++i)
             {
                 if (pSrc[i] < 0)
                     norm -= pSrc[i];
@@ -481,20 +515,11 @@ namespace nosimd
             *pNorm = norm;
         }
 
-        template<typename T, typename U> void normL2(const T * pSrc, int len, U * pNorm)
+        template<typename _T, typename _U>
+        inline void normDiffInf(const _T * pSrc1, const _T * pSrc2, int len, _U * pNorm)
         {
-            U norm = 0;
-            for (int i=0; i < len; ++i)
-            {
-                norm += pSrc[i] * pSrc[i];
-            }
-            *pNorm = sqrt_cmath(norm);
-        }
-
-        template<typename T, typename U> void normDiffInf(const T * pSrc1, const T * pSrc2, int len, U * pNorm)
-        {
-            T x = pSrc1[0]-pSrc2[0];
-            U mx = x;
+            _T x = pSrc1[0]-pSrc2[0];
+            _U mx = x;
             if (x < 0)
                 mx = -x;
 
@@ -515,12 +540,13 @@ namespace nosimd
             *pNorm = mx;
         }
 
-        template<typename T, typename U> void normDiffL1(const T * pSrc1, const T * pSrc2, int len, U * pNorm)
+        template<typename _T, typename _U>
+        inline void normDiffL1(const _T * pSrc1, const _T * pSrc2, int len, _U * pNorm)
         {
-            U norm = 0;
-            for (int i=0; i < len; ++i)
+            _U norm = 0;
+            for (int i = 0; i < len; ++i)
             {
-                T x = pSrc1[i] - pSrc2[i];
+                _T x = pSrc1[i] - pSrc2[i];
                 if (x < 0)
                     norm -= x;
                 else
@@ -529,61 +555,60 @@ namespace nosimd
             *pNorm = norm;
         }
 
-        template<typename T, typename U> void normDiffL2(const T * pSrc1, const T * pSrc2, int len, U * pNorm)
+        template<typename _T, typename _U>
+        inline void normDiffL2(const _T * pSrc1, const _T * pSrc2, int len, _U * pNorm)
         {
-            U norm = 0;
-            for (int i=0; i < len; ++i)
+            _U norm = 0;
+            for (int i = 0; i < len; ++i)
             {
-                U x = pSrc1[i] - pSrc2[i];
+                _U x = pSrc1[i] - pSrc2[i];
                 norm += x * x;
             }
             *pNorm = sqrt_cmath(norm);
-        }
-
-        template<typename T, typename U> void dotProd(const T * pSrc1, const T * pSrc2, int len, U * pDp)
-        {
-            U s = 0;
-            for (int i=0; i < len; ++i)
-                s += pSrc1[i] * pSrc2[i];
-            *pDp = s;
         }
     }
 
     namespace trigonometric
     {
-        template<typename T> void sin(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void sin(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = sin_cmath(pSrc[i]);
         }
 
-        template<typename T> void cos(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void cos(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = cos_cmath(pSrc[i]);
         }
 
-        template<typename T> void tan(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void tan(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = tan_cmath(pSrc[i]);
         }
 
-        template<typename T> void asin(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void asin(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = asin_cmath(pSrc[i]);
         }
 
-        template<typename T> void acos(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void acos(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = acos_cmath(pSrc[i]);
         }
 
-        template<typename T> void atan(const T * pSrc, T * pDst, int len)
+        template<typename _T>
+        inline void atan(const _T * pSrc, _T * pDst, int len)
         {
-            for (int i=0; i < len; ++i)
+            for (int i = 0; i < len; ++i)
                 pDst[i] = atan_cmath(pSrc[i]);
         }
     }
