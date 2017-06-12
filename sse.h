@@ -142,8 +142,25 @@ namespace sse
         using nosimd::common::malloc;
         using nosimd::common::free;
 #endif
+
+#if 0 // TODO
+        _SIMD_SSE_T void move(const _T * pSrc, _T * pDst, int len);
+        _SIMD_SSE_TU void convert(const _T * pSrc, _U * pDst, int len);
+#else
         using nosimd::common::move;
         using nosimd::common::convert;
+#endif
+    }
+
+    namespace compare
+    {
+#if 0 // TODO
+        _SIMD_SSE_T void find(_T * pSrc, _T val, int len, int * pPosition);
+        _SIMD_SSE_T void findDiff(const _T * pSrc1, _T * pSrc2, int len, int * pPosition);
+#else
+        using nosimd::compare::find;
+        using nosimd::compare::findDiff;
+#endif
     }
 
     namespace arithmetic
@@ -171,51 +188,68 @@ namespace sse
         _SIMD_SSE_T void sqrt(const _T* pSrc, _T* pDst, int len);
         _SIMD_SSE_T void invSqrt(const _T* pSrc, _T* pDst, int len);
 
-        template<typename _T> void sqr(const _T* pSrc, _T* pDst, int len)
-        {
-            sse::arithmetic::mul<_T>(pSrc, pSrc, pDst, len);
-        }
+        using nosimd::power::powx;
+        using nosimd::power::pow;
+        using nosimd::power::cbrt;
+        using nosimd::power::hypot;
     }
 
     namespace statistical
     {
         _SIMD_SSE_T void min(const _T* pSrc, int len, _T* pMin);
         _SIMD_SSE_T void max(const _T* pSrc, int len, _T* pMax);
-
         _SIMD_SSE_T void minMax(const _T* pSrc, int len, _T* pMin, _T* pMax);
+
+#if 0 // TODO
+        _SIMD_SSE_T void minIndx(const _T * pSrc, int len, _T * pMin, int * pIndx);
+        _SIMD_SSE_T void maxIndx(const _T * pSrc, int len, _T * pMax, int * pIndx);
+        _SIMD_SSE_T void minMaxIndx(const _T * pSrc, int len, _T * pMin, int * pMinIndx, _T * pMax, int * pMaxIndx);
+#else
+        using nosimd::statistical::minIndx;
+        using nosimd::statistical::maxIndx;
+        using nosimd::statistical::minMaxIndx;
+#endif
 
         _SIMD_SSE_T void sum(const _T* pSrc, int len, _T* pSum);
         _SIMD_SSE_T void meanStdDev(const _T* pSrc, int len, _T* pMean, _T* pStdDev);
 
-        template<typename _T> void mean(const _T* pSrc, int len, _T* pMean)
+        template<typename _T> inline void mean(const _T* pSrc, int len, _T* pMean)
         {
             sum(pSrc, len, pMean);
             *pMean /= len;
         }
 
-        template<typename _T> void stdDev(const _T* pSrc, int len, _T* pStdDev)
+        template<typename _T> inline void stdDev(const _T* pSrc, int len, _T* pStdDev)
         {
             _T m;
             meanStdDev(pSrc, len, &m, pStdDev);
         }
-#if 0
+
+        _SIMD_SSE_T void dotProd(const _T* pSrc1, const _T* pSrc2, int len, _T* pDp);
+
+#if 0 // TODO
         _SIMD_SSE_T void normInf(const _T* pSrc, int len, _T* pNorm);
         _SIMD_SSE_T void normL1(const _T* pSrc, int len, _T* pNorm);
         _SIMD_SSE_T void normL2(const _T* pSrc, int len, _T* pNorm);
-
         _SIMD_SSE_T void normDiffInf(const _T* pSrc1, const _T* pSrc2, int len, _T* pNorm);
         _SIMD_SSE_T void normDiffL1(const _T* pSrc1, const _T* pSrc2, int len, _T* pNorm);
         _SIMD_SSE_T void normDiffL2(const _T* pSrc1, const _T* pSrc2, int len, _T* pNorm);
+#else
+        using nosimd::statistical::normInf;
+        using nosimd::statistical::normL1;
+        using nosimd::statistical::normL2;
+        using nosimd::statistical::normDiffInf;
+        using nosimd::statistical::normDiffL1;
+        using nosimd::statistical::normDiffL2;
 #endif
-        _SIMD_SSE_T void dotProd(const _T* pSrc1, const _T* pSrc2, int len, _T* pDp);
     }
 
     using namespace sse::common;
+    using namespace sse::compare;
     using namespace sse::arithmetic;
     using namespace sse::power;
     using namespace sse::statistical;
 
-    using namespace nosimd::compare; // TODO
     using namespace nosimd::exp_log;
     using namespace nosimd::trigonometric;
 }

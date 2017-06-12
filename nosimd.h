@@ -289,13 +289,6 @@ namespace nosimd
         }
 
         template<typename _T>
-        inline void sqr(const _T * pSrc, _T * pDst, int len)
-        {
-            for (int i = 0; i < len; ++i)
-                pDst[i] = pSrc[i] * pSrc[i];
-        }
-
-        template<typename _T>
         inline void sqrt(const _T * pSrc, _T * pDst, int len)
         {
             for (int i = 0; i < len; ++i)
@@ -474,7 +467,7 @@ namespace nosimd
         template<typename _T, typename _U>
         inline void normL2(const _T * pSrc, int len, _U * pNorm)
         {
-            dotProd(pSrc, len, pNorm);
+            dotProd(pSrc, pSrc, len, pNorm);
             *pNorm = sqrt_cmath(*pNorm);
         }
 
