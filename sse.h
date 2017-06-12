@@ -79,6 +79,13 @@ namespace sse
     INLINE void avx_store_si(__m256i * x, __m256i y) { _mm256_storeu_si256(x, y); }
 #endif
 
+    INLINE constexpr int avxBlockLen(float) { return 8; }
+    INLINE constexpr int avxBlockLen(int32_t) { return 8; }
+    INLINE constexpr int avxBlockLen(uint32_t) { return 8; }
+    INLINE constexpr int avxBlockLen(double) { return 4; }
+    INLINE constexpr int avxBlockLen(int64_t) { return 4; }
+    INLINE constexpr int avxBlockLen(uint64_t) { return 4; }
+
     INLINE __m256i avxTailMask32(int len)
     {
         switch (len) {

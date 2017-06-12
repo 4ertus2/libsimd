@@ -75,15 +75,10 @@ namespace internals
 
     //
 
-    INLINE constexpr int blockLen(int32_t) { return 8; }
-    INLINE constexpr int blockLen(uint32_t) { return 8; }
-    INLINE constexpr int blockLen(int64_t) { return 4; }
-    INLINE constexpr int blockLen(uint64_t) { return 4; }
-
     template <typename _T, IntrAvxI::Unary op>
     INLINE void iValDstEnd(__m256i a, _T * pDst, int len)
     {
-        int tail = len % blockLen(_T());
+        int tail = len % avxBlockLen(_T());
         if (tail) {
             pDst += (len-tail);
             iValDstTail<op>(a, pDst, tail);
@@ -94,7 +89,7 @@ namespace internals
     template <typename _T, IntrAvxI::Unary op>
     INLINE void iPtrDstEnd(const _T * pSrc, _T * pDst, int len)
     {
-        int tail = len % blockLen(_T());
+        int tail = len % avxBlockLen(_T());
         if (tail) {
             pSrc += (len-tail);
             pDst += (len-tail);
@@ -106,7 +101,7 @@ namespace internals
     template <typename _T, IntrAvxI::Binary op>
     INLINE void iPtrValDstEnd(const _T * pSrc, const __m256i& b, _T * pDst, int len)
     {
-        int tail = len % blockLen(_T());
+        int tail = len % avxBlockLen(_T());
         if (tail) {
             pSrc += (len-tail);
             pDst += (len-tail);
@@ -118,7 +113,7 @@ namespace internals
     template <typename _T, IntrAvxI::Binary op>
     INLINE void iPtrPtrDstEnd(const _T * pSrc1, const _T * pSrc2, _T * pDst, int len)
     {
-        int tail = len % blockLen(_T());
+        int tail = len % avxBlockLen(_T());
         if (tail) {
             pSrc1 += (len-tail);
             pSrc2 += (len-tail);
