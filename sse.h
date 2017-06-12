@@ -205,6 +205,7 @@ namespace sse
     using namespace sse::power;
     using namespace sse::statistical;
 
+    using namespace nosimd::compare; // TODO
     using namespace nosimd::exp_log;
     using namespace nosimd::trigonometric;
 }
