@@ -90,6 +90,19 @@ namespace sse
     INLINE constexpr int avxBlockLen(int64_t) { return 4; }
     INLINE constexpr int avxBlockLen(uint64_t) { return 4; }
 
+    INLINE __m128i sseTailMask32(int len)
+    {
+        switch (len) {
+            case 1:
+                return _mm_set_epi32(0, 0, 0, -1);
+            case 2:
+                return _mm_set_epi32(0, 0, -1, -1);
+            case 3:
+                return _mm_set_epi32(0, -1, -1, -1);
+        }
+        return _mm_setzero_si128();
+    }
+
     INLINE __m256i avxTailMask32(int len)
     {
         switch (len) {
@@ -130,13 +143,21 @@ namespace sse
 
     namespace common
     {
-        _SIMD_SSE_T void set(_T val, _T* pDst, int len);
-        _SIMD_SSE_T void copy(const _T* pSrc, _T* pDst, int len);
+        _SIMD_SSE_T void set(_T val, _T* pDst, int len)
+        {
+            nosimd::common::set(val, pDst, len);
+        }
+
+        _SIMD_SSE_T void copy(const _T* pSrc, _T* pDst, int len)
+        {
+            nosimd::common::copy(pSrc, pDst, len);
+        }
 
         _SIMD_SSE_T void zero(_T* pDst, int len)
         {
             set<_T>((_T)0, pDst, len);
         }
+
 #if SSE_ALIGNED
         _SIMD_SSE_T _T* malloc(int len)
         {
@@ -152,12 +173,15 @@ namespace sse
         using nosimd::common::free;
 #endif
 
+        _SIMD_SSE_TU void convert(const _T * pSrc, _U * pDst, int len)
+        {
+            nosimd::common::convert(pSrc, pDst, len);
+        }
+
 #if 0 // TODO
         _SIMD_SSE_T void move(const _T * pSrc, _T * pDst, int len);
-        _SIMD_SSE_TU void convert(const _T * pSrc, _U * pDst, int len);
 #else
         using nosimd::common::move;
-        using nosimd::common::convert;
 #endif
     }
 

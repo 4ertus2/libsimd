@@ -300,32 +300,32 @@ namespace statistical
 {
     _SIMD_SSE_SPEC void min(const float * pSrc, int len, float * pMin)
     {
-        return nosimd::statistical::min(pSrc, len, pMin);
+        nosimd::statistical::min(pSrc, len, pMin);
     }
 
     _SIMD_SSE_SPEC void max(const float * pSrc, int len, float * pMax)
     {
-        return nosimd::statistical::max(pSrc, len, pMax);
+        nosimd::statistical::max(pSrc, len, pMax);
     }
 
     _SIMD_SSE_SPEC void minMax(const float * pSrc, int len, float * pMin, float * pMax)
     {
-        return nosimd::statistical::minMax(pSrc, len, pMin, pMax);
+        nosimd::statistical::minMax(pSrc, len, pMin, pMax);
     }
 
     _SIMD_SSE_SPEC void sum(const float * pSrc, int len, float * pSum)
     {
-        return nosimd::statistical::sum(pSrc, len, pSum);
+        nosimd::statistical::sum(pSrc, len, pSum);
     }
 
     _SIMD_SSE_SPEC void meanStdDev(const float * pSrc, int len, float * pMean, float * pStdDev)
     {
-        return nosimd::statistical::meanStdDev(pSrc, len, pMean, pStdDev);
+        nosimd::statistical::meanStdDev(pSrc, len, pMean, pStdDev);
     }
 
     _SIMD_SSE_SPEC void dotProd(const float * pSrc1, const float * pSrc2, int len, float * pDp)
     {
-        return nosimd::statistical::dotProd(pSrc1, pSrc2, len, pDp);
+        nosimd::statistical::dotProd(pSrc1, pSrc2, len, pDp);
     }
 }
 }

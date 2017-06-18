@@ -990,32 +990,32 @@ namespace statistical
 {
     _SIMD_SSE_T void min(const _T * pSrc, int len, _T * pMin)
     {
-        return nosimd::statistical::min(pSrc, len, pMin);
+        nosimd::statistical::min(pSrc, len, pMin);
     }
 
     _SIMD_SSE_T void max(const _T * pSrc, int len, _T * pMax)
     {
-        return nosimd::statistical::max(pSrc, len, pMax);
+        nosimd::statistical::max(pSrc, len, pMax);
     }
 
     _SIMD_SSE_T void minMax(const _T * pSrc, int len, _T * pMin, _T * pMax)
     {
-        return nosimd::statistical::minMax(pSrc, len, pMin, pMax);
+        nosimd::statistical::minMax(pSrc, len, pMin, pMax);
     }
 
     _SIMD_SSE_T void sum(const _T * pSrc, int len, _T * pSum)
     {
-        return nosimd::statistical::sum(pSrc, len, pSum);
+        nosimd::statistical::sum(pSrc, len, pSum);
     }
 
     _SIMD_SSE_T void meanStdDev(const _T * pSrc, int len, _T * pMean, _T * pStdDev)
     {
-        return nosimd::statistical::meanStdDev(pSrc, len, pMean, pStdDev);
+        nosimd::statistical::meanStdDev(pSrc, len, pMean, pStdDev);
     }
 
     _SIMD_SSE_T void dotProd(const _T * pSrc1, const _T * pSrc2, int len, _T * pDp)
     {
-        return nosimd::statistical::dotProd(pSrc1, pSrc2, len, pDp);
+        nosimd::statistical::dotProd(pSrc1, pSrc2, len, pDp);
     }
 }
 }

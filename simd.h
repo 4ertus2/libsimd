@@ -12,6 +12,7 @@ namespace simd { using namespace ipp; }
 #include "avx-float.h"
 #include "avx-double.h"
 #include "avx-int.h"
+#include "avx-convert.h"
 namespace simd { using namespace sse; }
 #else
 #include "sse-float.h"
