@@ -48,6 +48,14 @@ set_target_properties(test-arithm-avx PROPERTIES COMPILE_FLAGS "-DSIMD_AVX")
 set_target_properties(test-arithm-avx-a32 PROPERTIES COMPILE_FLAGS "-DSIMD_AVX -DSSE_ALIGNED=32")
 endif(AVX)
 
+if(OCL)
+add_executable(test-arithm-ocl test-arithm.cpp)
+#
+set_target_properties(test-arithm-ocl PROPERTIES COMPILE_FLAGS "-DSIMD_OPENCL -DFLOAT_ONLY")
+#
+target_link_libraries(test-arithm-ocl simdocl)
+endif()
+
 if(IPP_DIR)
 # ipp
 add_executable(test-common-ipp test-common.cpp)
@@ -89,6 +97,10 @@ add_test(convert-avx     test-convert-avx)
 add_test(convert-avx-a32 test-convert-avx-a32)
 add_test(arithm-avx     test-arithm-avx)
 add_test(arithm-avx-a32 test-arithm-avx-a32)
+endif()
+
+if(OCL)
+add_test(arithm-ocl     test-arithm-ocl)
 endif()
 
 if(IPP_DIR)

@@ -8,6 +8,9 @@ namespace simd { using namespace nosimd; }
 #if defined(SIMD_IPP)
 #include "sse_ipp.h"
 namespace simd { using namespace ipp; }
+#elif defined(SIMD_OPENCL)
+#include "ocl.h"
+namespace simd { using namespace ocl; }
 #elif defined(SIMD_AVX)
 #include "avx-float.h"
 #include "avx-double.h"

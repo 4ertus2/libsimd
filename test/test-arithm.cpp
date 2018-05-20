@@ -6,7 +6,7 @@
 #include "compare.h"
 
 template<typename T>
-void test_arithm(unsigned length, T value1, T value2)
+void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 {
     auto pv1 = std::shared_ptr<T>(simd::malloc<T>(length), simd::free<T>);
     auto pv2 = std::shared_ptr<T>(simd::malloc<T>(length), simd::free<T>);
@@ -107,7 +107,7 @@ void test_arithm(unsigned length, T value1, T value2)
     }
 #endif // TEST_FIXED
 
-    if (result[length] != 0x7f)
+    if (!allowTrash && result[length] != 0x7f)
         FAIL();
 }
 
@@ -117,13 +117,12 @@ void test_abs(unsigned length = 47)
     auto pv = std::shared_ptr<T>(simd::malloc<T>(length), simd::free<T>);
     T * v = pv.get();
 
-    T val = 1;
-    for (int i=0; i < length; ++i, val*=-1)
-        v[i] = val;
+    for (int i = 0; i < length; ++i)
+        v[i] = -i;
 
     simd::abs(v, v, length);
 
-    for (int i=0; i < length; ++i, val+=1)
+    for (int i = 0; i < length; ++i)
     {
         if (v[i] < 0)
             FAIL();
@@ -134,12 +133,25 @@ int main()
 {
     try
     {
+#ifdef FLOAT_ONLY
+        for (unsigned len = 0; len < 128; ++len)
+        {
+            test_arithm<float>(len, 2, 1, true);
+            test_abs<float>(len);
+        }
+
+        for (unsigned len = 1000; len < 1024 * 1024; len += 100000)
+        {
+            test_arithm<float>(len, 2, 1, true);
+            test_abs<float>(len);
+        }
+#else
         for (unsigned len = 0; len < 128; ++len)
         {
             test_arithm<float>(len, 2, 1);
-            test_arithm<double>(len, 1, 2);
-
             test_abs<float>(len);
+
+            test_arithm<double>(len, 1, 2);
             test_abs<double>(len);
 
 #ifndef NO_8_16
@@ -158,6 +170,11 @@ int main()
             test_abs<int64_t>(len);
             test_abs<uint64_t>(len);
         }
+#endif
+    }
+    catch (const int& line) {
+        std::cerr << " line: " << line << std::endl;
+        return 1;
     }
     catch (const Exception& ex)
     {
