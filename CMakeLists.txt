@@ -52,7 +52,11 @@ if(IPP_DIR)
     set_target_properties(simdipp PROPERTIES COMPILE_FLAGS "-DDEPRECATED")
 endif()
 
-add_library(simdocl STATIC ocl.cpp)
-target_link_libraries(simdocl OpenCL)
+if(OCL)
+    include_directories(/opt/intel/opencl/include)
+    link_directories(/opt/intel/opencl)
+    add_library(simdocl STATIC ocl.cpp)
+    target_link_libraries(simdocl OpenCL)
+endif()
 
 add_subdirectory(test)
