@@ -111,9 +111,9 @@ namespace internals
     public:
         static SimdOpenCl& getInstance()
         {
-            static uint32_t platformId = 1;
-            static uint32_t deviceId = 1;
-            static SimdOpenCl instance(platformId, deviceId);
+            static const uint32_t platformId = 0;
+            static const uint32_t deviceId = 0;
+            static SimdOpenCl instance(platformId, CL_DEVICE_TYPE_GPU, deviceId);
             return instance;
         }
 
@@ -174,19 +174,24 @@ namespace internals
         cl_context gpuContext() { return gpuContext_.get(); }
         cl_command_queue commandQueue() { return commandQueue_.get(); }
 
-        SimdOpenCl(uint32_t platformId, uint32_t deviceId)
+        SimdOpenCl(uint32_t platformId, cl_device_type deviceType, uint32_t deviceId)
         {
             cl_uint numPlatforms;
-            if (clGetPlatformIDs(0, nullptr, &numPlatforms) || numPlatforms < platformId)
-                throw OCL_EXCEPTION;
-            if (clGetPlatformIDs(platformId, &platform_, nullptr))
+            if (clGetPlatformIDs(0, nullptr, &numPlatforms) || numPlatforms <= platformId)
                 throw OCL_EXCEPTION;
 
+            std::vector<cl_platform_id> platforms(numPlatforms);
+            if (clGetPlatformIDs(numPlatforms, platforms.data(), nullptr))
+                throw OCL_EXCEPTION;
+            platform_ = platforms[platformId];
+
             cl_uint numDevices;
-            if (clGetDeviceIDs(platform_, CL_DEVICE_TYPE_GPU, 0, nullptr, &numDevices) || numDevices < deviceId)
+            if (clGetDeviceIDs(platform_, deviceType, 0, nullptr, &numDevices) || numDevices <= deviceId)
                 throw OCL_EXCEPTION;
-            if (clGetDeviceIDs(platform_, CL_DEVICE_TYPE_GPU, deviceId, &device_, nullptr))
+            std::vector<cl_device_id> devices(numDevices);
+            if (clGetDeviceIDs(platform_, deviceType, numDevices, devices.data(), nullptr))
                 throw OCL_EXCEPTION;
+            device_ = devices[deviceId];
 
             cl_int err = 0;
             gpuContext_ = std::shared_ptr<ContextType>(

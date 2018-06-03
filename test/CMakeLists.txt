@@ -51,12 +51,14 @@ set_target_properties(test-arithm-avx-moredata PROPERTIES COMPILE_FLAGS "-DSIMD_
 endif(AVX)
 
 if(OCL)
+add_executable(info-ocl opencl_info.cpp)
 add_executable(test-arithm-ocl test-arithm.cpp)
 add_executable(test-arithm-ocl-moredata test-arithm.cpp)
 #
 set_target_properties(test-arithm-ocl PROPERTIES COMPILE_FLAGS "-DSIMD_OPENCL -DALLOW_TRASH -DNO_8_16")
 set_target_properties(test-arithm-ocl-moredata PROPERTIES COMPILE_FLAGS "-DSIMD_OPENCL -DALLOW_TRASH -DNO_8_16 -DMORE_DATA")
 #
+target_link_libraries(info-ocl OpenCL)
 target_link_libraries(test-arithm-ocl simdocl)
 target_link_libraries(test-arithm-ocl-moredata simdocl)
 endif()
