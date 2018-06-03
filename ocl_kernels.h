@@ -23,6 +23,19 @@ namespace internals
             Count
         };
 
+        ///
+        struct TextProgram
+        {
+            const char * name = nullptr;
+            const char * text = nullptr;
+
+            template <typename _T>
+            static constexpr TextProgram create()
+            {
+                return {_T::programName(), _T::programText()};
+            }
+        };
+
         static constexpr uint32_t funcCount() { return (uint32_t)Func::Count; }
 
         template <typename _T>
@@ -235,48 +248,26 @@ namespace internals
             }
         };
 
-        static constexpr const char * programName(Func func)
+        static constexpr TextProgram program(Func func)
         {
             switch (func) {
-                case Func::Add_32f: return Add_32f::programName();
-                case Func::Sub_32f: return Sub_32f::programName();
-                case Func::Mul_32f: return Mul_32f::programName();
-                case Func::Div_32f: return Div_32f::programName();
+                case Func::Add_32f: return TextProgram::create<Add_32f>();
+                case Func::Sub_32f: return TextProgram::create<Sub_32f>();
+                case Func::Mul_32f: return TextProgram::create<Mul_32f>();
+                case Func::Div_32f: return TextProgram::create<Div_32f>();
                 //
-                case Func::AddC_32f: return AddC_32f::programName();
-                case Func::SubC_32f: return SubC_32f::programName();
-                case Func::MulC_32f: return MulC_32f::programName();
-                case Func::DivC_32f: return DivC_32f::programName();
-                case Func::SubCRev_32f: return SubCRev_32f::programName();
-                case Func::DivCRev_32f: return DivCRev_32f::programName();
+                case Func::AddC_32f: return TextProgram::create<AddC_32f>();
+                case Func::SubC_32f: return TextProgram::create<SubC_32f>();
+                case Func::MulC_32f: return TextProgram::create<MulC_32f>();
+                case Func::DivC_32f: return TextProgram::create<DivC_32f>();
+                case Func::SubCRev_32f: return TextProgram::create<SubCRev_32f>();
+                case Func::DivCRev_32f: return TextProgram::create<DivCRev_32f>();
                 //
-                case Func::Abs_32f: return Abs_32f::programName();
+                case Func::Abs_32f: return TextProgram::create<Abs_32f>();
                 case Func::Count:
                     break;
             }
-            return nullptr;
-        }
-
-        static constexpr const char * programText(Func func)
-        {
-            switch (func) {
-                case Func::Add_32f: return Add_32f::programText();
-                case Func::Sub_32f: return Sub_32f::programText();
-                case Func::Mul_32f: return Mul_32f::programText();
-                case Func::Div_32f: return Div_32f::programText();
-                //
-                case Func::AddC_32f: return AddC_32f::programText();
-                case Func::SubC_32f: return SubC_32f::programText();
-                case Func::MulC_32f: return MulC_32f::programText();
-                case Func::DivC_32f: return DivC_32f::programText();
-                case Func::SubCRev_32f: return SubCRev_32f::programText();
-                case Func::DivCRev_32f: return DivCRev_32f::programText();
-                //
-                case Func::Abs_32f: return Abs_32f::programText();
-                case Func::Count:
-                    break;
-            }
-            return nullptr;
+            return {nullptr, nullptr};
         }
     };
 } // internals

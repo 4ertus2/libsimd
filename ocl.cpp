@@ -216,13 +216,13 @@ namespace internals
         void makeKernel(Kernel::Func func, BuiltProgram& prog)
         {
             cl_int err = 0;
-            const char * text = Kernel::programText(func);
-            size_t progLength = strlen(text);
+            Kernel::TextProgram srcProg = Kernel::program(func);
+            size_t progLength = strlen(srcProg.text);
 
             if (programs_.size() <= (uint32_t)func)
                 throw OCL_EXCEPTION;
 
-            prog.setProgram(clCreateProgramWithSource(gpuContext(), 1, (const char **)&text, &progLength, &err));
+            prog.setProgram(clCreateProgramWithSource(gpuContext(), 1, (const char **)&srcProg.text, &progLength, &err));
             if (err)
                 throw OCL_EXCEPTION;
 
@@ -231,7 +231,7 @@ namespace internals
             if (err)
                 throw OCL_EXCEPTION;
 
-            prog.setKernel(clCreateKernel(prog.program(), Kernel::programName(func), &err));
+            prog.setKernel(clCreateKernel(prog.program(), srcProg.name, &err));
             if (err)
                 throw OCL_EXCEPTION;
         }
