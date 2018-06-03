@@ -135,7 +135,7 @@ namespace internals
             typename BufferType<typename _T::BaseType>::Type buffers(gpuContext(), workSize);
             //size_t dataSize = buffers.dataSize();
 
-            cl_kernel kernel = programs_[(uint32_t)_T::id()].kernel();
+            cl_kernel kernel = programs_[static_cast<uint32_t>(_T::id())].kernel();
             setArgs(kernel, buffers, size);
 
             runCoreSequence(src1, src2, dst, kernel, buffers);
@@ -219,7 +219,7 @@ namespace internals
             Kernel::TextProgram srcProg = Kernel::program(func);
             size_t progLength = strlen(srcProg.text);
 
-            if (programs_.size() <= (uint32_t)func)
+            if (programs_.size() <= static_cast<uint32_t>(func))
                 throw OCL_EXCEPTION;
 
             prog.setProgram(clCreateProgramWithSource(gpuContext(), 1, (const char **)&srcProg.text, &progLength, &err));

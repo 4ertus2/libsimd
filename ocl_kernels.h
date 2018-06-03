@@ -7,7 +7,7 @@ namespace internals
     ///
     struct Kernel
     {
-        enum class Func
+        enum class Func : uint32_t
         {
             Add_32f,
             Sub_32f,
