@@ -133,60 +133,54 @@ int main()
 {
     try
     {
-#ifdef FLOAT_AND_DOUBLE
-        for (unsigned len = 0; len < 128; ++len)
-        {
-            test_arithm<float>(len, 2, 1, true);
-            test_abs<float>(len);
-        }
-
-        for (unsigned len = 0; len < 128; ++len)
-        {
-            test_arithm<double>(len, 2, 1, true);
-            test_abs<double>(len);
-        }
-#ifdef MORE_DATA
-        for (unsigned len = 1000; len < 1024 * 1024; len += 100000)
-        {
-            test_arithm<float>(len, 2, 1, true);
-            test_abs<float>(len);
-        }
-
-        for (unsigned len = 1000; len < 1024 * 1024; len += 100000)
-        {
-            test_arithm<double>(len, 2, 1, true);
-            test_abs<double>(len);
-        }
-#endif
+#ifdef ALLOW_TRASH
+        bool allowTrash = true;
 #else
-        for (unsigned len = 0; len < 128; ++len)
+        bool allowTrash = false;
+#endif
+#ifdef MORE_DATA
+        unsigned start = 1000;
+        unsigned end = 1024 * 1024;
+        unsigned inc = 100000;
+#else
+        unsigned start = 0;
+        unsigned end = 128;
+        unsigned inc = 1;
+#endif
+        for (unsigned len = start; len < end; len+=inc)
         {
-            test_arithm<float>(len, 2, 1);
+            test_arithm<float>(len, 2, 1, allowTrash);
             test_abs<float>(len);
 
-            test_arithm<double>(len, 1, 2);
+            test_arithm<double>(len, 2, 1, allowTrash);
             test_abs<double>(len);
+        }
 
-#ifndef NO_8_16
-            test_arithm<uint8_t>(len, 2, 1);
-            test_arithm<int16_t>(len, 2, 1);
-            test_arithm<uint16_t>(len, 2, 1);
-            test_abs<int16_t>(len);
-#endif
-            test_arithm<int32_t>(len, 2, 1);
-            test_arithm<uint32_t>(len, 2, 1);
+        for (unsigned len = start; len < end; len+=inc)
+        {
+            test_arithm<int32_t>(len, 2, 1, allowTrash);
+            test_arithm<uint32_t>(len, 2, 1, allowTrash);
             test_abs<int32_t>(len);
             test_abs<uint32_t>(len);
 
-            test_arithm<int64_t>(len, 2, 1);
-            test_arithm<uint64_t>(len, 2, 1);
+            test_arithm<int64_t>(len, 2, 1, allowTrash);
+            test_arithm<uint64_t>(len, 2, 1, allowTrash);
             test_abs<int64_t>(len);
             test_abs<uint64_t>(len);
         }
+
+#ifndef NO_8_16
+        for (unsigned len = start; len < end; len+=inc)
+        {
+            test_arithm<uint8_t>(len, 2, 1, allowTrash);
+            test_arithm<int16_t>(len, 2, 1, allowTrash);
+            test_arithm<uint16_t>(len, 2, 1, allowTrash);
+            test_abs<int16_t>(len);
+        }
 #endif
     }
-    catch (const int& line) {
-        std::cerr << " line: " << line << std::endl;
+    catch (const simd::Exception& ex) {
+        std::cerr << ex.file() << ":" << ex.line() << " " << ex.what() << std::endl;
         return 1;
     }
     catch (const Exception& ex)

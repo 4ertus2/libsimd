@@ -13,6 +13,8 @@
 #include <CL/cl.h>
 #endif
 
+#define OCL_EXCEPTION simd::Exception(__FILE__, __LINE__, __FUNCTION__)
+
 namespace ocl
 {
 namespace internals
@@ -321,6 +323,236 @@ namespace internals
 
 namespace arithmetic
 {
+    // int32_t
+
+    _SIMD_OCL_SPEC void addC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::AddC_32s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::SubC_32s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::MulC_32s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::DivC_32s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::SubCRev_32s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::DivCRev_32s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Add_32s>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Sub_32s>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Mul_32s>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Div_32s>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const int32_t * pSrc, int32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Abs_32s>(pSrc, 0.0f, pDst, len);
+    }
+
+    // uint32_t
+
+    _SIMD_OCL_SPEC void addC(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::AddC_32u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::SubC_32u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::MulC_32u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::DivC_32u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::SubCRev_32u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::DivCRev_32u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const uint32_t * pSrc1, const uint32_t * pSrc2, uint32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Add_32u>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const uint32_t * pSrc1, const uint32_t * pSrc2, uint32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Sub_32u>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const uint32_t * pSrc1, const uint32_t * pSrc2, uint32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Mul_32u>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const uint32_t * pSrc1, const uint32_t * pSrc2, uint32_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Div_32u>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const uint32_t * pSrc, uint32_t * pDst, int len)
+    {
+        if (pSrc != pDst)
+            copy(pSrc, pDst, len);
+    }
+
+    // int64_t
+
+    _SIMD_OCL_SPEC void addC(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::AddC_64s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::SubC_64s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::MulC_64s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::DivC_64s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::SubCRev_64s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::DivCRev_64s>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Add_64s>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Sub_64s>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Mul_64s>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Div_64s>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const int64_t * pSrc, int64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Abs_64s>(pSrc, 0.0f, pDst, len);
+    }
+
+    // uint64_t
+
+    _SIMD_OCL_SPEC void addC(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::AddC_64u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::SubC_64u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::MulC_64u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::DivC_64u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::SubCRev_64u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::DivCRev_64u>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const uint64_t * pSrc1, const uint64_t * pSrc2, uint64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Add_64u>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const uint64_t * pSrc1, const uint64_t * pSrc2, uint64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Sub_64u>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const uint64_t * pSrc1, const uint64_t * pSrc2, uint64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Mul_64u>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const uint64_t * pSrc1, const uint64_t * pSrc2, uint64_t * pDst, int len)
+    {
+        internals::SimdOpenCl::getInstance().exec<internals::Kernel::Div_64u>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const uint64_t * pSrc, uint64_t * pDst, int len)
+    {
+        if (pSrc != pDst)
+            copy(pSrc, pDst, len);
+    }
+
     // float
 
     _SIMD_OCL_SPEC void addC(const float * pSrc, float val, float * pDst, int len)
@@ -373,7 +605,7 @@ namespace arithmetic
         internals::SimdOpenCl::getInstance().exec<internals::Kernel::Div_32f>(pSrc1, pSrc2, pDst, len);
     }
 
-    _SIMD_OCL_SPEC void abs(const float* pSrc, float* pDst, int len)
+    _SIMD_OCL_SPEC void abs(const float * pSrc, float * pDst, int len)
     {
         internals::SimdOpenCl::getInstance().exec<internals::Kernel::Abs_32f>(pSrc, 0.0f, pDst, len);
     }
@@ -430,7 +662,7 @@ namespace arithmetic
         internals::SimdOpenCl::getInstance().exec<internals::Kernel::Div_64f>(pSrc1, pSrc2, pDst, len);
     }
 
-    _SIMD_OCL_SPEC void abs(const double* pSrc, double* pDst, int len)
+    _SIMD_OCL_SPEC void abs(const double * pSrc, double * pDst, int len)
     {
         internals::SimdOpenCl::getInstance().exec<internals::Kernel::Abs_64f>(pSrc, 0.0f, pDst, len);
     }

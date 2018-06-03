@@ -1,6 +1,28 @@
 #pragma once
 #include <cstdint>
 #include <cmath>
+#include <exception>
+
+namespace simd
+{
+    ///
+    class Exception : public std::exception
+    {
+    public:
+        Exception(const char * file, uint32_t line, const char * func)
+        :   file_(file), line_(line), function_(func)
+        {}
+
+        const char * what() const noexcept { return function_; }
+        const char * file() const noexcept { return file_; }
+        uint32_t line() const noexcept { return line_; }
+
+    private:
+        const char * file_;
+        const char * function_;
+        uint32_t line_;
+    };
+}
 
 namespace
 {
