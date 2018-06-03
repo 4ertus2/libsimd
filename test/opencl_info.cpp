@@ -20,8 +20,8 @@ static const char * toString(const cl_device_type& devType)
         return "CL_DEVICE_TYPE_GPU";
     if (devType == CL_DEVICE_TYPE_ACCELERATOR)
         return "CL_DEVICE_TYPE_ACCELERATOR";
-    if (devType == CL_DEVICE_TYPE_ACCELERATOR)
-        return "CL_DEVICE_TYPE_ACCELERATOR";
+    if (devType == CL_DEVICE_TYPE_CUSTOM)
+        return "CL_DEVICE_TYPE_CUSTOM";
     return "UNKNOWN";
 }
 
