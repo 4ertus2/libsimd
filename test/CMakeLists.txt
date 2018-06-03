@@ -50,10 +50,13 @@ endif(AVX)
 
 if(OCL)
 add_executable(test-arithm-ocl test-arithm.cpp)
+add_executable(test-arithm-ocl-moredata test-arithm.cpp)
 #
-set_target_properties(test-arithm-ocl PROPERTIES COMPILE_FLAGS "-DSIMD_OPENCL -DFLOAT_ONLY")
+set_target_properties(test-arithm-ocl PROPERTIES COMPILE_FLAGS "-DSIMD_OPENCL -DFLOAT_AND_DOUBLE")
+set_target_properties(test-arithm-ocl-moredata PROPERTIES COMPILE_FLAGS "-DSIMD_OPENCL -DFLOAT_AND_DOUBLE -DMORE_DATA")
 #
 target_link_libraries(test-arithm-ocl simdocl)
+target_link_libraries(test-arithm-ocl-moredata simdocl)
 endif()
 
 if(IPP_DIR)
@@ -101,6 +104,7 @@ endif()
 
 if(OCL)
 add_test(arithm-ocl     test-arithm-ocl)
+add_test(arithm-ocl-1m  test-arithm-ocl-moredata)
 endif()
 
 if(IPP_DIR)

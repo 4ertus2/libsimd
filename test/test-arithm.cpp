@@ -133,8 +133,20 @@ int main()
 {
     try
     {
-#ifdef FLOAT_ONLY
+#ifdef FLOAT_AND_DOUBLE
         for (unsigned len = 0; len < 128; ++len)
+        {
+            test_arithm<float>(len, 2, 1, true);
+            test_abs<float>(len);
+        }
+
+        for (unsigned len = 0; len < 128; ++len)
+        {
+            test_arithm<double>(len, 2, 1, true);
+            test_abs<double>(len);
+        }
+#ifdef MORE_DATA
+        for (unsigned len = 1000; len < 1024 * 1024; len += 100000)
         {
             test_arithm<float>(len, 2, 1, true);
             test_abs<float>(len);
@@ -142,9 +154,10 @@ int main()
 
         for (unsigned len = 1000; len < 1024 * 1024; len += 100000)
         {
-            test_arithm<float>(len, 2, 1, true);
-            test_abs<float>(len);
+            test_arithm<double>(len, 2, 1, true);
+            test_abs<double>(len);
         }
+#endif
 #else
         for (unsigned len = 0; len < 128; ++len)
         {
