@@ -1,5 +1,10 @@
 #include <cstdint>
 
+//int iGID = get_global_id(0);
+//if (iGID >= size)
+//    return;
+#define OCL_IGUID_COMMON " int iGID = get_global_id(0); if (iGID >= size) return; "
+
 namespace ocl
 {
 namespace internals
@@ -124,14 +129,9 @@ namespace internals
             static constexpr const char * programName() { return "add_32s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void add_32s(__global const int* a, __global const int* b, __global int* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b[iGID];
-                })";
+                return "__kernel void add_32s(__global const int* a, __global const int* b, __global int* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b[iGID]; }";
             }
         };
 
@@ -141,14 +141,9 @@ namespace internals
             static constexpr const char * programName() { return "sub_32s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void sub_32s(__global const int* a, __global const int* b, __global int* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b[iGID];
-                })";
+                return "__kernel void sub_32s(__global const int* a, __global const int* b, __global int* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b[iGID]; }";
             }
         };
 
@@ -158,14 +153,9 @@ namespace internals
             static constexpr const char * programName() { return "mul_32s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mul_32s(__global const int* a, __global const int* b, __global int* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b[iGID];
-                })";
+                return " __kernel void mul_32s(__global const int* a, __global const int* b, __global int* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b[iGID]; }";
             }
         };
 
@@ -175,14 +165,9 @@ namespace internals
             static constexpr const char * programName() { return "div_32s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void div_32s(__global const int* a, __global const int* b, __global int* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b[iGID];
-                })";
+                return "__kernel void div_32s(__global const int* a, __global const int* b, __global int* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b[iGID]; }";
             }
         };
 
@@ -192,14 +177,9 @@ namespace internals
             static constexpr const char * programName() { return "addC_32s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void addC_32s(__global const int* a, int b, __global int* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b;
-                })";
+                return "__kernel void addC_32s(__global const int* a, int b, __global int* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b; }";
             }
         };
 
@@ -209,14 +189,9 @@ namespace internals
             static constexpr const char * programName() { return "subC_32s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subC_32s(__global const int* a, int b, __global int* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b;
-                })";
+                return "__kernel void subC_32s(__global const int* a, int b, __global int* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b; }";
             }
         };
 
@@ -226,14 +201,9 @@ namespace internals
             static constexpr const char * programName() { return "subCRev_32s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subCRev_32s(__global const int* a, int b, __global int* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b - a[iGID];
-                })";
+                return "__kernel void subCRev_32s(__global const int* a, int b, __global int* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b - a[iGID]; }";
             }
         };
 
@@ -243,14 +213,9 @@ namespace internals
             static constexpr const char * programName() { return "mulC_32s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mulC_32s(__global const int* a, int b, __global int* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b;
-                })";
+                return "__kernel void mulC_32s(__global const int* a, int b, __global int* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b; }";
             }
         };
 
@@ -260,14 +225,9 @@ namespace internals
             static constexpr const char * programName() { return "divC_32s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divC_32s(__global const int* a, int b, __global int* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b;
-                })";
+                return "__kernel void divC_32s(__global const int* a, int b, __global int* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b; }";
             }
         };
 
@@ -277,14 +237,9 @@ namespace internals
             static constexpr const char * programName() { return "divCRev_32s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divCRev_32s(__global const int* a, int b, __global int* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b / a[iGID];
-                })";
+                return "__kernel void divCRev_32s(__global const int* a, int b, __global int* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b / a[iGID]; }";
             }
         };
 
@@ -316,14 +271,9 @@ namespace internals
             static constexpr const char * programName() { return "add_32u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void add_32u(__global const uint* a, __global const uint* b, __global uint* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b[iGID];
-                })";
+                return "__kernel void add_32u(__global const uint* a, __global const uint* b, __global uint* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b[iGID]; }";
             }
         };
 
@@ -333,14 +283,9 @@ namespace internals
             static constexpr const char * programName() { return "sub_32u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void sub_32u(__global const uint* a, __global const uint* b, __global uint* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b[iGID];
-                })";
+                return "__kernel void sub_32u(__global const uint* a, __global const uint* b, __global uint* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b[iGID]; }";
             }
         };
 
@@ -350,14 +295,9 @@ namespace internals
             static constexpr const char * programName() { return "mul_32u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mul_32u(__global const uint* a, __global const uint* b, __global uint* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b[iGID];
-                })";
+                return "__kernel void mul_32u(__global const uint* a, __global const uint* b, __global uint* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b[iGID]; }";
             }
         };
 
@@ -367,14 +307,9 @@ namespace internals
             static constexpr const char * programName() { return "div_32u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void div_32u(__global const uint* a, __global const uint* b, __global uint* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b[iGID];
-                })";
+                return "__kernel void div_32u(__global const uint* a, __global const uint* b, __global uint* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b[iGID]; }";
             }
         };
 
@@ -384,14 +319,9 @@ namespace internals
             static constexpr const char * programName() { return "addC_32u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void addC_32u(__global const uint* a, uint b, __global uint* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b;
-                })";
+                return "__kernel void addC_32u(__global const uint* a, uint b, __global uint* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b; }";
             }
         };
 
@@ -401,14 +331,9 @@ namespace internals
             static constexpr const char * programName() { return "subC_32u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subC_32u(__global const uint* a, uint b, __global uint* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b;
-                })";
+                return "__kernel void subC_32u(__global const uint* a, uint b, __global uint* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b; }";
             }
         };
 
@@ -418,14 +343,9 @@ namespace internals
             static constexpr const char * programName() { return "subCRev_32u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subCRev_32u(__global const uint* a, uint b, __global uint* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b - a[iGID];
-                })";
+                return "__kernel void subCRev_32u(__global const uint* a, uint b, __global uint* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b - a[iGID]; }";
             }
         };
 
@@ -435,14 +355,9 @@ namespace internals
             static constexpr const char * programName() { return "mulC_32u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mulC_32u(__global const uint* a, uint b, __global uint* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b;
-                })";
+                return "__kernel void mulC_32u(__global const uint* a, uint b, __global uint* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b; }";
             }
         };
 
@@ -452,14 +367,9 @@ namespace internals
             static constexpr const char * programName() { return "divC_32u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divC_32u(__global const uint* a, uint b, __global uint* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b;
-                })";
+                return "__kernel void divC_32u(__global const uint* a, uint b, __global uint* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b; }";
             }
         };
 
@@ -469,14 +379,9 @@ namespace internals
             static constexpr const char * programName() { return "divCRev_32u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divCRev_32u(__global const uint* a, uint b, __global uint* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b / a[iGID];
-                })";
+                return "__kernel void divCRev_32u(__global const uint* a, uint b, __global uint* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b / a[iGID]; }";
             }
         };
 
@@ -488,14 +393,9 @@ namespace internals
             static constexpr const char * programName() { return "add_64s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void add_64s(__global const long* a, __global const long* b, __global long* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b[iGID];
-                })";
+                return "__kernel void add_64s(__global const long* a, __global const long* b, __global long* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b[iGID]; }";
             }
         };
 
@@ -505,14 +405,9 @@ namespace internals
             static constexpr const char * programName() { return "sub_64s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void sub_64s(__global const long* a, __global const long* b, __global long* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b[iGID];
-                })";
+                return "__kernel void sub_64s(__global const long* a, __global const long* b, __global long* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b[iGID]; }";
             }
         };
 
@@ -522,14 +417,9 @@ namespace internals
             static constexpr const char * programName() { return "mul_64s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mul_64s(__global const long* a, __global const long* b, __global long* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b[iGID];
-                })";
+                return "__kernel void mul_64s(__global const long* a, __global const long* b, __global long* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b[iGID]; }";
             }
         };
 
@@ -539,14 +429,9 @@ namespace internals
             static constexpr const char * programName() { return "div_64s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void div_64s(__global const long* a, __global const long* b, __global long* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b[iGID];
-                })";
+                return "__kernel void div_64s(__global const long* a, __global const long* b, __global long* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b[iGID]; }";
             }
         };
 
@@ -556,14 +441,9 @@ namespace internals
             static constexpr const char * programName() { return "addC_64s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void addC_64s(__global const long* a, long b, __global long* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b;
-                })";
+                return "__kernel void addC_64s(__global const long* a, long b, __global long* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b; }";
             }
         };
 
@@ -573,14 +453,9 @@ namespace internals
             static constexpr const char * programName() { return "subC_64s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subC_64s(__global const long* a, long b, __global long* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b;
-                })";
+                return "__kernel void subC_64s(__global const long* a, long b, __global long* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b; }";
             }
         };
 
@@ -590,14 +465,9 @@ namespace internals
             static constexpr const char * programName() { return "subCRev_64s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subCRev_64s(__global const long* a, long b, __global long* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b - a[iGID];
-                })";
+                return "__kernel void subCRev_64s(__global const long* a, long b, __global long* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b - a[iGID]; }";
             }
         };
 
@@ -607,14 +477,9 @@ namespace internals
             static constexpr const char * programName() { return "mulC_64s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mulC_64s(__global const long* a, long b, __global long* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b;
-                })";
+                return "__kernel void mulC_64s(__global const long* a, long b, __global long* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b; }";
             }
         };
 
@@ -624,14 +489,9 @@ namespace internals
             static constexpr const char * programName() { return "divC_64s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divC_64s(__global const long* a, long b, __global long* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b;
-                })";
+                return "__kernel void divC_64s(__global const long* a, long b, __global long* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b; }";
             }
         };
 
@@ -641,14 +501,9 @@ namespace internals
             static constexpr const char * programName() { return "divCRev_64s"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divCRev_64s(__global const long* a, long b, __global long* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b / a[iGID];
-                })";
+                return "__kernel void divCRev_64s(__global const long* a, long b, __global long* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b / a[iGID]; }";
             }
         };
 
@@ -680,14 +535,9 @@ namespace internals
             static constexpr const char * programName() { return "add_64u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void add_64u(__global const ulong* a, __global const ulong* b, __global ulong* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b[iGID];
-                })";
+                return "__kernel void add_64u(__global const ulong* a, __global const ulong* b, __global ulong* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b[iGID]; }";
             }
         };
 
@@ -697,14 +547,9 @@ namespace internals
             static constexpr const char * programName() { return "sub_64u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void sub_64u(__global const ulong* a, __global const ulong* b, __global ulong* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b[iGID];
-                })";
+                return "__kernel void sub_64u(__global const ulong* a, __global const ulong* b, __global ulong* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b[iGID]; }";
             }
         };
 
@@ -714,14 +559,9 @@ namespace internals
             static constexpr const char * programName() { return "mul_64u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mul_64u(__global const ulong* a, __global const ulong* b, __global ulong* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b[iGID];
-                })";
+                return "__kernel void mul_64u(__global const ulong* a, __global const ulong* b, __global ulong* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b[iGID]; }";
             }
         };
 
@@ -731,14 +571,9 @@ namespace internals
             static constexpr const char * programName() { return "div_64u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void div_64u(__global const ulong* a, __global const ulong* b, __global ulong* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b[iGID];
-                })";
+                return "__kernel void div_64u(__global const ulong* a, __global const ulong* b, __global ulong* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b[iGID]; }";
             }
         };
 
@@ -748,14 +583,9 @@ namespace internals
             static constexpr const char * programName() { return "addC_64u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void addC_64u(__global const ulong* a, ulong b, __global ulong* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b;
-                })";
+                return "__kernel void addC_64u(__global const ulong* a, ulong b, __global ulong* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b; }";
             }
         };
 
@@ -765,14 +595,9 @@ namespace internals
             static constexpr const char * programName() { return "subC_64u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subC_64u(__global const ulong* a, ulong b, __global ulong* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b;
-                })";
+                return "__kernel void subC_64u(__global const ulong* a, ulong b, __global ulong* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b; }";
             }
         };
 
@@ -782,14 +607,9 @@ namespace internals
             static constexpr const char * programName() { return "subCRev_64u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subCRev_64u(__global const ulong* a, ulong b, __global ulong* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b - a[iGID];
-                })";
+                return "__kernel void subCRev_64u(__global const ulong* a, ulong b, __global ulong* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b - a[iGID]; }";
             }
         };
 
@@ -799,14 +619,9 @@ namespace internals
             static constexpr const char * programName() { return "mulC_64u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mulC_64u(__global const ulong* a, ulong b, __global ulong* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b;
-                })";
+                return "__kernel void mulC_64u(__global const ulong* a, ulong b, __global ulong* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b; }";
             }
         };
 
@@ -816,14 +631,9 @@ namespace internals
             static constexpr const char * programName() { return "divC_64u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divC_64u(__global const ulong* a, ulong b, __global ulong* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b;
-                })";
+                return "__kernel void divC_64u(__global const ulong* a, ulong b, __global ulong* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b; }";
             }
         };
 
@@ -833,14 +643,9 @@ namespace internals
             static constexpr const char * programName() { return "divCRev_64u"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divCRev_64u(__global const ulong* a, ulong b, __global ulong* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b / a[iGID];
-                })";
+                return "__kernel void divCRev_64u(__global const ulong* a, ulong b, __global ulong* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b / a[iGID]; }";
             }
         };
 
@@ -852,14 +657,9 @@ namespace internals
             static constexpr const char * programName() { return "add_32f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void add_32f(__global const float* a, __global const float* b, __global float* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b[iGID];
-                })";
+                return "__kernel void add_32f(__global const float* a, __global const float* b, __global float* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b[iGID]; }";
             }
         };
 
@@ -869,14 +669,9 @@ namespace internals
             static constexpr const char * programName() { return "sub_32f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void sub_32f(__global const float* a, __global const float* b, __global float* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b[iGID];
-                })";
+                return "__kernel void sub_32f(__global const float* a, __global const float* b, __global float* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b[iGID]; }";
             }
         };
 
@@ -886,14 +681,9 @@ namespace internals
             static constexpr const char * programName() { return "mul_32f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mul_32f(__global const float* a, __global const float* b, __global float* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b[iGID];
-                })";
+                return "__kernel void mul_32f(__global const float* a, __global const float* b, __global float* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b[iGID]; }";
             }
         };
 
@@ -903,14 +693,9 @@ namespace internals
             static constexpr const char * programName() { return "div_32f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void div_32f(__global const float* a, __global const float* b, __global float* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b[iGID];
-                })";
+                return "__kernel void div_32f(__global const float* a, __global const float* b, __global float* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b[iGID]; }";
             }
         };
 
@@ -920,14 +705,9 @@ namespace internals
             static constexpr const char * programName() { return "addC_32f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void addC_32f(__global const float* a, float b, __global float* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b;
-                })";
+                return "__kernel void addC_32f(__global const float* a, float b, __global float* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b; }";
             }
         };
 
@@ -937,14 +717,9 @@ namespace internals
             static constexpr const char * programName() { return "subC_32f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subC_32f(__global const float* a, float b, __global float* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b;
-                })";
+                return "__kernel void subC_32f(__global const float* a, float b, __global float* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b; }";
             }
         };
 
@@ -954,14 +729,9 @@ namespace internals
             static constexpr const char * programName() { return "subCRev_32f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subCRev_32f(__global const float* a, float b, __global float* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b - a[iGID];
-                })";
+                return "__kernel void subCRev_32f(__global const float* a, float b, __global float* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b - a[iGID]; }";
             }
         };
 
@@ -971,14 +741,9 @@ namespace internals
             static constexpr const char * programName() { return "mulC_32f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mulC_32f(__global const float* a, float b, __global float* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b;
-                })";
+                return "__kernel void mulC_32f(__global const float* a, float b, __global float* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b; }";
             }
         };
 
@@ -988,14 +753,9 @@ namespace internals
             static constexpr const char * programName() { return "divC_32f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divC_32f(__global const float* a, float b, __global float* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b;
-                })";
+                return "__kernel void divC_32f(__global const float* a, float b, __global float* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b; }";
             }
         };
 
@@ -1005,14 +765,9 @@ namespace internals
             static constexpr const char * programName() { return "divCRev_32f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divCRev_32f(__global const float* a, float b, __global float* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b / a[iGID];
-                })";
+                return "__kernel void divCRev_32f(__global const float* a, float b, __global float* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b / a[iGID]; }";
             }
         };
 
@@ -1044,14 +799,9 @@ namespace internals
             static constexpr const char * programName() { return "add_64f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void add_64f(__global const double* a, __global const double* b, __global double* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b[iGID];
-                })";
+                return "__kernel void add_64f(__global const double* a, __global const double* b, __global double* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b[iGID]; }";
             }
         };
 
@@ -1061,14 +811,9 @@ namespace internals
             static constexpr const char * programName() { return "sub_64f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void sub_64f(__global const double* a, __global const double* b, __global double* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b[iGID];
-                })";
+                return "__kernel void sub_64f(__global const double* a, __global const double* b, __global double* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b[iGID]; }";
             }
         };
 
@@ -1078,14 +823,9 @@ namespace internals
             static constexpr const char * programName() { return "mul_64f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mul_64f(__global const double* a, __global const double* b, __global double* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b[iGID];
-                })";
+                return "__kernel void mul_64f(__global const double* a, __global const double* b, __global double* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b[iGID]; }";
             }
         };
 
@@ -1095,14 +835,9 @@ namespace internals
             static constexpr const char * programName() { return "div_64f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void div_64f(__global const double* a, __global const double* b, __global double* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b[iGID];
-                })";
+                return "__kernel void div_64f(__global const double* a, __global const double* b, __global double* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b[iGID]; }";
             }
         };
 
@@ -1112,14 +847,9 @@ namespace internals
             static constexpr const char * programName() { return "addC_64f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void addC_64f(__global const double* a, double b, __global double* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] + b;
-                })";
+                return "__kernel void addC_64f(__global const double* a, double b, __global double* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] + b; }";
             }
         };
 
@@ -1129,14 +859,9 @@ namespace internals
             static constexpr const char * programName() { return "subC_64f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subC_64f(__global const double* a, double b, __global double* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] - b;
-                })";
+                return "__kernel void subC_64f(__global const double* a, double b, __global double* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] - b; }";
             }
         };
 
@@ -1146,14 +871,9 @@ namespace internals
             static constexpr const char * programName() { return "subCRev_64f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void subCRev_64f(__global const double* a, double b, __global double* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b - a[iGID];
-                })";
+                return "__kernel void subCRev_64f(__global const double* a, double b, __global double* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b - a[iGID]; }";
             }
         };
 
@@ -1163,14 +883,9 @@ namespace internals
             static constexpr const char * programName() { return "mulC_64f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void mulC_64f(__global const double* a, double b, __global double* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] * b;
-                })";
+                return "__kernel void mulC_64f(__global const double* a, double b, __global double* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] * b; }";
             }
         };
 
@@ -1180,14 +895,9 @@ namespace internals
             static constexpr const char * programName() { return "divC_64f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divC_64f(__global const double* a, double b, __global double* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = a[iGID] / b;
-                })";
+                return "__kernel void divC_64f(__global const double* a, double b, __global double* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = a[iGID] / b; }";
             }
         };
 
@@ -1197,14 +907,9 @@ namespace internals
             static constexpr const char * programName() { return "divCRev_64f"; }
             static constexpr const char * programText()
             {
-                return R"(
-                __kernel void divCRev_64f(__global const double* a, double b, __global double* c, int size)
-                {
-                    int iGID = get_global_id(0);
-                    if (iGID >= size)
-                        return;
-                    c[iGID] = b / a[iGID];
-                })";
+                return "__kernel void divCRev_64f(__global const double* a, double b, __global double* c, int size) {"
+                    OCL_IGUID_COMMON
+                    "c[iGID] = b / a[iGID]; }";
             }
         };
 
