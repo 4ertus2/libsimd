@@ -1,6 +1,10 @@
 #pragma once
 #include "nosimd.h"
 
+#include <exception>
+
+#define OCL_EXCEPTION ocl::Exception(__FILE__, __LINE__, __FUNCTION__)
+
 #ifndef _SIMD_OCL_T
 #define _SIMD_OCL_T template<typename _T>
 #define _SIMD_OCL_SPEC template <>
@@ -59,4 +63,22 @@ namespace ocl
     using namespace nosimd::statistical;
     using namespace nosimd::exp_log;
     using namespace nosimd::trigonometric;
+
+    ///
+    class Exception : public std::exception
+    {
+    public:
+        Exception(const char * file, uint32_t line, const char * func)
+        :   file_(file), line_(line), function_(func)
+        {}
+
+        const char * what() const noexcept { return function_; }
+        const char * file() const noexcept { return file_; }
+        uint32_t line() const noexcept { return line_; }
+
+    private:
+        const char * file_;
+        const char * function_;
+        uint32_t line_;
+    };
 }

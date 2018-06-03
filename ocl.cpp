@@ -31,12 +31,12 @@ namespace internals
             srcA_ = std::shared_ptr<ClMemType>(
                 clCreateBuffer(gpuContext, CL_MEM_READ_ONLY, dataSize(), nullptr, &err), clReleaseMemObject);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
 
             dst_ = std::shared_ptr<ClMemType>(
                 clCreateBuffer(gpuContext, CL_MEM_WRITE_ONLY, dataSize(), nullptr, &err), clReleaseMemObject);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
         }
 
         uint32_t workSize() const { return workSize_; }
@@ -66,7 +66,7 @@ namespace internals
                 clCreateBuffer(gpuContext, CL_MEM_READ_ONLY, SrcDstBuffers<_T>::dataSize(), nullptr, &err),
                 clReleaseMemObject);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
         }
 
         cl_mem srcB() { return srcB_.get(); }
@@ -432,21 +432,21 @@ namespace internals
         {
             cl_uint numPlatforms;
             if (clGetPlatformIDs(0, nullptr, &numPlatforms) || numPlatforms < platformId)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
             if (clGetPlatformIDs(platformId, &platform_, nullptr))
-                throw __LINE__;
+                throw OCL_EXCEPTION;
 
             cl_uint numDevices;
             if (clGetDeviceIDs(platform_, CL_DEVICE_TYPE_GPU, 0, nullptr, &numDevices) || numDevices < deviceId)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
             if (clGetDeviceIDs(platform_, CL_DEVICE_TYPE_GPU, deviceId, &device_, nullptr))
-                throw __LINE__;
+                throw OCL_EXCEPTION;
 
             cl_int err = 0;
             gpuContext_ = std::shared_ptr<ContextType>(
                 clCreateContext(nullptr, 1, &device_, nullptr, nullptr, &err), clReleaseContext);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
 
 #ifdef CL_USE_DEPRECATED_OPENCL_1_2_APIS
             commandQueue_ = std::shared_ptr<CmdQueueType>(
@@ -456,7 +456,7 @@ namespace internals
                 clCreateCommandQueueWithProperties(gpuContext(), device_, nullptr, &err), clReleaseCommandQueue);
 #endif
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
 
             makePrograms();
         }
@@ -476,20 +476,20 @@ namespace internals
             size_t progLength = strlen(text);
 
             if (programs_.size() <= (uint32_t)func)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
 
             prog.setProgram(clCreateProgramWithSource(gpuContext(), 1, (const char **)&text, &progLength, &err));
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
 
             //const char* flags = "-cl-fast-relaxed-math";
             err = clBuildProgram(prog.program(), 0, nullptr, nullptr, nullptr, nullptr);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
 
             prog.setKernel(clCreateKernel(prog.program(), Kernel::programName(func), &err));
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
         }
 
         template <typename _T>
@@ -504,7 +504,7 @@ namespace internals
             err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &dst);
             err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &count);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
         }
 
         template <typename _T>
@@ -518,7 +518,7 @@ namespace internals
             err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &dst);
             err |= clSetKernelArg(kernel, 3, sizeof(cl_int), &count);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
         }
 
         template <typename _T>
@@ -535,7 +535,7 @@ namespace internals
         {
             cl_int err = clSetKernelArg(kernel, 1, sizeof(_T), &src2);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
 
             asyncWriteToGPU(src1, bufs.dataSize(), bufs.srcA());
             launchKernel(kernel, bufs.workSize());
@@ -548,7 +548,7 @@ namespace internals
             cl_int err = clEnqueueNDRangeKernel(
                 commandQueue(), kernel, 1, nullptr, &workSize, &localWS, 0, nullptr, nullptr);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
         }
 
         void asyncWriteToGPU(const void * src, size_t dataSize, cl_mem gpuBuffer)
@@ -556,7 +556,7 @@ namespace internals
             cl_int err = clEnqueueWriteBuffer(
                 commandQueue(), gpuBuffer, CL_FALSE, 0, dataSize, src, 0, nullptr, nullptr);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
         }
 
         void syncReadFromGPU(void * dst, size_t dataSize, cl_mem gpuBuffer)
@@ -564,7 +564,7 @@ namespace internals
             cl_int err = clEnqueueReadBuffer(
                 commandQueue(), gpuBuffer, CL_TRUE, 0, dataSize, dst, 0, nullptr, nullptr);
             if (err)
-                throw __LINE__;
+                throw OCL_EXCEPTION;
         }
     };
 

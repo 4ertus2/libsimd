@@ -14,7 +14,6 @@ endif()
 
 set(LIB_IPP
     ipps${ESFX} ipps${MSFX}
-#	ippsr${ESFX} ippsr${MSFX}
     ippvm${ESFX} ippvm${MSFX}
     ippcore${PSFX}
 )
@@ -27,7 +26,7 @@ endif()
 if(WIN32)
     set(CXX_OPT /EHsc)
 else()
-    set(CXX_OPT "-std=c++14 -m64 -msse4.1")
+    set(CXX_OPT "-std=c++14 -Wno-ignored-attributes -m64 -msse4.1")
     if (AVX)
         set(CXX_OPT "${CXX_OPT} -mavx2")
     endif()

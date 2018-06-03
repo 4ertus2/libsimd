@@ -7,13 +7,13 @@ namespace ipp
     {
     public:
         IppException(IppStatus s, const char * fn)
-        :	status_(s), function_(fn)
+        :   status_(s), function_(fn)
         {}
 
         IppStatus status() const { return status_; }
 
-        const char * what() const { return ippGetStatusString(status_); }
-        const char * func() const { return function_; }
+        const char * what() const noexcept { return ippGetStatusString(status_); }
+        const char * func() const noexcept { return function_; }
 
     private:
         IppStatus status_;
