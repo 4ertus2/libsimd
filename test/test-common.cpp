@@ -41,7 +41,7 @@ void test_common(unsigned length, T value = 42)
     simd::copy(a, b, length);
     for (unsigned i=0; i<length; ++i)
     {
-        if (b[i] != i)
+        if (b[i] != (T)i)
             FAIL();
     }
 

@@ -19,8 +19,8 @@ namespace simd
 
     private:
         const char * file_;
-        const char * function_;
         uint32_t line_;
+        const char * function_;
     };
 }
 

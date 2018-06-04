@@ -19,7 +19,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
     simd::set(value1, v1, length);
     simd::set(value2, v2, length);
 
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (! equal(v1[i], value1) || ! equal(v2[i], value2))
             FAIL();
@@ -27,7 +27,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 
     T r = value1 + value2;
     arithm::add(v1, v2, result, length);
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (! equal(result[i], r))
             FAIL();
@@ -35,7 +35,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 
     r = value1 - value2;
     arithm::sub(v1, v2, result, length);
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (! equal(result[i], r))
             FAIL();
@@ -43,7 +43,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 
     r = value1 * value2;
     arithm::mul(v1, v2, result, length);
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (! equal(result[i], r))
             FAIL();
@@ -51,7 +51,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 
     r = value1 / value2;
     arithm::div(v1, v2, result, length);
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (! equal(result[i], r))
             FAIL();
@@ -60,7 +60,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 #ifndef TEST_FIXED
     r = value1 + value2;
     simd::addC(v1, value2, result, length);
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (! equal(result[i], r))
             FAIL();
@@ -68,7 +68,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 
     r = value1 - value2;
     simd::subC(v1, value2, result, length);
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (result[i] != r)
             FAIL();
@@ -76,7 +76,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 
     r = value2 - value1;
     simd::subCRev(v1, value2, result, length);
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (! equal(result[i], r))
             FAIL();
@@ -84,7 +84,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 
     r = value1 * value2;
     simd::mulC(v1, value2, result, length);
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (result[i] != r)
             FAIL();
@@ -92,7 +92,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 
     r = value1 / value2;
     simd::divC(v1, value2, result, length);
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (! equal(result[i], r))
             FAIL();
@@ -100,7 +100,7 @@ void test_arithm(unsigned length, T value1, T value2, bool allowTrash = false)
 
     r = value2 / value1;
     simd::divCRev(v1, value2, result, length);
-    for (int i=0; i<length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (! equal(result[i], r))
             FAIL();
@@ -117,12 +117,12 @@ void test_abs(unsigned length = 47)
     auto pv = std::shared_ptr<T>(simd::malloc<T>(length), simd::free<T>);
     T * v = pv.get();
 
-    for (int i = 0; i < length; ++i)
+    for (int i = 0; i < (int)length; ++i)
         v[i] = -i;
 
     simd::abs(v, v, length);
 
-    for (int i = 0; i < length; ++i)
+    for (int i = 0; i < (int)length; ++i)
     {
         if (v[i] < 0)
             FAIL();

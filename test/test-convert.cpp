@@ -17,7 +17,7 @@ void test_convert(unsigned length, _T value)
     simd::set(value, t, length);
     simd::convert(t, u, length);
 
-    for (int i = 0; i < length; ++i)
+    for (unsigned i = 0; i < length; ++i)
     {
         if (! equal(u[i], (_U)value))
             FAIL();

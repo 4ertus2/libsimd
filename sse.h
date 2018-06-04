@@ -202,21 +202,60 @@ namespace sse
 
     namespace arithmetic
     {
-        _SIMD_SSE_T void addC(const _T* pSrc, _T val, _T* pDst, int len);
-        _SIMD_SSE_T void add(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
+        _SIMD_SSE_T void addC(const _T* pSrc, _T val, _T* pDst, int len)
+        {
+            nosimd::addC(pSrc, val, pDst, len);
+        }
 
-        _SIMD_SSE_T void subC(const _T* pSrc, _T val, _T* pDst, int len);
-        _SIMD_SSE_T void subCRev(const _T* pSrc, _T val, _T* pDst, int len);
-        _SIMD_SSE_T void sub(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
+        _SIMD_SSE_T void add(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len)
+        {
+            nosimd::add(pSrc1, pSrc2, pDst, len);
+        }
 
-        _SIMD_SSE_T void mulC(const _T* pSrc, _T val, _T* pDst, int len);
-        _SIMD_SSE_T void mul(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
+        _SIMD_SSE_T void subC(const _T* pSrc, _T val, _T* pDst, int len)
+        {
+            nosimd::subC(pSrc, val, pDst, len);
+        }
 
-        _SIMD_SSE_T void divC(const _T* pSrc, _T val, _T* pDst, int len);
-        _SIMD_SSE_T void divCRev(const _T* pSrc, _T val, _T* pDst, int len);
-        _SIMD_SSE_T void div(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len);
+        _SIMD_SSE_T void subCRev(const _T* pSrc, _T val, _T* pDst, int len)
+        {
+            nosimd::subCRev(pSrc, val, pDst, len);
+        }
 
-        _SIMD_SSE_T void abs(const _T* pSrc, _T* pDst, int len);
+        _SIMD_SSE_T void sub(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len)
+        {
+            nosimd::sub(pSrc1, pSrc2, pDst, len);
+        }
+
+        _SIMD_SSE_T void mulC(const _T* pSrc, _T val, _T* pDst, int len)
+        {
+            nosimd::mulC(pSrc, val, pDst, len);
+        }
+
+        _SIMD_SSE_T void mul(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len)
+        {
+            nosimd::mul(pSrc1, pSrc2, pDst, len);
+        }
+
+        _SIMD_SSE_T void divC(const _T* pSrc, _T val, _T* pDst, int len)
+        {
+            nosimd::divC(pSrc, val, pDst, len);
+        }
+
+        _SIMD_SSE_T void divCRev(const _T* pSrc, _T val, _T* pDst, int len)
+        {
+            nosimd::divCRev(pSrc, val, pDst, len);
+        }
+
+        _SIMD_SSE_T void div(const _T* pSrc1, const _T* pSrc2, _T* pDst, int len)
+        {
+            nosimd::div(pSrc1, pSrc2, pDst, len);
+        }
+
+        _SIMD_SSE_T void abs(const _T* pSrc, _T* pDst, int len)
+        {
+            nosimd::abs(pSrc, pDst, len);
+        }
     }
 
     namespace power

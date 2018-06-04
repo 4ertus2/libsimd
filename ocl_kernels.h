@@ -125,7 +125,7 @@ namespace internals
 
         struct Add_32s : public PtrPtrPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::Add_32s; }
+            static constexpr Func id() { return Func::Add_32s; }
             static constexpr const char * programName() { return "add_32s"; }
             static constexpr const char * programText()
             {
@@ -137,7 +137,7 @@ namespace internals
 
         struct Sub_32s : public PtrPtrPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::Sub_32s; }
+            static constexpr Func id() { return Func::Sub_32s; }
             static constexpr const char * programName() { return "sub_32s"; }
             static constexpr const char * programText()
             {
@@ -149,7 +149,7 @@ namespace internals
 
         struct Mul_32s : public PtrPtrPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::Mul_32s; }
+            static constexpr Func id() { return Func::Mul_32s; }
             static constexpr const char * programName() { return "mul_32s"; }
             static constexpr const char * programText()
             {
@@ -161,7 +161,7 @@ namespace internals
 
         struct Div_32s : public PtrPtrPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::Div_32s; }
+            static constexpr Func id() { return Func::Div_32s; }
             static constexpr const char * programName() { return "div_32s"; }
             static constexpr const char * programText()
             {
@@ -173,7 +173,7 @@ namespace internals
 
         struct AddC_32s : public PtrValPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::AddC_32s; }
+            static constexpr Func id() { return Func::AddC_32s; }
             static constexpr const char * programName() { return "addC_32s"; }
             static constexpr const char * programText()
             {
@@ -185,7 +185,7 @@ namespace internals
 
         struct SubC_32s : public PtrValPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::SubC_32s; }
+            static constexpr Func id() { return Func::SubC_32s; }
             static constexpr const char * programName() { return "subC_32s"; }
             static constexpr const char * programText()
             {
@@ -197,7 +197,7 @@ namespace internals
 
         struct SubCRev_32s : public PtrValPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::SubCRev_32s; }
+            static constexpr Func id() { return Func::SubCRev_32s; }
             static constexpr const char * programName() { return "subCRev_32s"; }
             static constexpr const char * programText()
             {
@@ -209,7 +209,7 @@ namespace internals
 
         struct MulC_32s : public PtrValPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::MulC_32s; }
+            static constexpr Func id() { return Func::MulC_32s; }
             static constexpr const char * programName() { return "mulC_32s"; }
             static constexpr const char * programText()
             {
@@ -221,7 +221,7 @@ namespace internals
 
         struct DivC_32s : public PtrValPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::DivC_32s; }
+            static constexpr Func id() { return Func::DivC_32s; }
             static constexpr const char * programName() { return "divC_32s"; }
             static constexpr const char * programText()
             {
@@ -233,7 +233,7 @@ namespace internals
 
         struct DivCRev_32s : public PtrValPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::DivCRev_32s; }
+            static constexpr Func id() { return Func::DivCRev_32s; }
             static constexpr const char * programName() { return "divCRev_32s"; }
             static constexpr const char * programText()
             {
@@ -245,7 +245,7 @@ namespace internals
 
         struct Abs_32s : public PtrValPtr<int32_t>
         {
-            static constexpr const Func id() { return Func::Abs_32s; }
+            static constexpr Func id() { return Func::Abs_32s; }
             static constexpr const char * programName() { return "abs_32s"; }
             static constexpr const char * programText()
             {
@@ -267,7 +267,7 @@ namespace internals
 
         struct Add_32u : public PtrPtrPtr<uint32_t>
         {
-            static constexpr const Func id() { return Func::Add_32u; }
+            static constexpr Func id() { return Func::Add_32u; }
             static constexpr const char * programName() { return "add_32u"; }
             static constexpr const char * programText()
             {
@@ -279,7 +279,7 @@ namespace internals
 
         struct Sub_32u : public PtrPtrPtr<uint32_t>
         {
-            static constexpr const Func id() { return Func::Sub_32u; }
+            static constexpr Func id() { return Func::Sub_32u; }
             static constexpr const char * programName() { return "sub_32u"; }
             static constexpr const char * programText()
             {
@@ -291,7 +291,7 @@ namespace internals
 
         struct Mul_32u : public PtrPtrPtr<uint32_t>
         {
-            static constexpr const Func id() { return Func::Mul_32u; }
+            static constexpr Func id() { return Func::Mul_32u; }
             static constexpr const char * programName() { return "mul_32u"; }
             static constexpr const char * programText()
             {
@@ -303,7 +303,7 @@ namespace internals
 
         struct Div_32u : public PtrPtrPtr<uint32_t>
         {
-            static constexpr const Func id() { return Func::Div_32u; }
+            static constexpr Func id() { return Func::Div_32u; }
             static constexpr const char * programName() { return "div_32u"; }
             static constexpr const char * programText()
             {
@@ -315,7 +315,7 @@ namespace internals
 
         struct AddC_32u : public PtrValPtr<uint32_t>
         {
-            static constexpr const Func id() { return Func::AddC_32u; }
+            static constexpr Func id() { return Func::AddC_32u; }
             static constexpr const char * programName() { return "addC_32u"; }
             static constexpr const char * programText()
             {
@@ -327,7 +327,7 @@ namespace internals
 
         struct SubC_32u : public PtrValPtr<uint32_t>
         {
-            static constexpr const Func id() { return Func::SubC_32u; }
+            static constexpr Func id() { return Func::SubC_32u; }
             static constexpr const char * programName() { return "subC_32u"; }
             static constexpr const char * programText()
             {
@@ -339,7 +339,7 @@ namespace internals
 
         struct SubCRev_32u : public PtrValPtr<uint32_t>
         {
-            static constexpr const Func id() { return Func::SubCRev_32u; }
+            static constexpr Func id() { return Func::SubCRev_32u; }
             static constexpr const char * programName() { return "subCRev_32u"; }
             static constexpr const char * programText()
             {
@@ -351,7 +351,7 @@ namespace internals
 
         struct MulC_32u : public PtrValPtr<uint32_t>
         {
-            static constexpr const Func id() { return Func::MulC_32u; }
+            static constexpr Func id() { return Func::MulC_32u; }
             static constexpr const char * programName() { return "mulC_32u"; }
             static constexpr const char * programText()
             {
@@ -363,7 +363,7 @@ namespace internals
 
         struct DivC_32u : public PtrValPtr<uint32_t>
         {
-            static constexpr const Func id() { return Func::DivC_32u; }
+            static constexpr Func id() { return Func::DivC_32u; }
             static constexpr const char * programName() { return "divC_32u"; }
             static constexpr const char * programText()
             {
@@ -375,7 +375,7 @@ namespace internals
 
         struct DivCRev_32u : public PtrValPtr<uint32_t>
         {
-            static constexpr const Func id() { return Func::DivCRev_32u; }
+            static constexpr Func id() { return Func::DivCRev_32u; }
             static constexpr const char * programName() { return "divCRev_32u"; }
             static constexpr const char * programText()
             {
@@ -389,7 +389,7 @@ namespace internals
 
         struct Add_64s : public PtrPtrPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::Add_64s; }
+            static constexpr Func id() { return Func::Add_64s; }
             static constexpr const char * programName() { return "add_64s"; }
             static constexpr const char * programText()
             {
@@ -401,7 +401,7 @@ namespace internals
 
         struct Sub_64s : public PtrPtrPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::Sub_64s; }
+            static constexpr Func id() { return Func::Sub_64s; }
             static constexpr const char * programName() { return "sub_64s"; }
             static constexpr const char * programText()
             {
@@ -413,7 +413,7 @@ namespace internals
 
         struct Mul_64s : public PtrPtrPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::Mul_64s; }
+            static constexpr Func id() { return Func::Mul_64s; }
             static constexpr const char * programName() { return "mul_64s"; }
             static constexpr const char * programText()
             {
@@ -425,7 +425,7 @@ namespace internals
 
         struct Div_64s : public PtrPtrPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::Div_64s; }
+            static constexpr Func id() { return Func::Div_64s; }
             static constexpr const char * programName() { return "div_64s"; }
             static constexpr const char * programText()
             {
@@ -437,7 +437,7 @@ namespace internals
 
         struct AddC_64s : public PtrValPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::AddC_64s; }
+            static constexpr Func id() { return Func::AddC_64s; }
             static constexpr const char * programName() { return "addC_64s"; }
             static constexpr const char * programText()
             {
@@ -449,7 +449,7 @@ namespace internals
 
         struct SubC_64s : public PtrValPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::SubC_64s; }
+            static constexpr Func id() { return Func::SubC_64s; }
             static constexpr const char * programName() { return "subC_64s"; }
             static constexpr const char * programText()
             {
@@ -461,7 +461,7 @@ namespace internals
 
         struct SubCRev_64s : public PtrValPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::SubCRev_64s; }
+            static constexpr Func id() { return Func::SubCRev_64s; }
             static constexpr const char * programName() { return "subCRev_64s"; }
             static constexpr const char * programText()
             {
@@ -473,7 +473,7 @@ namespace internals
 
         struct MulC_64s : public PtrValPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::MulC_64s; }
+            static constexpr Func id() { return Func::MulC_64s; }
             static constexpr const char * programName() { return "mulC_64s"; }
             static constexpr const char * programText()
             {
@@ -485,7 +485,7 @@ namespace internals
 
         struct DivC_64s : public PtrValPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::DivC_64s; }
+            static constexpr Func id() { return Func::DivC_64s; }
             static constexpr const char * programName() { return "divC_64s"; }
             static constexpr const char * programText()
             {
@@ -497,7 +497,7 @@ namespace internals
 
         struct DivCRev_64s : public PtrValPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::DivCRev_64s; }
+            static constexpr Func id() { return Func::DivCRev_64s; }
             static constexpr const char * programName() { return "divCRev_64s"; }
             static constexpr const char * programText()
             {
@@ -509,7 +509,7 @@ namespace internals
 
         struct Abs_64s : public PtrValPtr<int64_t>
         {
-            static constexpr const Func id() { return Func::Abs_64s; }
+            static constexpr Func id() { return Func::Abs_64s; }
             static constexpr const char * programName() { return "abs_64s"; }
             static constexpr const char * programText()
             {
@@ -531,7 +531,7 @@ namespace internals
 
         struct Add_64u : public PtrPtrPtr<uint64_t>
         {
-            static constexpr const Func id() { return Func::Add_64u; }
+            static constexpr Func id() { return Func::Add_64u; }
             static constexpr const char * programName() { return "add_64u"; }
             static constexpr const char * programText()
             {
@@ -543,7 +543,7 @@ namespace internals
 
         struct Sub_64u : public PtrPtrPtr<uint64_t>
         {
-            static constexpr const Func id() { return Func::Sub_64u; }
+            static constexpr Func id() { return Func::Sub_64u; }
             static constexpr const char * programName() { return "sub_64u"; }
             static constexpr const char * programText()
             {
@@ -555,7 +555,7 @@ namespace internals
 
         struct Mul_64u : public PtrPtrPtr<uint64_t>
         {
-            static constexpr const Func id() { return Func::Mul_64u; }
+            static constexpr Func id() { return Func::Mul_64u; }
             static constexpr const char * programName() { return "mul_64u"; }
             static constexpr const char * programText()
             {
@@ -567,7 +567,7 @@ namespace internals
 
         struct Div_64u : public PtrPtrPtr<uint64_t>
         {
-            static constexpr const Func id() { return Func::Div_64u; }
+            static constexpr Func id() { return Func::Div_64u; }
             static constexpr const char * programName() { return "div_64u"; }
             static constexpr const char * programText()
             {
@@ -579,7 +579,7 @@ namespace internals
 
         struct AddC_64u : public PtrValPtr<uint64_t>
         {
-            static constexpr const Func id() { return Func::AddC_64u; }
+            static constexpr Func id() { return Func::AddC_64u; }
             static constexpr const char * programName() { return "addC_64u"; }
             static constexpr const char * programText()
             {
@@ -591,7 +591,7 @@ namespace internals
 
         struct SubC_64u : public PtrValPtr<uint64_t>
         {
-            static constexpr const Func id() { return Func::SubC_64u; }
+            static constexpr Func id() { return Func::SubC_64u; }
             static constexpr const char * programName() { return "subC_64u"; }
             static constexpr const char * programText()
             {
@@ -603,7 +603,7 @@ namespace internals
 
         struct SubCRev_64u : public PtrValPtr<uint64_t>
         {
-            static constexpr const Func id() { return Func::SubCRev_64u; }
+            static constexpr Func id() { return Func::SubCRev_64u; }
             static constexpr const char * programName() { return "subCRev_64u"; }
             static constexpr const char * programText()
             {
@@ -615,7 +615,7 @@ namespace internals
 
         struct MulC_64u : public PtrValPtr<uint64_t>
         {
-            static constexpr const Func id() { return Func::MulC_64u; }
+            static constexpr Func id() { return Func::MulC_64u; }
             static constexpr const char * programName() { return "mulC_64u"; }
             static constexpr const char * programText()
             {
@@ -627,7 +627,7 @@ namespace internals
 
         struct DivC_64u : public PtrValPtr<uint64_t>
         {
-            static constexpr const Func id() { return Func::DivC_64u; }
+            static constexpr Func id() { return Func::DivC_64u; }
             static constexpr const char * programName() { return "divC_64u"; }
             static constexpr const char * programText()
             {
@@ -639,7 +639,7 @@ namespace internals
 
         struct DivCRev_64u : public PtrValPtr<uint64_t>
         {
-            static constexpr const Func id() { return Func::DivCRev_64u; }
+            static constexpr Func id() { return Func::DivCRev_64u; }
             static constexpr const char * programName() { return "divCRev_64u"; }
             static constexpr const char * programText()
             {
@@ -653,7 +653,7 @@ namespace internals
 
         struct Add_32f : public PtrPtrPtr<float>
         {
-            static constexpr const Func id() { return Func::Add_32f; }
+            static constexpr Func id() { return Func::Add_32f; }
             static constexpr const char * programName() { return "add_32f"; }
             static constexpr const char * programText()
             {
@@ -665,7 +665,7 @@ namespace internals
 
         struct Sub_32f : public PtrPtrPtr<float>
         {
-            static constexpr const Func id() { return Func::Sub_32f; }
+            static constexpr Func id() { return Func::Sub_32f; }
             static constexpr const char * programName() { return "sub_32f"; }
             static constexpr const char * programText()
             {
@@ -677,7 +677,7 @@ namespace internals
 
         struct Mul_32f : public PtrPtrPtr<float>
         {
-            static constexpr const Func id() { return Func::Mul_32f; }
+            static constexpr Func id() { return Func::Mul_32f; }
             static constexpr const char * programName() { return "mul_32f"; }
             static constexpr const char * programText()
             {
@@ -689,7 +689,7 @@ namespace internals
 
         struct Div_32f : public PtrPtrPtr<float>
         {
-            static constexpr const Func id() { return Func::Div_32f; }
+            static constexpr Func id() { return Func::Div_32f; }
             static constexpr const char * programName() { return "div_32f"; }
             static constexpr const char * programText()
             {
@@ -701,7 +701,7 @@ namespace internals
 
         struct AddC_32f : public PtrValPtr<float>
         {
-            static constexpr const Func id() { return Func::AddC_32f; }
+            static constexpr Func id() { return Func::AddC_32f; }
             static constexpr const char * programName() { return "addC_32f"; }
             static constexpr const char * programText()
             {
@@ -713,7 +713,7 @@ namespace internals
 
         struct SubC_32f : public PtrValPtr<float>
         {
-            static constexpr const Func id() { return Func::SubC_32f; }
+            static constexpr Func id() { return Func::SubC_32f; }
             static constexpr const char * programName() { return "subC_32f"; }
             static constexpr const char * programText()
             {
@@ -725,7 +725,7 @@ namespace internals
 
         struct SubCRev_32f : public PtrValPtr<float>
         {
-            static constexpr const Func id() { return Func::SubCRev_32f; }
+            static constexpr Func id() { return Func::SubCRev_32f; }
             static constexpr const char * programName() { return "subCRev_32f"; }
             static constexpr const char * programText()
             {
@@ -737,7 +737,7 @@ namespace internals
 
         struct MulC_32f : public PtrValPtr<float>
         {
-            static constexpr const Func id() { return Func::MulC_32f; }
+            static constexpr Func id() { return Func::MulC_32f; }
             static constexpr const char * programName() { return "mulC_32f"; }
             static constexpr const char * programText()
             {
@@ -749,7 +749,7 @@ namespace internals
 
         struct DivC_32f : public PtrValPtr<float>
         {
-            static constexpr const Func id() { return Func::DivC_32f; }
+            static constexpr Func id() { return Func::DivC_32f; }
             static constexpr const char * programName() { return "divC_32f"; }
             static constexpr const char * programText()
             {
@@ -761,7 +761,7 @@ namespace internals
 
         struct DivCRev_32f : public PtrValPtr<float>
         {
-            static constexpr const Func id() { return Func::DivCRev_32f; }
+            static constexpr Func id() { return Func::DivCRev_32f; }
             static constexpr const char * programName() { return "divCRev_32f"; }
             static constexpr const char * programText()
             {
@@ -773,7 +773,7 @@ namespace internals
 
         struct Abs_32f : public PtrValPtr<float>
         {
-            static constexpr const Func id() { return Func::Abs_32f; }
+            static constexpr Func id() { return Func::Abs_32f; }
             static constexpr const char * programName() { return "abs_32f"; }
             static constexpr const char * programText()
             {
@@ -795,7 +795,7 @@ namespace internals
 
         struct Add_64f : public PtrPtrPtr<double>
         {
-            static constexpr const Func id() { return Func::Add_64f; }
+            static constexpr Func id() { return Func::Add_64f; }
             static constexpr const char * programName() { return "add_64f"; }
             static constexpr const char * programText()
             {
@@ -807,7 +807,7 @@ namespace internals
 
         struct Sub_64f : public PtrPtrPtr<double>
         {
-            static constexpr const Func id() { return Func::Sub_64f; }
+            static constexpr Func id() { return Func::Sub_64f; }
             static constexpr const char * programName() { return "sub_64f"; }
             static constexpr const char * programText()
             {
@@ -819,7 +819,7 @@ namespace internals
 
         struct Mul_64f : public PtrPtrPtr<double>
         {
-            static constexpr const Func id() { return Func::Mul_64f; }
+            static constexpr Func id() { return Func::Mul_64f; }
             static constexpr const char * programName() { return "mul_64f"; }
             static constexpr const char * programText()
             {
@@ -831,7 +831,7 @@ namespace internals
 
         struct Div_64f : public PtrPtrPtr<double>
         {
-            static constexpr const Func id() { return Func::Div_64f; }
+            static constexpr Func id() { return Func::Div_64f; }
             static constexpr const char * programName() { return "div_64f"; }
             static constexpr const char * programText()
             {
@@ -843,7 +843,7 @@ namespace internals
 
         struct AddC_64f : public PtrValPtr<double>
         {
-            static constexpr const Func id() { return Func::AddC_64f; }
+            static constexpr Func id() { return Func::AddC_64f; }
             static constexpr const char * programName() { return "addC_64f"; }
             static constexpr const char * programText()
             {
@@ -855,7 +855,7 @@ namespace internals
 
         struct SubC_64f : public PtrValPtr<double>
         {
-            static constexpr const Func id() { return Func::SubC_64f; }
+            static constexpr Func id() { return Func::SubC_64f; }
             static constexpr const char * programName() { return "subC_64f"; }
             static constexpr const char * programText()
             {
@@ -867,7 +867,7 @@ namespace internals
 
         struct SubCRev_64f : public PtrValPtr<double>
         {
-            static constexpr const Func id() { return Func::SubCRev_64f; }
+            static constexpr Func id() { return Func::SubCRev_64f; }
             static constexpr const char * programName() { return "subCRev_64f"; }
             static constexpr const char * programText()
             {
@@ -879,7 +879,7 @@ namespace internals
 
         struct MulC_64f : public PtrValPtr<double>
         {
-            static constexpr const Func id() { return Func::MulC_64f; }
+            static constexpr Func id() { return Func::MulC_64f; }
             static constexpr const char * programName() { return "mulC_64f"; }
             static constexpr const char * programText()
             {
@@ -891,7 +891,7 @@ namespace internals
 
         struct DivC_64f : public PtrValPtr<double>
         {
-            static constexpr const Func id() { return Func::DivC_64f; }
+            static constexpr Func id() { return Func::DivC_64f; }
             static constexpr const char * programName() { return "divC_64f"; }
             static constexpr const char * programText()
             {
@@ -903,7 +903,7 @@ namespace internals
 
         struct DivCRev_64f : public PtrValPtr<double>
         {
-            static constexpr const Func id() { return Func::DivCRev_64f; }
+            static constexpr Func id() { return Func::DivCRev_64f; }
             static constexpr const char * programName() { return "divCRev_64f"; }
             static constexpr const char * programText()
             {
@@ -915,7 +915,7 @@ namespace internals
 
         struct Abs_64f : public PtrValPtr<double>
         {
-            static constexpr const Func id() { return Func::Abs_64f; }
+            static constexpr Func id() { return Func::Abs_64f; }
             static constexpr const char * programName() { return "abs_64f"; }
             static constexpr const char * programText()
             {
