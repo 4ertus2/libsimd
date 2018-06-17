@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <cstdint>
+#include <limits>
 
 #include "simd.h"
 #include "compare.h"
@@ -124,7 +125,7 @@ void test_abs(unsigned length = 47)
 
     for (int i = 0; i < (int)length; ++i)
     {
-        if (v[i] < 0)
+        if (v[i] < 0 && v[i] != std::numeric_limits<T>::min())
             FAIL();
     }
 }
