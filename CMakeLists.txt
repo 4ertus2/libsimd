@@ -51,7 +51,7 @@ if(IPP_DIR)
     set_target_properties(simdipp PROPERTIES COMPILE_FLAGS "-DDEPRECATED")
 endif()
 
-if(OCL)
+if(SIMD_OPENCL)
     include_directories(/opt/intel/opencl/include)
     link_directories(/opt/intel/opencl)
     add_library(simdocl STATIC ocl.cpp)
