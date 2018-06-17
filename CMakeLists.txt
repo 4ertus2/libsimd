@@ -52,10 +52,15 @@ if(IPP_DIR)
 endif()
 
 if(SIMD_OPENCL)
-    include_directories(/opt/intel/opencl/include)
-    link_directories(/opt/intel/opencl)
+    set (ENV{INTELOCLSDKROOT} /opt/intel/opencl)
+    find_package(OpenCL)
+    include_directories(${OpenCL_INCLUDE_DIR})
+    if (NOT ${OpenCL_LIBRARY}) # cmake can't find intel OpenCL
+        link_directories(/opt/intel/opencl)
+        set (OpenCL_LIBRARY OpenCL)
+    endif ()
     add_library(simdocl STATIC ocl.cpp)
-    target_link_libraries(simdocl OpenCL)
+    target_link_libraries(simdocl ${OpenCL_LIBRARY})
 endif()
 
 add_subdirectory(test)
