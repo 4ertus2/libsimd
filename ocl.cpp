@@ -344,68 +344,591 @@ namespace internals
     template <typename _KernelT, typename _T>
     void execKernel(const _T * pSrc1, const _T * pSrc2, _T * pDst, int len)
     {
-        internals::SimdOpenCl::getInstance().exec<_KernelT>(pSrc1, pSrc2, pDst, len);
+        SimdOpenCl::getInstance().exec<_KernelT>(pSrc1, pSrc2, pDst, len);
     }
 
     template <typename _KernelT, typename _T>
     void execKernel(const _T * pSrc, _T val, _T * pDst, int len)
     {
-        internals::SimdOpenCl::getInstance().exec<_KernelT>(pSrc, val, pDst, len);
+        SimdOpenCl::getInstance().exec<_KernelT>(pSrc, val, pDst, len);
     }
 
 } // internals
 
 namespace arithmetic
 {
-    template <typename _T>
-    void regFuncs()
+    // int8_t
+
+    _SIMD_OCL_SPEC void addC(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
     {
-        const _T * pSrc = nullptr;
-        const _T * pSrc1 = nullptr;
-        const _T * pSrc2 = nullptr;
-        _T val(0);
-        _T * pDst = nullptr;
-        int len = 0;
-
-        internals::execKernel<internals::Kernel::Add<_T>>(pSrc1, pSrc2, pDst, len);
-        internals::execKernel<internals::Kernel::Sub<_T>>(pSrc1, pSrc2, pDst, len);
-        internals::execKernel<internals::Kernel::Mul<_T>>(pSrc1, pSrc2, pDst, len);
-        internals::execKernel<internals::Kernel::Div<_T>>(pSrc1, pSrc2, pDst, len);
-
-        internals::execKernel<internals::Kernel::AddC<_T>>(pSrc, val, pDst, len);
-        internals::execKernel<internals::Kernel::SubC<_T>>(pSrc, val, pDst, len);
-        internals::execKernel<internals::Kernel::MulC<_T>>(pSrc, val, pDst, len);
-        internals::execKernel<internals::Kernel::DivC<_T>>(pSrc, val, pDst, len);
-        internals::execKernel<internals::Kernel::SubCRev<_T>>(pSrc, val, pDst, len);
-        internals::execKernel<internals::Kernel::DivCRev<_T>>(pSrc, val, pDst, len);
+        internals::execKernel<internals::Kernel::AddC<int8_t>>(pSrc, val, pDst, len);
     }
 
-    void registerFunctions()
+    _SIMD_OCL_SPEC void subC(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
     {
-        regFuncs<int8_t>();
-        regFuncs<uint8_t>();
-        regFuncs<int16_t>();
-        regFuncs<uint16_t>();
-        regFuncs<int32_t>();
-        regFuncs<uint32_t>();
-        regFuncs<int64_t>();
-        regFuncs<uint64_t>();
-        regFuncs<float>();
-        regFuncs<double>();
+        internals::execKernel<internals::Kernel::SubC<int8_t>>(pSrc, val, pDst, len);
+    }
 
-        int len = 0;
-        int8_t i8 = 0;
-        int16_t i16 = 0;
-        int32_t i32 = 0;
-        int64_t i64 = 0;
-        float f32 = 0;
-        double f64 = 0;
-        internals::execKernel<internals::Kernel::Abs<int8_t>>((const int8_t*)&i8, i8, &i8, len);
-        internals::execKernel<internals::Kernel::Abs<int16_t>>((const int16_t*)&i16, i16, &i16, len);
-        internals::execKernel<internals::Kernel::Abs<int32_t>>((const int32_t*)&i32, i32, &i32, len);
-        internals::execKernel<internals::Kernel::Abs<int64_t>>((const int64_t*)&i64, i64, &i64, len);
-        internals::execKernel<internals::Kernel::Abs<float>>((const float*)&f32, f32, &f32, len);
-        internals::execKernel<internals::Kernel::Abs<double>>((const double*)&f64, f64, &f64, len);
+    _SIMD_OCL_SPEC void mulC(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::MulC<int8_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivC<int8_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubCRev<int8_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const int8_t * pSrc, int8_t val, int8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivCRev<int8_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const int8_t * pSrc1, const int8_t * pSrc2, int8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Add<int8_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const int8_t * pSrc1, const int8_t * pSrc2, int8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Sub<int8_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const int8_t * pSrc1, const int8_t * pSrc2, int8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Mul<int8_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const int8_t * pSrc1, const int8_t * pSrc2, int8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Div<int8_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const int8_t * pSrc, int8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Abs<int8_t>>(pSrc, int8_t(0), pDst, len);
+    }
+
+    // uint16_t
+
+    _SIMD_OCL_SPEC void addC(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::AddC<uint8_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubC<uint8_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::MulC<uint8_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivC<uint8_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubCRev<uint8_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const uint8_t * pSrc, uint8_t val, uint8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivCRev<uint8_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Add<uint8_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Sub<uint8_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Mul<uint8_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const uint8_t * pSrc1, const uint8_t * pSrc2, uint8_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Div<uint8_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const uint8_t * pSrc, uint8_t * pDst, int len)
+    {
+        if (pSrc != pDst)
+            copy(pSrc, pDst, len);
+    }
+
+    // int16_t
+
+    _SIMD_OCL_SPEC void addC(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::AddC<int16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubC<int16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::MulC<int16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivC<int16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubCRev<int16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const int16_t * pSrc, int16_t val, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivCRev<int16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Add<int16_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Sub<int16_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Mul<int16_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const int16_t * pSrc1, const int16_t * pSrc2, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Div<int16_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const int16_t * pSrc, int16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Abs<int16_t>>(pSrc, int16_t(0), pDst, len);
+    }
+
+    // uint16_t
+
+    _SIMD_OCL_SPEC void addC(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::AddC<uint16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubC<uint16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::MulC<uint16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivC<uint16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubCRev<uint16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const uint16_t * pSrc, uint16_t val, uint16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivCRev<uint16_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Add<uint16_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Sub<uint16_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Mul<uint16_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const uint16_t * pSrc1, const uint16_t * pSrc2, uint16_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Div<uint16_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const uint16_t * pSrc, uint16_t * pDst, int len)
+    {
+        if (pSrc != pDst)
+            copy(pSrc, pDst, len);
+    }
+
+    // int32_t
+
+    _SIMD_OCL_SPEC void addC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::AddC<int32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubC<int32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::MulC<int32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivC<int32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubCRev<int32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const int32_t * pSrc, int32_t val, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivCRev<int32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Add<int32_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Sub<int32_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Mul<int32_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const int32_t * pSrc1, const int32_t * pSrc2, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Div<int32_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const int32_t * pSrc, int32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Abs<int32_t>>(pSrc, 0, pDst, len);
+    }
+
+    // uint32_t
+
+    _SIMD_OCL_SPEC void addC(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::AddC<uint32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubC<uint32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::MulC<uint32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivC<uint32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubCRev<uint32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const uint32_t * pSrc, uint32_t val, uint32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivCRev<uint32_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const uint32_t * pSrc1, const uint32_t * pSrc2, uint32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Add<uint32_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const uint32_t * pSrc1, const uint32_t * pSrc2, uint32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Sub<uint32_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const uint32_t * pSrc1, const uint32_t * pSrc2, uint32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Mul<uint32_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const uint32_t * pSrc1, const uint32_t * pSrc2, uint32_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Div<uint32_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const uint32_t * pSrc, uint32_t * pDst, int len)
+    {
+        if (pSrc != pDst)
+            copy(pSrc, pDst, len);
+    }
+
+    // int64_t
+
+    _SIMD_OCL_SPEC void addC(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::AddC<int64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubC<int64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::MulC<int64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivC<int64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubCRev<int64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const int64_t * pSrc, int64_t val, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivCRev<int64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Add<int64_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Sub<int64_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Mul<int64_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const int64_t * pSrc1, const int64_t * pSrc2, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Div<int64_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const int64_t * pSrc, int64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Abs<int64_t>>(pSrc, 0l, pDst, len);
+    }
+
+    // uint64_t
+
+    _SIMD_OCL_SPEC void addC(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::AddC<uint64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubC<uint64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::MulC<uint64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivC<uint64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubCRev<uint64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const uint64_t * pSrc, uint64_t val, uint64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivCRev<uint64_t>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const uint64_t * pSrc1, const uint64_t * pSrc2, uint64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Add<uint64_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const uint64_t * pSrc1, const uint64_t * pSrc2, uint64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Sub<uint64_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const uint64_t * pSrc1, const uint64_t * pSrc2, uint64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Mul<uint64_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const uint64_t * pSrc1, const uint64_t * pSrc2, uint64_t * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Div<uint64_t>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const uint64_t * pSrc, uint64_t * pDst, int len)
+    {
+        if (pSrc != pDst)
+            copy(pSrc, pDst, len);
+    }
+
+    // float
+
+    _SIMD_OCL_SPEC void addC(const float * pSrc, float val, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::AddC<float>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const float * pSrc, float val, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubC<float>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const float * pSrc, float val, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::MulC<float>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const float * pSrc, float val, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivC<float>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const float * pSrc, float val, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubCRev<float>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const float * pSrc, float val, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivCRev<float>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Add<float>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Sub<float>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Mul<float>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const float * pSrc1, const float * pSrc2, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Div<float>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const float * pSrc, float * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Abs<float>>(pSrc, 0.0f, pDst, len);
+    }
+
+    // double
+
+    _SIMD_OCL_SPEC void addC(const double * pSrc, double val, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::AddC<double>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subC(const double * pSrc, double val, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubC<double>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mulC(const double * pSrc, double val, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::MulC<double>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divC(const double * pSrc, double val, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivC<double>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void subCRev(const double * pSrc, double val, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::SubCRev<double>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void divCRev(const double * pSrc, double val, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::DivCRev<double>>(pSrc, val, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void add(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Add<double>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void sub(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Sub<double>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void mul(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Mul<double>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void div(const double * pSrc1, const double * pSrc2, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Div<double>>(pSrc1, pSrc2, pDst, len);
+    }
+
+    _SIMD_OCL_SPEC void abs(const double * pSrc, double * pDst, int len)
+    {
+        internals::execKernel<internals::Kernel::Abs<double>>(pSrc, 0.0, pDst, len);
     }
 }
 
