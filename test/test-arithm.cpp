@@ -177,11 +177,12 @@ int main()
             test_arithm<int16_t>(len, 2, 1, allowTrash);
             test_arithm<uint16_t>(len, 2, 1, allowTrash);
             test_abs<int16_t>(len);
+            test_abs<int8_t>(len);
         }
 #endif
     }
     catch (const simd::Exception& ex) {
-        std::cerr << ex.file() << ":" << ex.line() << " " << ex.what() << std::endl;
+        std::cerr << ex.file() << ":" << ex.line() << " (" << ex.code() << ") " << ex.what() << std::endl;
         return 1;
     }
     catch (const Exception& ex)

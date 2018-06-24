@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cmath>
 #include <exception>
+#include <string>
 
 namespace simd
 {
@@ -9,18 +10,25 @@ namespace simd
     class Exception : public std::exception
     {
     public:
-        Exception(const char * file, uint32_t line, const char * func)
-        :   file_(file), line_(line), function_(func)
+        Exception(const char * file, uint32_t line, const char * func, int32_t err = 0)
+        :   file_(file), line_(line), function_(func), errorCode_(err)
         {}
 
-        const char * what() const noexcept { return function_; }
+        Exception(const char * file, uint32_t line, const char * func, int32_t err, const char * msg)
+        :   file_(file), line_(line), function_(func), errorCode_(err), what_(msg)
+        {}
+
+        const char * what() const noexcept { return what_.c_str(); }
         const char * file() const noexcept { return file_; }
         uint32_t line() const noexcept { return line_; }
+        int32_t code() const noexcept { return errorCode_; }
 
     private:
         const char * file_;
         uint32_t line_;
         const char * function_;
+        int32_t errorCode_;
+        std::string what_;
     };
 }
 
