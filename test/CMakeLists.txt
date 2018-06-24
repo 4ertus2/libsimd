@@ -50,7 +50,7 @@ set_target_properties(test-arithm-avx-a32 PROPERTIES COMPILE_FLAGS "-DSIMD_AVX -
 set_target_properties(test-arithm-avx-moredata PROPERTIES COMPILE_FLAGS "-DSIMD_AVX -DMORE_DATA")
 endif(AVX)
 
-if(OCL)
+if(SIMD_OPENCL)
 add_executable(info-ocl opencl_info.cpp)
 add_executable(test-arithm-ocl test-arithm.cpp)
 add_executable(test-arithm-ocl-moredata test-arithm.cpp)
@@ -107,7 +107,7 @@ add_test(arithm-avx-a32 test-arithm-avx-a32)
 add_test(arithm-avx-1m  test-arithm-avx-moredata)
 endif()
 
-if(OCL)
+if(SIMD_OPENCL)
 add_test(arithm-ocl     test-arithm-ocl)
 add_test(arithm-ocl-1m  test-arithm-ocl-moredata)
 endif()
